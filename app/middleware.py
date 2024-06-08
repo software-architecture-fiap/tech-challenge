@@ -4,8 +4,7 @@ from aioredis import from_url, Redis
 import time
 import logging
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+from .logging_config import logger
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, redis_url: str, rate_limit: int, rate_limit_period: int):
@@ -17,7 +16,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         if not self.redis:
-            self.redis = from_url(self.redis_url, decode_responses=True)
+            self.redis = await from_url(self.redis_url, decode_responses=True)
         
         ip = request.client.host
         key = f"ratelimit:{ip}"
@@ -29,7 +28,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             logger.info(f"Handling request from IP: {ip} at time: {current_time}")
 
             # Remove outdated requests
-            logger.info(f"Removing outdated requests for key: {key} from {start_time} to {current_time}")
             removed = await self.redis.zremrangebyscore(key, 0, start_time)
             logger.info(f"Removed {removed} outdated requests for key: {key}")
 
@@ -45,7 +43,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 )
 
             # Add current request
-            logger.info(f"Adding request at time {current_time} for key {key}")
             added = await self.redis.zadd(key, {current_time: current_time})
             logger.info(f"Added {added} requests at time {current_time} for key {key}")
 
@@ -53,6 +50,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             logger.info(f"Set expiration for key {key}: {expiration_set}")
 
             response = await call_next(request)
+            logger.info(f"Request handled successfully for IP: {ip}")
             return response
 
         except Exception as e:

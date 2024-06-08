@@ -1,17 +1,20 @@
-from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from .. import database, schemas, security, crud
+from .. import crud, schemas, security
+from ..database import get_db
+from datetime import timedelta
+from fastapi.security import OAuth2PasswordRequestForm
+from ..logging_config import logger
 
 router = APIRouter()
 
 @router.post("/token", response_model=schemas.Token)
-def login_for_access_token(db: Session = Depends(database.get_db), form_data: OAuth2PasswordRequestForm = Depends()):
-    user = security.authenticate_user(db, form_data.username, form_data.password)
-    if not user:
+def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
+    user = crud.get_user_by_email(db, email=form_data.username)
+    if not user or not security.verify_password(form_data.password, user.hashed_password):
+        logger.warning(f"Login failed for user: {form_data.username}")
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=400,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
@@ -19,5 +22,5 @@ def login_for_access_token(db: Session = Depends(database.get_db), form_data: OA
     access_token = security.create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
-    crud.create_token(db, access_token, user.id)
+    logger.info(f"Token created for user ID: {user.id}")
     return {"access_token": access_token, "token_type": "bearer"}

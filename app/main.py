@@ -5,11 +5,14 @@ from .routers import customer, product, order, auth
 from .security import get_current_user
 from . import schemas
 from .middleware import RateLimitMiddleware
+from .logging_config import logger
 
 # Criando todas as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+logger.info("Application startup")
 
 # Configuração do CORS
 origins = [
@@ -26,8 +29,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Implementar RateLimitMiddleware para proteger a rota de token
-#app.add_middleware(RateLimitMiddleware, redis_url="redis://localhost:2000/token", rate_limit=3, rate_limit_period=60)
+# Adicionar RateLimitMiddleware para proteger a rota de token
+app.add_middleware(RateLimitMiddleware, redis_url="/token", rate_limit=10, rate_limit_period=60)
 
 # Incluindo os roteadores
 app.include_router(auth.router)
@@ -37,8 +40,10 @@ app.include_router(order.router, prefix="/orders", tags=["orders"])
 
 @app.get("/")
 def read_root():
+    logger.info("Root endpoint accessed")
     return {"message": "Welcome to the food ordering system!"}
 
 @app.get("/users/me", response_model=schemas.Customer)
 def read_users_me(current_user: schemas.Customer = Depends(get_current_user)):
+    logger.info(f"User endpoint accessed by {current_user.id}")
     return current_user

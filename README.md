@@ -123,7 +123,7 @@ A documentação interativa da API está disponível em `localhost:2000/docs`.
 
 Foi criado mas ainda não implementado um middleware para limitar as solicitações de um mesmo IP para o endpoint de token. Este middleware usa Redis para rastrear e limitar as solicitações:
 
-- Limite de 3 solicitações por minuto por IP.
+- Limite de 10 solicitações por minuto por IP.
 - Mensagem de erro personalizada quando o limite é atingido.
 
 ### Contribuição

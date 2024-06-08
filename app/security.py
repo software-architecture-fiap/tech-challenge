@@ -8,6 +8,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from . import schemas, models, crud, database
+from .logging_config import logger
 
 load_dotenv()
 
@@ -22,9 +23,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def verify_password(plain_password, hashed_password):
+    logger.debug(f"Verifying password for user")
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password):
+    logger.debug(f"Hashing password")
     return pwd_context.hash(password)
 
 def authenticate_user(db: Session, username: str, password: str):
