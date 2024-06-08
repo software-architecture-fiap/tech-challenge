@@ -1,0 +1,159 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyo
+*.pyd
+
+# Environment
+venv/
+.env
+.venv/
+env/
+ENV/
+env.bak/
+*.env
+*.local
+
+# Pytest
+.cache/
+*.cache
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Coverage
+.coverage
+coverage.*
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath
+*.sage.py
+
+# Environments
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env*.local
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+docs/build/
+
+# PyBuilder
+target/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Pyre type checker
+.pyre/
+
+# fastapi
+*.log
+docker-compose.override.yml
+
+# Database
+*.db
+
+# Visual Studio Code
+.vscode/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+helm
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Windows image file caches
+*.stackdump
+
+# Folder config file
+*.directory
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Cloud drive metadata
+*.sync
+
+# Temporary files
+*.temp
+*.tmp
+*.swp
+*.swo
+*.swn
+*~
+*.bak
+*.backup
+*.orig
+*.save
+
+# Backup files
+*.bak
+*.backup
+*.swp
+*.swo
+*.tmp
+*.temp
+*~
+version/
+versions/
