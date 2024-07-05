@@ -7,6 +7,8 @@ services:
       POSTGRES_PASSWORD: mypassword
     ports:
       - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
 
   web:
     build: .
@@ -15,4 +17,10 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgresql://myuser:mypassword@localhost:5432/mydb
+      DATABASE_URL: postgresql://myuser:mypassword@db:5432/mydb
+    volumes:
+      - logs:/app/logs
+
+volumes:
+  db-data:
+  logs:
