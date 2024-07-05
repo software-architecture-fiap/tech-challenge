@@ -3,26 +3,8 @@ from sqlalchemy.orm import Session
 from ..model import models, schemas
 from . import security
 from jose import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from ..tools.logging import logger
-
-def get_user_by_email(db: Session, email: str):
-    logger.info(f"Fetching user with email: {email}")
-    return db.query(models.Customer).filter(models.Customer.email == email).first()
-
-def get_customers_count(db: Session):
-    logger.info("Fetching total count of customers")
-    return db.query(models.Customer).count()
-
-def create_user(db: Session, user: schemas.CustomerCreate):
-    logger.info(f"Creating user with email: {user.email}")
-    hashed_password = security.get_password_hash(user.password)
-    db_user = models.Customer(name=user.name, email=user.email, cpf=user.cpf, hashed_password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    logger.info(f"User created with ID: {db_user.id}")
-    return db_user
 
 def create_token(db: Session, token: str, user_id: int):
     logger.info(f"Creating token for user ID: {user_id}")
@@ -57,11 +39,31 @@ def is_token_used(db: Session, token: str):
 def create_access_token(data: dict, expires_delta: timedelta):
     logger.info("Creating access token")
     to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
+    expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, security.SECRET_KEY, algorithm=security.ALGORITHM)
     logger.info("Access token created")
     return encoded_jwt
+
+
+def get_user_by_email(db: Session, email: str):
+    logger.info(f"Fetching user with email: {email}")
+    return db.query(models.Customer).filter(models.Customer.email == email).first()
+
+def create_user(db: Session, user: schemas.CustomerCreate):
+    logger.info(f"Creating user with email: {user.email}")
+    hashed_password = security.get_password_hash(user.password)
+    db_user = models.Customer(name=user.name, email=user.email, cpf=user.cpf, hashed_password=hashed_password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    logger.info(f"User created with ID: {db_user.id}")
+    return db_user
+
+
+def get_customers_count(db: Session):
+    logger.info("Fetching total count of customers")
+    return db.query(models.Customer).count()
 
 def get_customer(db: Session, customer_id: int):
     logger.info(f"Fetching customer with ID: {customer_id}")
@@ -80,6 +82,7 @@ def create_customer(db: Session, customer: schemas.CustomerCreate):
     logger.info(f"Customer created with ID: {db_customer.id}")
     return db_customer
 
+
 def get_product(db: Session, product_id: int):
     logger.info(f"Fetching product with ID: {product_id}")
     return db.query(models.Product).filter(models.Product.id == product_id).first()
@@ -96,6 +99,7 @@ def create_product(db: Session, product: schemas.ProductCreate):
     db.refresh(db_product)
     logger.info(f"Product created with ID: {db_product.id}")
     return db_product
+
 
 def get_order(db: Session, order_id: int):
     logger.info(f"Fetching order with ID: {order_id}")

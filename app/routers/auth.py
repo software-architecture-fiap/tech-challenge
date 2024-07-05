@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from ..services import security
 
 from ..model import schemas
-from ..services import crud
+from ..services import repository
 from ..db.database import get_db
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordRequestForm
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.post("/token", response_model=schemas.Token)
 def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
-    user = crud.get_user_by_email(db, email=form_data.username)
+    user = repository.get_user_by_email(db, email=form_data.username)
     if not user or not security.verify_password(form_data.password, user.hashed_password):
         logger.warning(f"Login failed for user: {form_data.username}")
         raise HTTPException(

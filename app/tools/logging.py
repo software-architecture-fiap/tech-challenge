@@ -21,4 +21,5 @@ logging.basicConfig(
     ]
 )
 
+logging.getLogger("passlib.registry").setLevel(logging.WARNING)
 logger = logging.getLogger("Application")

@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from ..model import models, schemas
 
 from ..db import database
-from . import crud
+from . import repository
 from ..tools.logging import logger
 
 load_dotenv()
@@ -35,7 +35,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 def authenticate_user(db: Session, username: str, password: str):
-    user = crud.get_user_by_email(db, email=username)
+    user = repository.get_user_by_email(db, email=username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -66,14 +66,14 @@ def get_current_user(db: Session = Depends(database.get_db), token: str = Depend
     except JWTError:
         raise credentials_exception
 
-    if crud.is_token_used(db, token):
+    if repository.is_token_used(db, token):
         raise HTTPException(status_code=401, detail="Token has already been used")
 
-    user = crud.get_user_by_email(db, email=username)
+    user = repository.get_user_by_email(db, email=username)
     if user is None:
         raise credentials_exception
     
     # Mark the token as used after it's validated
-    crud.mark_token_as_used(db, token)
+    repository.mark_token_as_used(db, token)
 
     return user
