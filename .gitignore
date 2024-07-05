@@ -146,6 +146,7 @@ $RECYCLE.BIN/
 *.backup
 *.orig
 *.save
+directory_tree.md
 
 # Backup files
 *.bak

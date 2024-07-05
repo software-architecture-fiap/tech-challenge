@@ -4,7 +4,7 @@ from aioredis import from_url, Redis
 import time
 import logging
 
-from .logging_config import logger
+from ..tools.logging import logger
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, redis_url: str, rate_limit: int, rate_limit_period: int):

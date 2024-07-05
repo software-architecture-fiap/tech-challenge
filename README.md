@@ -82,6 +82,13 @@ source venv/bin/activate  # Linux/macOS
 pip install -r requirements.txt
 ```
 
+- Execute as migrações do Alembic para criar o banco de dados e as tabelas necessárias:
+
+    ```sh
+    alembic revision --autogenerate -m 'initial migration'
+    alembic upgrade head
+    ```
+
 ### Executando a Aplicação
 
 **Com Docker:**
@@ -100,7 +107,7 @@ A aplicação estará disponível em `localhost:2000`.
 Execute o servidor FastAPI:
 
 ```sh
-uvicorn app.main:app --host 0.0.0.0 --port 2000
+uvicorn app.main:app --host 0.0.0.0 --port 2000 --reload
 ```
 
 A aplicação estará disponível em `localhost:2000`.

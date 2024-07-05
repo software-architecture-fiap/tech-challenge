@@ -42,7 +42,7 @@ class OrderBase(BaseModel):
     status: str
 
 class OrderCreate(OrderBase):
-    pass
+    products: List[int]
 
 class Order(OrderBase):
     id: int

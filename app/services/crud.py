@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session
-from . import models, schemas, security
+
+from ..model import models, schemas
+from . import security
 from jose import jwt
 from datetime import datetime, timedelta
-from .logging_config import logger
+from ..tools.logging import logger
 
 def get_user_by_email(db: Session, email: str):
     logger.info(f"Fetching user with email: {email}")
@@ -109,5 +111,9 @@ def create_order(db: Session, order: schemas.OrderCreate):
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
+    for product_id in order.products:
+        db_order_product = models.OrderProduct(order_id=db_order.id, product_id=product_id)
+        db.add(db_order_product)
     logger.info(f"Order created with ID: {db_order.id}")
+    db.commit()
     return db_order

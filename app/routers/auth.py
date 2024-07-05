@@ -1,10 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from .. import crud, schemas, security
-from ..database import get_db
+
+from ..services import security
+
+from ..model import schemas
+from ..services import crud
+from ..db.database import get_db
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordRequestForm
-from ..logging_config import logger
+from ..tools.logging import logger
 
 router = APIRouter()
 

@@ -1,9 +1,11 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from .. import crud, schemas
-from ..database import get_db
-from ..logging_config import logger
+
+from ..model import schemas
+from ..services import crud
+from ..db.database import get_db
+from ..tools.logging import logger
 
 router = APIRouter()
 

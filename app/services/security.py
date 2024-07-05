@@ -7,8 +7,12 @@ from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from . import schemas, models, crud, database
-from .logging_config import logger
+
+from ..model import models, schemas
+
+from ..db import database
+from . import crud
+from ..tools.logging import logger
 
 load_dotenv()
 

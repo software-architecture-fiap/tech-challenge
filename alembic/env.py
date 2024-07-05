@@ -8,8 +8,8 @@ import sys
 # Adiciona o caminho do diretório raiz do projeto ao sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from app.database import Base
-from app.models import Customer
+from app.db.database import Base
+from app.model.models import Customer
 
 # Carrega variáveis de ambiente do .env
 from dotenv import load_dotenv
