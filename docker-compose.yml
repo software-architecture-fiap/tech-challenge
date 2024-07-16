@@ -13,7 +13,7 @@ services:
   web:
     build: .
     ports:
-      - "2000:8000"
+      - "2000:2000"
     depends_on:
       - db
     environment:
