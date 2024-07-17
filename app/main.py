@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from .db.database import engine, Base
+from .db.database import engine, Base, SessionLocal
 from .routers import customer, product, order, auth
-from .services.security import get_current_user
+from .services.security import get_current_user 
+from .services.repository import create_admin_user
 from .model import schemas
 from .middleware import RateLimitMiddleware
 from .tools.logging import logger
@@ -11,7 +12,14 @@ import uvicorn
 # Criando todas as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+def init_admin_user():
+    db = SessionLocal()
+    try:
+        create_admin_user(db)
+    finally:
+        db.close()
+
+app = FastAPI(on_startup=[init_admin_user])
 
 logger.info("Application startup")
 
@@ -31,7 +39,7 @@ app.add_middleware(
 )
 
 # Adicionar RateLimitMiddleware para proteger a rota de token
-#app.add_middleware(RateLimitMiddleware, redis_url="/token", rate_limit=10, rate_limit_period=60)
+# app.add_middleware(RateLimitMiddleware, redis_url="/token", rate_limit=10, rate_limit_period=60)
 
 # Incluindo os roteadores
 app.include_router(auth.router)

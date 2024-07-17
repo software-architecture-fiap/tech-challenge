@@ -2,9 +2,14 @@ from sqlalchemy.orm import Session
 
 from ..model import models, schemas
 from . import security
+from ..db.database import SessionLocal
 from jose import jwt
 from datetime import datetime, timedelta, timezone
 from ..tools.logging import logger
+import os
+from dotenv import load_dotenv as env
+
+env()
 
 def create_token(db: Session, token: str, user_id: int):
     logger.info(f"Creating token for user ID: {user_id}")
@@ -60,6 +65,48 @@ def create_user(db: Session, user: schemas.CustomerCreate):
     logger.info(f"User created with ID: {db_user.id}")
     return db_user
 
+def create_admin_user(db: Session, user: schemas.CustomerCreate):
+    logger.info(f"Creating user with email: {user.email}")
+    hashed_password = security.get_password_hash(user.password)
+    db_user = models.Customer(name=user.name, email=user.email, cpf=user.cpf, hashed_password=hashed_password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    logger.info(f"User created with ID: {db_user.id}")
+    return db_user
+
+def create_admin_user(db: Session):
+    try:
+        admin_email = os.getenv("ADMIN_EMAIL")
+        admin_password = os.getenv("ADMIN_PASSWORD")
+        admin_cpf = os.getenv("ADMIN_CPF")
+        admin_name = os.getenv("ADMIN_NAME")
+
+        if not all([admin_email, admin_password, admin_cpf, admin_name]):
+            logger.error("Admin user details are not set in environment variables.")
+            return
+
+        logger.info(f"Admin email: {admin_email}, Admin name: {admin_name}")
+
+        # Check if the user already exists
+        user = db.query(models.Customer).filter(models.Customer.email == admin_email).first()
+        if not user:
+            # Create new admin user
+            hashed_password = security.get_password_hash(admin_password)
+            admin_user = models.Customer(
+                name=admin_name,
+                email=admin_email,
+                cpf=admin_cpf,
+                hashed_password=hashed_password
+            )
+            db.add(admin_user)
+            db.commit()
+            db.refresh(admin_user)
+            logger.info(f"Admin user created with email: {admin_email}")
+        else:
+            logger.info(f"Admin user already exists with email: {admin_email}")
+    except Exception as e:
+        logger.error(f"Error creating admin user: {e}")
 
 def get_customers_count(db: Session):
     logger.info("Fetching total count of customers")
