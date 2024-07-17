@@ -64,6 +64,11 @@ GRANT ALL PRIVILEGES ON DATABASE mydb TO myuser;
 ```bash
 DATABASE_URL=postgresql://myuser:mypassword@localhost:5432/mydb
 SECRET_KEY=mySecurePassword
+ADMIN_NAME=Admin User
+ADMIN_EMAIL=email@email.com.br
+ADMIN_CPF=00000000000
+ADMIN_PASSWORD=your_password
+
 ```
 
 ### Instalando Dependências
