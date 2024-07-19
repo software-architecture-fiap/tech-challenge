@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-
+from typing import List, Dict
 from ..model import models, schemas
 from . import security
 from ..db.database import SessionLocal
@@ -129,6 +129,13 @@ def create_customer(db: Session, customer: schemas.CustomerCreate):
     logger.info(f"Customer created with ID: {db_customer.id}")
     return db_customer
 
+def categorize_products(products: List[schemas.Product]) -> Dict[str, List[schemas.Product]]:
+    categorized_products = {}
+    for product in products:
+        if product.category not in categorized_products:
+            categorized_products[product.category] = []
+        categorized_products[product.category].append(product)
+    return categorized_products
 
 def get_product(db: Session, product_id: int):
     logger.info(f"Fetching product with ID: {product_id}")
