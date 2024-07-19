@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Float, Text, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime, timezone
 from ..db.database import Base
 
 class Customer(Base):
@@ -10,6 +11,8 @@ class Customer(Base):
     email = Column(String, unique=True, index=True)
     cpf = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    
+    orders = relationship("Order", back_populates="customer")
 
 class Product(Base):
     __tablename__ = "products"
@@ -24,17 +27,41 @@ class Order(Base):
     __tablename__ = "orders"
     
     id = Column(Integer, primary_key=True, index=True)
-    customer_id = Column(Integer, ForeignKey("customers.id"))
-    status = Column(String, index=True)
-    products = relationship("OrderProduct", back_populates="order")
+    status = Column(String, index=True, default="created")
+    user_agent = Column(String)
+    ip_address = Column(String)
+    os = Column(String)
+    browser = Column(String)
+    device = Column(String)
+    comments = Column(Text)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    customer_id = Column(Integer, ForeignKey('customers.id'))
+    customer = relationship("Customer", back_populates="orders")
+    order_items = relationship("OrderItem", back_populates="order")
+    order_products = relationship("OrderProduct", back_populates="order")
+
+class OrderItem(Base):
+    __tablename__ = "order_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey('orders.id'))
+    product_id = Column(Integer, ForeignKey('products.id'))
+    comment = Column(String)
+
+    order = relationship("Order", back_populates="order_items")
+    product = relationship("Product")
 
 class OrderProduct(Base):
     __tablename__ = "order_products"
-    
+
     id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(Integer, ForeignKey("orders.id"))
-    product_id = Column(Integer, ForeignKey("products.id"))
-    order = relationship("Order", back_populates="products")
+    order_id = Column(Integer, ForeignKey('orders.id'))
+    product_id = Column(Integer, ForeignKey('products.id'))
+    comment = Column(Text)
+
+    order = relationship("Order", back_populates="order_products")
     product = relationship("Product")
 
 class Token(Base):

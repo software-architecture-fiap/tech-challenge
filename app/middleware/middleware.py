@@ -1,10 +1,13 @@
 from fastapi import Request, HTTPException
+from starlette.requests import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from aioredis import from_url, Redis
 import time
 import logging
 
 from ..tools.logging import logger
+
+logger = logging.getLogger("Application")
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, redis_url: str, rate_limit: int, rate_limit_period: int):
@@ -59,3 +62,14 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 status_code=500,
                 detail="Internal server error"
             )
+
+
+class ExceptionLoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        try:
+            response = await call_next(request)
+            return response
+        except Exception as e:
+            logger.error(f"Unhandled error: {e}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal Server Error")
+

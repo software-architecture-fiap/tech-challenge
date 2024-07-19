@@ -14,7 +14,7 @@ log_filepath = os.path.join(log_directory, log_filename)
 # Configuração do logger
 logging.basicConfig(
     level=logging.DEBUG,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    format="%(asctime)s -  %(filename)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.FileHandler(log_filepath),
         logging.StreamHandler()

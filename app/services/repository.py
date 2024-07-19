@@ -1,8 +1,8 @@
+import logging
 from sqlalchemy.orm import Session
 from typing import List, Dict
 from ..model import models, schemas
 from . import security
-from ..db.database import SessionLocal
 from jose import jwt
 from datetime import datetime, timedelta, timezone
 from ..tools.logging import logger
@@ -10,6 +10,7 @@ import os
 from dotenv import load_dotenv as env
 
 env()
+logger = logging.getLogger("Application")
 
 def create_token(db: Session, token: str, user_id: int):
     logger.info(f"Creating token for user ID: {user_id}")
@@ -50,22 +51,11 @@ def create_access_token(data: dict, expires_delta: timedelta):
     logger.info("Access token created")
     return encoded_jwt
 
-
 def get_user_by_email(db: Session, email: str):
     logger.info(f"Fetching user with email: {email}")
     return db.query(models.Customer).filter(models.Customer.email == email).first()
 
 def create_user(db: Session, user: schemas.CustomerCreate):
-    logger.info(f"Creating user with email: {user.email}")
-    hashed_password = security.get_password_hash(user.password)
-    db_user = models.Customer(name=user.name, email=user.email, cpf=user.cpf, hashed_password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    logger.info(f"User created with ID: {db_user.id}")
-    return db_user
-
-def create_admin_user(db: Session, user: schemas.CustomerCreate):
     logger.info(f"Creating user with email: {user.email}")
     hashed_password = security.get_password_hash(user.password)
     db_user = models.Customer(name=user.name, email=user.email, cpf=user.cpf, hashed_password=hashed_password)
@@ -175,24 +165,72 @@ def delete_product(db: Session, product_id: int):
         logger.warning(f"Product not found: ID {product_id}")
     return db_product
 
+def create_order(db: Session, order: schemas.OrderCreate):
+    logger.info(f"Creating order for customer ID: {order.customer_id}")
+    try:
+        db_order = models.Order(
+            status=order.status,
+            user_agent=order.user_agent,
+            ip_address=order.ip_address,
+            os=order.os,
+            browser=order.browser,
+            device=order.device,
+            comments=order.comments,
+            customer_id=order.customer_id,
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc)
+        )
+        db.add(db_order)
+        db.commit()
+        db.refresh(db_order)
+        logger.info(f"Order created with ID: {db_order.id}")
 
-def get_order(db: Session, order_id: int):
-    logger.info(f"Fetching order with ID: {order_id}")
-    return db.query(models.Order).filter(models.Order.id == order_id).first()
+        for product in order.products:
+            db_order_product = models.OrderProduct(
+                order_id=db_order.id,
+                product_id=product.product_id,
+                comment=product.comment
+            )
+            db.add(db_order_product)
+            db.commit()
+            db.refresh(db_order_product)
+            logger.info(f"Product {db_order_product.product_id} added to order {db_order.id}")
+
+        return db_order
+    except Exception as e:
+        logger.error(f"Error creating order: {e}", exc_info=True)
+        raise
+
+def update_order_status(db: Session, order_id: int, status: str):
+    try:
+        db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
+        if db_order:
+            db_order.status = status
+            db_order.updated_at = datetime.now(timezone.utc)
+            db.commit()
+            db.refresh(db_order)
+            logger.info(f"Order ID {db_order.id} status updated to {status}")
+        return db_order
+    except Exception as e:
+        logger.error(f"Error updating order status: {e}", exc_info=True)
+        raise
 
 def get_orders(db: Session, skip: int = 0, limit: int = 10):
     logger.info(f"Fetching orders with skip: {skip}, limit: {limit}")
-    return db.query(models.Order).offset(skip).limit(limit).all()
+    try:
+        orders = db.query(models.Order).offset(skip).limit(limit).all()
+        logger.info(f"Orders fetched successfully")
+        return orders
+    except Exception as e:
+        logger.error(f"Error fetching orders: {e}", exc_info=True)
+        raise
 
-def create_order(db: Session, order: schemas.OrderCreate):
-    logger.info(f"Creating order for customer ID: {order.customer_id}")
-    db_order = models.Order(customer_id=order.customer_id, status=order.status)
-    db.add(db_order)
-    db.commit()
-    db.refresh(db_order)
-    for product_id in order.products:
-        db_order_product = models.OrderProduct(order_id=db_order.id, product_id=product_id)
-        db.add(db_order_product)
-    logger.info(f"Order created with ID: {db_order.id}")
-    db.commit()
-    return db_order
+def get_order(db: Session, order_id: int):
+    logger.info(f"Fetching order with ID: {order_id}")
+    try:
+        order = db.query(models.Order).filter(models.Order.id == order_id).first()
+        logger.info(f"Order fetched successfully")
+        return order
+    except Exception as e:
+        logger.error(f"Error fetching order: {e}", exc_info=True)
+        raise

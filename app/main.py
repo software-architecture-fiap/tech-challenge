@@ -7,7 +7,7 @@ from .services.repository import create_admin_user
 from .model import schemas
 from .tools.initialize_db import initialize_db
 from .tools.logging import logger
-from .middleware import RateLimitMiddleware
+from .middleware import RateLimitMiddleware, ExceptionLoggingMiddleware
 import uvicorn
 
 # Criando todas as tabelas no banco de dados
@@ -44,6 +44,7 @@ app.add_middleware(
 # app.add_middleware(RateLimitMiddleware, redis_url="/token", rate_limit=10, rate_limit_period=60)
 
 # Incluindo os roteadores
+app.add_middleware(ExceptionLoggingMiddleware)
 app.include_router(auth.router)
 app.include_router(customer.router, prefix="/customers", tags=["customers"])
 app.include_router(product.router, prefix="/products", tags=["products"])

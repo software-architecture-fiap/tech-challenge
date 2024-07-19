@@ -1,35 +1,70 @@
 from fastapi import APIRouter, Depends, HTTPException
-from typing import List
+from typing import List, Dict
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-
-from ..services import security
-
+from ..services import security, repository
+from ..db.database import get_db
 from ..model import schemas
-
-from ..db import database
-from ..services import repository
+from ..tools.logging import logger
 
 router = APIRouter()
 
 @router.post("/", response_model=schemas.Order)
-def create_order(order: schemas.OrderCreate, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
-    return repository.create_order(db=db, order=order)
+def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+    logger.info("Create order endpoint called")
+    try:
+        db_order = repository.create_order(db=db, order=order)
+        logger.info("Order created successfully")
+        return db_order
+    except Exception as e:
+        logger.error(f"Error creating order: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.get("/", response_model=List[schemas.Order])
-def read_orders(skip: int = 0, limit: int = 10, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
-    orders = repository.get_orders(db, skip=skip, limit=limit)
-    return orders
+@router.put("/{order_id}/status", response_model=schemas.Order)
+def update_order_status(order_id: int, update_data: schemas.UpdateOrderStatus, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+    logger.info(f"Update order status endpoint called for order ID: {order_id} with status: {update_data.status}")
+    try:
+        db_order = repository.update_order_status(db, order_id=order_id, status=update_data.status)
+        if db_order is None:
+            logger.warning(f"Order not found: {order_id}")
+            raise HTTPException(status_code=404, detail="Order not found")
+        logger.info(f"Order ID {order_id} status updated to {update_data.status}")
+        return db_order
+    except Exception as e:
+        logger.error(f"Error updating order status: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+@router.get("/", response_model=Dict[str, List[schemas.Order]])
+def read_orders(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+    logger.info("Read orders endpoint called")
+    try:
+        orders = repository.get_orders(db, skip=skip, limit=limit)
+        logger.info("Orders fetched successfully")
+        return {"orders": orders}
+    except Exception as e:
+        logger.error(f"Error fetching orders: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.get("/{order_id}", response_model=schemas.Order)
-def read_order(order_id: int, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
-    db_order = repository.get_order(db, order_id=order_id)
-    if db_order is None:
-        raise HTTPException(status_code=404, detail="Order not found")
-    return db_order
+def read_order(order_id: int, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+    logger.info(f"Read order endpoint called for order_id: {order_id}")
+    try:
+        db_order = repository.get_order(db, order_id=order_id)
+        if db_order is None:
+            logger.warning(f"Order not found: {order_id}")
+            raise HTTPException(status_code=404, detail="Order not found")
+        logger.info(f"Order fetched successfully for order_id: {order_id}")
+        return db_order
+    except Exception as e:
+        logger.error(f"Error fetching order: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.post("/checkout", response_model=schemas.Order)
-def fake_checkout(order: schemas.OrderCreate, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
-    db_order = create_order(db=db, order=order)
-    return db_order
+def fake_checkout(order: schemas.OrderCreate, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+    logger.info("Fake checkout endpoint called")
+    try:
+        db_order = repository.create_order(db=db, order=order)
+        logger.info("Checkout order created successfully")
+        return db_order
+    except Exception as e:
+        logger.error(f"Error during fake checkout: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
