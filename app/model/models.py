@@ -41,6 +41,7 @@ class Order(Base):
     customer = relationship("Customer", back_populates="orders")
     order_items = relationship("OrderItem", back_populates="order")
     order_products = relationship("OrderProduct", back_populates="order")
+    tracking = relationship("Tracking", back_populates="order")
 
 class OrderItem(Base):
     __tablename__ = "order_items"
@@ -63,6 +64,16 @@ class OrderProduct(Base):
 
     order = relationship("Order", back_populates="order_products")
     product = relationship("Product")
+
+class Tracking(Base):
+    __tablename__ = "tracking"
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey('orders.id'))
+    status = Column(String, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    order = relationship("Order", back_populates="tracking")
 
 class Token(Base):
     __tablename__ = "tokens"

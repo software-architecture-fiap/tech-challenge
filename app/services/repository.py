@@ -195,6 +195,8 @@ def create_order(db: Session, order: schemas.OrderCreate):
             db.commit()
             db.refresh(db_order_product)
             logger.info(f"Product {db_order_product.product_id} added to order {db_order.id}")
+            
+        create_tracking(db, db_order.id, db_order.status)
 
         return db_order
     except Exception as e:
@@ -210,10 +212,29 @@ def update_order_status(db: Session, order_id: int, status: str):
             db.commit()
             db.refresh(db_order)
             logger.info(f"Order ID {db_order.id} status updated to {status}")
+            create_tracking(db, db_order.id, status)
         return db_order
     except Exception as e:
         logger.error(f"Error updating order status: {e}", exc_info=True)
         raise
+
+def create_tracking(db: Session, order_id: int, status: str):
+    logger.info(f"Creating tracking entry for order ID: {order_id} with status: {status}")
+    try:
+        db_tracking = models.Tracking(
+            order_id=order_id,
+            status=status,
+            created_at=datetime.now(timezone.utc)
+        )
+        db.add(db_tracking)
+        db.commit()
+        db.refresh(db_tracking)
+        logger.info(f"Tracking entry created with ID: {db_tracking.id}")
+        return db_tracking
+    except Exception as e:
+        logger.error(f"Error updating order status: {e}", exc_info=True)
+        raise 
+
 
 def get_orders(db: Session, skip: int = 0, limit: int = 10):
     logger.info(f"Fetching orders with skip: {skip}, limit: {limit}")

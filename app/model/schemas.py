@@ -20,6 +20,7 @@ class Customer(CustomerBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    customer_id: int
 
 class TokenData(BaseModel):
     username: Optional[str] = None
@@ -63,15 +64,6 @@ class OrderProduct(OrderProductBase):
     class Config:
         orm_mode = True
 
-class OrderBase(BaseModel):
-    status: str
-    user_agent: str
-    ip_address: str
-    os: str
-    browser: str
-    device: str
-    comments: Optional[str] = None
-
 class OrderCreate(OrderBase):
     customer_id: int
     products: List[OrderProductCreate]
@@ -81,11 +73,34 @@ class Order(OrderBase):
     customer_id: int
     created_at: datetime
     updated_at: datetime
-    order_products: List[OrderProduct]
+    order_products: List[OrderProduct] = []
+    class Config:
+        orm_mode = True
 
+class OrderResponse(BaseModel):
+    id: int
+    customer_id: int
+    class Config:
+        orm_mode = True
+
+class OrderCustomerView(BaseModel):
+    id: int
+    customer_id: int
+    status: str
+    class Config:
+        orm_mode = True
+
+class TrackingCreate(BaseModel):
+    status: str
+    order_id: int
+
+class Tracking(BaseModel):
+    id: int
+    order_id: int
+    status: str
+    created_at: datetime
     class Config:
         orm_mode = True
 
 class UpdateOrderStatus(BaseModel):
     status: str
-    

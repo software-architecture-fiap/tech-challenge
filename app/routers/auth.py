@@ -27,4 +27,4 @@ def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2Passw
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     logger.info(f"Token created for user ID: {user.id}")
-    return {"access_token": f'bearer {access_token}', "token_type": "bearer"}
+    return {"token_type":"Bearer", "access_token": f'bearer {access_token}', "customer_id": user.id}
