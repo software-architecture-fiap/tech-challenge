@@ -5,8 +5,9 @@ from .routers import customer, product, order, auth
 from .services.security import get_current_user 
 from .services.repository import create_admin_user
 from .model import schemas
-from .middleware import RateLimitMiddleware
+from .tools.initialize_db import initialize_db
 from .tools.logging import logger
+from .middleware import RateLimitMiddleware
 import uvicorn
 
 # Criando todas as tabelas no banco de dados
@@ -16,6 +17,7 @@ def init_admin_user():
     db = SessionLocal()
     try:
         create_admin_user(db)
+        initialize_db(db)
     finally:
         db.close()
 

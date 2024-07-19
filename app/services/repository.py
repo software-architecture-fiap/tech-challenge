@@ -147,6 +147,27 @@ def create_product(db: Session, product: schemas.ProductCreate):
     logger.info(f"Product created with ID: {db_product.id}")
     return db_product
 
+def update_product(db: Session, db_product: models.Product, product: schemas.ProductCreate):
+    logger.info(f"Updating product with name: {product.name}")
+    db_product.name = product.name
+    db_product.description = product.description
+    db_product.price = product.price
+    db_product.category = product.category
+    db.commit()
+    db.refresh(db_product)
+    logger.info(f"Product updated with ID: {db_product.id}")
+    return db_product
+
+def delete_product(db: Session, product_id: int):
+    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if db_product:
+        db.delete(db_product)
+        db.commit()
+        logger.info(f"Product deleted: {db_product.name} - Category: {db_product.category}")
+    else:
+        logger.warning(f"Product not found: ID {product_id}")
+    return db_product
+
 
 def get_order(db: Session, order_id: int):
     logger.info(f"Fetching order with ID: {order_id}")
