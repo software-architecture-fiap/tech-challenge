@@ -93,5 +93,7 @@ extra:
       lang: pt-BR
 nav:
   - Home: "index.md"
-  - DDD: "ddd.md"
+  - Documentação:
+    - DDD: "ddd.md"
+    - Event Storming: "event-storming.md"
   - Testando Aplicação: "testando.md"
