@@ -1,5 +1,7 @@
 ## :fontawesome-solid-poo-storm: Event Storming
 
+Esse é o board do Figma que usamos para o Event Storming.
+
 <iframe 
     style="border: 1px solid rgba(0, 0, 0, 0.1);" 
     width="800" 
