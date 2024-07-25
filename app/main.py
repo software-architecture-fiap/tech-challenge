@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_redoc_html
 from .db.database import engine, Base, SessionLocal
 from .routers import customer, product, order, auth
 from .services.security import get_current_user 
@@ -59,6 +60,15 @@ def read_root():
 def read_users_me(current_user: schemas.Customer = Depends(get_current_user)):
     logger.info(f"User endpoint accessed by {current_user.id}")
     return current_user
+
+# Adiciona a rota para a documentação do ReDoc
+@app.get("/redoc", include_in_schema=False)
+async def redoc():
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - ReDoc",
+        redoc_js_url="https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js",
+    )
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="127.0.0.1", port=2000, reload=True)

@@ -51,6 +51,7 @@ def create_access_token(data: dict, expires_delta: timedelta):
     logger.info("Access token created")
     return encoded_jwt
 
+
 def get_user_by_email(db: Session, email: str):
     logger.info(f"Fetching user with email: {email}")
     return db.query(models.Customer).filter(models.Customer.email == email).first()
@@ -64,6 +65,25 @@ def create_user(db: Session, user: schemas.CustomerCreate):
     db.refresh(db_user)
     logger.info(f"User created with ID: {db_user.id}")
     return db_user
+
+def create_anonymous_customer(db: Session):
+    logger.info("Creating anonymous customer")
+    anonymous_customer = models.Customer(
+        name="Anonymous",
+        email=None,
+        cpf=None,
+        hashed_password=None
+    )
+    db.add(anonymous_customer)
+    db.commit()
+    db.refresh(anonymous_customer)
+    logger.info(f"Anonymous customer created with ID: {anonymous_customer.id}")
+    return anonymous_customer
+
+
+def get_customer_by_cpf(db: Session, cpf: str):
+    logger.info(f"Fetching customer with CPF: {cpf}")
+    return db.query(models.Customer).filter(models.Customer.cpf == cpf).first()
 
 def create_admin_user(db: Session):
     try:

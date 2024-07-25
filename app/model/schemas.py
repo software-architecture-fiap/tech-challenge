@@ -3,18 +3,21 @@ from datetime import datetime
 from typing import List, Optional
 
 class CustomerBase(BaseModel):
-    name: str
-    email: str
+    name: Optional[str] = None
+    email: Optional[str] = None
+    cpf: Optional[str] = None
 
 class CustomerCreate(CustomerBase):
-    cpf: str
-    password: str
+    password: Optional[str] = None
 
 class Customer(CustomerBase):
     id: int
     
     class Config:
         from_attributes = True
+
+class CPFIdentify(BaseModel):
+    cpf: str
 
 
 class Token(BaseModel):
