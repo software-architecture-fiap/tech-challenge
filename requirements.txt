@@ -56,3 +56,7 @@ websockets
 zipp
 aioredis
 fastapi-limiter
+mkdocs-material
+mkdocstrings
+mkdocstrings-python
+mkdocs-glightbox
