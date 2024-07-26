@@ -1,6 +1,10 @@
 # Challenge 1
 
-Este projeto é um sistema de pedidos de lanches adaptável para web e mobile, focado no backend. A aplicação é desenvolvida utilizando FastAPI, SQLAlchemy, e Docker.
+Este projeto é um sistema de pedidos de lanches adaptável para web e mobile, focado no backend.
+A aplicação é desenvolvida utilizando FastAPI, SQLAlchemy, e Docker.
+
+Você irá encontrar todos os Passos do Nosso Projeto na nossa
+[Plataforma de Documentação](https://software-architecture-fiap.github.io/tech-challenge/).
 
 ## Pré-requisitos
 
