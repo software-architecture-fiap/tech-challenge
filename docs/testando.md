@@ -25,8 +25,8 @@ _É importante que os desenhos sigam os padrões utilizados na explicação._
 2. Uma Aplicação para todo o sistema de backend (monolito) que deverá ser desenvolvido seguindo os padrões apresentados
 nas aulas:
 
-    1. [X] Utilizando Arquitetura Hexagonal
-    2. [X] API’s
+    - [X] Utilizando Arquitetura Hexagonal
+    - [X] API’s
         - [X] Cadastro do Cliente: Pode ser feito com ou sem cpf;
         - [X] Com cpf: Pode ser feito pela Rota [Create Customer](http://localhost:2000/docs#/customers/create_customer_customers_admin_post)
         - [X] Sem cpf: Pode ser feito pela Rota [Create Anonymous Customer](http://localhost:2000/docs#/customers/create_anonymous_customer_customers_anonymous_post)
@@ -35,5 +35,18 @@ nas aulas:
         - [ ] Buscar Produtos por Categoria
         - [ ] Fake Checkout: apenas enviar os produtos escolhidos para a fila. O checkout é a finalização do pedido.
         - [ ] Listar os Pedidos
-    3. [X] Banco de Dados à sua Escolha: Escolhemos o Postgres.
+    - [X] Banco de Dados à sua Escolha: Escolhemos o Postgres.
         - Inicialmente, deveremos trabalhar e organizar a fila dos pedidos apenas em um banco de dados.
+
+### Entregável 3
+
+3. [X] A aplicação deve ser entregue com um Dockerfile configurado para executá-la corretamente, e um docker-compose.yaml para subir o ambiente completo.
+
+    - [X] Disponibilizar também o Swagger para consumo dessas APIs.
+
+Para validação da POC, temos a seguinte limitação de infraestrutura:
+
+- [X] 1 instância para banco de dados
+- [X] 1 instância para executar a aplicação
+
+Não será necessário o desenvolvimento de interfaces para o frontend, o foco deve ser total no backend.
