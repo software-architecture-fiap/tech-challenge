@@ -1,6 +1,6 @@
 # Testando Aplicação no Swagger
 
-Essa página irá mostrar para os nossos orientadores o processo completo de fazer os testes no nosso backend. Seguiremos
+Essa página irá mostrar para os nossos orientadores, o processo completo de fazer os testes no nosso backend. Seguiremos
 as etapas definidas no desafio.
 
 ## Entregáveis
@@ -49,4 +49,4 @@ Para validação da POC, temos a seguinte limitação de infraestrutura:
 - [X] 1 instância para banco de dados
 - [X] 1 instância para executar a aplicação
 
-Não será necessário o desenvolvimento de interfaces para o frontend, o foco deve ser total no backend.
+_Não será necessário o desenvolvimento de interfaces para o frontend, o foco deve ser total no backend._
