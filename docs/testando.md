@@ -15,7 +15,7 @@ módulo de DDD, e utilizando a linguagem ubíqua, dos seguintes fluxos:
 
 _É importante que os desenhos sigam os padrões utilizados na explicação._
 
-#### Links das Entregas
+Links das Entregas
 
 - Documentação do Sistema [(DDD)](https://software-architecture-fiap.github.io/tech-challenge/ddd/)   
 - Com [Event Storming](https://software-architecture-fiap.github.io/tech-challenge/event-storming/)
