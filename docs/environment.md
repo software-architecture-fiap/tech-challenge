@@ -1,17 +1,17 @@
-# Challenge 1
+# Preparando Ambiente
 
-Este projeto é um sistema de pedidos de lanches adaptável para web e mobile, focado no backend.
-A aplicação é desenvolvida utilizando FastAPI, SQLAlchemy, e Docker.
+## Challenge 1
 
-Você irá encontrar todos os Passos do Nosso Projeto na nossa
-[Plataforma de Documentação](https://software-architecture-fiap.github.io/tech-challenge/).
+Este projeto é um sistema de pedidos de lanches adaptável para web e mobile, focado no backend. A aplicação é
+desenvolvida utilizando FastAPI, SQLAlchemy, e Docker.
 
-## Pré-requisitos
+## Pré-Requisitos
 
-1. **Sistema Operacional**: O projeto pode ser executado em qualquer sistema operacional que suporte Docker e Python. Recomenda-se um sistema baseado em Unix (Linux ou macOS) para facilitar o uso de Docker.
-2. **Python**: Versão 3.8 ou superior.
-3. **Docker**: Para containerização da aplicação.
-4. **Docker Compose**: Para orquestração dos contêineres Docker.
+1. **Sistema Operacional**: O projeto pode ser executado em qualquer sistema operacional que suporte Docker e Python.
+Recomenda-se um sistema baseado em Unix (Linux ou macOS) para facilitar o uso de Docker;
+2. **Python**: Versão 3.8 ou Superior;
+3. **Docker**: Para Containerização da Aplicação.
+4. **Docker Compose**: Para Orquestração dos Contêineres Docker.
 
 ## Configuração do Ambiente
 
@@ -26,7 +26,7 @@ sudo apt install python3 python3-pip
 
 **Windows**:
 
-- Baixe e instale o Python no [site oficial](https://www.python.org/downloads/).
+- Baixe e instale o Python no [Site Oficial](https://www.python.org/downloads/).
 
 ### Instalação do Docker
 
@@ -85,7 +85,7 @@ source venv/bin/activate  # Linux/macOS
 .\venv\Scripts\activate   # Windows
 ```
 
-- Instale as dependências do projeto:
+- Instale as Dependências do Projeto:
 
 ```sh
 pip install -r requirements.txt
@@ -137,7 +137,8 @@ A documentação interativa da API está disponível em `localhost:2000/docs`.
 
 ### Limitação de Taxa
 
-Foi criado mas ainda não implementado um middleware para limitar as solicitações de um mesmo IP para o endpoint de token. Este middleware usa Redis para rastrear e limitar as solicitações:
+Foi criado mas ainda não implementado um middleware para limitar as solicitações de um mesmo IP para o endpoint de
+token. Este middleware usa Redis para rastrear e limitar as solicitações:
 
 - Limite de 10 solicitações por minuto por IP.
 - Mensagem de erro personalizada quando o limite é atingido.
@@ -146,8 +147,8 @@ Foi criado mas ainda não implementado um middleware para limitar as solicitaç�
 
 Para contribuir com este projeto, siga os passos:
 
-- Fork o repositório.
-- Crie uma nova branch (`git checkout -b feature/nova-funcionalidade`).
-- Commit suas mudanças (`git commit -am 'Adicionei uma nova funcionalidade'`).
-- Push para a branch (`git push origin feature/nova-funcionalidade`).
-- Abra um Pull Request.
+- Fork o repositório;
+- Crie uma nova branch (`git checkout -b feature/nova-funcionalidade`);
+- Commit suas mudanças (`git commit -am 'Adicionei uma nova funcionalidade'`);
+- Push para a branch (`git push origin feature/nova-funcionalidade`);
+- Abra um Pull Request;
