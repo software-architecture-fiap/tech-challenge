@@ -42,7 +42,7 @@ git clone https://github.com/seu-usuario/tech-challenge.git
 cd tech-challenge
 ```
 
-### :material-database-check: Configuração do Banco de Dados
+### :material-database-check: Banco de Dados
 
 1. **Criar Banco de Dados e Usuário no PostgreSQL**:
 
@@ -123,7 +123,7 @@ A aplicação estará disponível em `localhost:2000`.
 
 A documentação interativa da API está disponível em `localhost:2000/docs`.
 
-### E:material-folder: strutura de Arquivos e Funções
+### :material-folder: Estrutura de Arquivos
 
 - `app/main.py`: Ponto de entrada da aplicação.
 - `app/models.py`: Definição dos modelos de dados.
