@@ -1,11 +1,9 @@
 # Preparando Ambiente
 
-## Challenge 1
-
 Este projeto é um sistema de pedidos de lanches adaptável para web e mobile, focado no backend. A aplicação é
 desenvolvida utilizando FastAPI, SQLAlchemy, e Docker.
 
-## Pré-Requisitos
+## :octicons-package-dependencies-16: Pré-Requisitos
 
 1. **Sistema Operacional**: O projeto pode ser executado em qualquer sistema operacional que suporte Docker e Python.
 Recomenda-se um sistema baseado em Unix (Linux ou macOS) para facilitar o uso de Docker;
@@ -13,29 +11,29 @@ Recomenda-se um sistema baseado em Unix (Linux ou macOS) para facilitar o uso de
 3. **Docker**: Para Containerização da Aplicação.
 4. **Docker Compose**: Para Orquestração dos Contêineres Docker.
 
-## Configuração do Ambiente
+## :simple-editorconfig: Configuração do Ambiente
 
-### Instalação do Python
+### :simple-python: Instalação do Python
 
-**Linux/macOS**:
+**:simple-linux: Linux  :simple-apple: macOS**:
 
 ```sh
 sudo apt update
 sudo apt install python3 python3-pip
 ```
 
-**Windows**:
+**:fontawesome-brands-windows: Windows**:
 
 - Baixe e instale o Python no [Site Oficial](https://www.python.org/downloads/).
 
-### Instalação do Docker
+### :simple-docker: Instalação do Docker
 
 Siga as instruções no site oficial do Docker para instalar o Docker e Docker Compose:
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
-### Clonando o Repositório
+### :simple-git: Clonando o Repositório
 
 Clone este repositório para sua máquina local:
 
@@ -44,7 +42,7 @@ git clone https://github.com/seu-usuario/tech-challenge.git
 cd tech-challenge
 ```
 
-### Configuração do Banco de Dados
+### :material-database-check: Configuração do Banco de Dados
 
 1. **Criar Banco de Dados e Usuário no PostgreSQL**:
 
@@ -75,7 +73,7 @@ ADMIN_PASSWORD=your_password
 
 ```
 
-### Instalando Dependências
+### :octicons-terminal-16: Instalando Dependências
 
 - Crie e ative um ambiente virtual (opcional, mas recomendado):
 
@@ -98,7 +96,7 @@ pip install -r requirements.txt
     alembic upgrade head
     ```
 
-### Executando a Aplicação
+### :material-infinity: Executando a Aplicação
 
 **Com Docker:**
 
@@ -121,11 +119,11 @@ uvicorn app.main:app --host 0.0.0.0 --port 2000 --reload
 
 A aplicação estará disponível em `localhost:2000`.
 
-### Documentação da API
+### :simple-swagger: Documentação da API
 
 A documentação interativa da API está disponível em `localhost:2000/docs`.
 
-### Estrutura de Arquivos e Funções
+### E:material-folder: strutura de Arquivos e Funções
 
 - `app/main.py`: Ponto de entrada da aplicação.
 - `app/models.py`: Definição dos modelos de dados.
@@ -135,7 +133,7 @@ A documentação interativa da API está disponível em `localhost:2000/docs`.
 - `app/routers`: Roteadores FastAPI para diferentes endpoints (clientes, produtos, pedidos).
 - `app/middleware.py`: Middleware para limitação de taxa (Rate Limiting).
 
-### Limitação de Taxa
+### :material-car-speed-limiter: Limitação de Taxa
 
 Foi criado mas ainda não implementado um middleware para limitar as solicitações de um mesmo IP para o endpoint de
 token. Este middleware usa Redis para rastrear e limitar as solicitações:
@@ -143,7 +141,7 @@ token. Este middleware usa Redis para rastrear e limitar as solicitações:
 - Limite de 10 solicitações por minuto por IP.
 - Mensagem de erro personalizada quando o limite é atingido.
 
-### Contribuição
+### :material-open-source-initiative: Contribuição
 
 Para contribuir com este projeto, siga os passos:
 

@@ -3,9 +3,9 @@
 Essa página irá mostrar para os nossos orientadores, o processo completo de fazer os testes no nosso backend. Seguiremos
 as etapas definidas no desafio.
 
-## Entregáveis
+## :material-package: Entregáveis
 
-### Entregável 1
+### :material-package-variant-plus: Entregável 1
 
 1. [X] Documentação do sistema (DDD) com Event Storming, incluindo todos os passos/tipos de diagrama mostrados na aula 6 do
 módulo de DDD, e utilizando a linguagem ubíqua, dos seguintes fluxos:
@@ -15,12 +15,12 @@ módulo de DDD, e utilizando a linguagem ubíqua, dos seguintes fluxos:
 
 _É importante que os desenhos sigam os padrões utilizados na explicação._
 
-Links das Entregas
+:octicons-link-16: Links das Entregas
 
 - Documentação do Sistema [(DDD)](https://software-architecture-fiap.github.io/tech-challenge/ddd/)   
 - Com [Event Storming](https://software-architecture-fiap.github.io/tech-challenge/event-storming/)
 
-### Entregável 2
+### :material-package-variant-plus: Entregável 2
 
 2. Uma Aplicação para todo o sistema de backend (monolito) que deverá ser desenvolvido seguindo os padrões apresentados
 nas aulas:
@@ -38,7 +38,7 @@ nas aulas:
     - [X] Banco de Dados à sua Escolha: Escolhemos o Postgres.
         - Inicialmente, deveremos trabalhar e organizar a fila dos pedidos apenas em um banco de dados.
 
-### Entregável 3
+### :material-package-variant-plus: Entregável 3
 
 3. [X] A aplicação deve ser entregue com um Dockerfile configurado para executá-la corretamente, e um docker-compose.yaml para subir o ambiente completo.
 
