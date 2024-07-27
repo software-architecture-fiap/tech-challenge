@@ -15,10 +15,11 @@ módulo de DDD, e utilizando a linguagem ubíqua, dos seguintes fluxos:
 
 _É importante que os desenhos sigam os padrões utilizados na explicação._
 
-:octicons-link-16: Links das Entregas
-
-- Documentação do Sistema [(DDD)](https://software-architecture-fiap.github.io/tech-challenge/ddd/)   
-- Com [Event Storming](https://software-architecture-fiap.github.io/tech-challenge/event-storming/)
+???+ note ":octicons-link-16: Links das Entregas"
+      - [Clique nesse Link](https://software-architecture-fiap.github.io/tech-challenge/ddd/) para visitar a página com a
+      Documentação do DDD.
+      - [Clique nesse Link](https://software-architecture-fiap.github.io/tech-challenge/event-storming/) para visitar a
+      página com o Event Storming feito com Figma.
 
 ### :material-package-variant-plus: Entregável 2
 
@@ -42,7 +43,7 @@ nas aulas:
 
 3. [X] A aplicação deve ser entregue com um Dockerfile configurado para executá-la corretamente, e um docker-compose.yaml para subir o ambiente completo.
 
-    - [X] Disponibilizar também o Swagger para consumo dessas APIs.
+    - [X] Disponibilizar também o [Swagger](http://localhost:2000/docs) para consumo dessas APIs.
 
 Para validação da POC, temos a seguinte limitação de infraestrutura:
 

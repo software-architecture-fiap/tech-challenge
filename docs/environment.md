@@ -44,23 +44,6 @@ cd tech-challenge
 
 ### :material-database-check: Banco de Dados
 
-1. **Criar Banco de Dados e Usuário no PostgreSQL**:
-
-- Acesse o PostgreSQL (certifique-se de que o serviço está em execução).
-
-```sh
-sudo -u postgres psql
-```
-
-- Execute os comandos SQL para criar o banco de dados e o usuário:
-
-```sql
-CREATE DATABASE mydb;
-\c mydb
-CREATE USER myuser WITH ENCRYPTED PASSWORD 'mypassword';
-GRANT ALL PRIVILEGES ON DATABASE mydb TO myuser;
-```
-
 - Crie um arquivo `.env` na raiz do projeto e defina as seguintes variáveis:
 
 ```bash
