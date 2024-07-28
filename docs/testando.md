@@ -32,7 +32,7 @@ nas aulas:
         - [X] Com cpf: Pode ser feito pela Rota [Create Customer](http://localhost:2000/docs#/customers/create_customer_customers_admin_post)
         - [X] Sem cpf: Pode ser feito pela Rota [Create Anonymous Customer](http://localhost:2000/docs#/customers/create_anonymous_customer_customers_anonymous_post)
         - [X] Identificação do Cliente via CPF: Se cadastrado com [Create Customer](http://localhost:2000/docs#/customers/create_customer_customers_admin_post)
-        - [X] [Criar](http://localhost:2000/docs#/products/create_product_products__post), [Editar](http://localhost:2000/docs#/products/update_product_products__product_id__put) e [Remover](http://localhost:2000/docs#/products/delete_product_products__product_id__delete) Produtos: Necessário estar logado com Token;
+        - [X] [Criar](http://localhost:2000/docs#/products/create_product_products__post), [Editar](http://localhost:2000/docs#/products/update_product_products__product_id__put) e [Remover](http://localhost:2000/docs#/products/delete_product_products__product_id__delete) Produtos: Necessário estar logado com Username (e-mail) e Token cadastrado com Admin;
         - [ ] Buscar Produtos por Categoria
         - [ ] Fake Checkout: apenas enviar os produtos escolhidos para a fila. O checkout é a finalização do pedido.
         - [ ] Listar os Pedidos
