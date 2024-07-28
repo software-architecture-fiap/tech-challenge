@@ -1,41 +1,39 @@
-# Challenge 1
+# Preparando Ambiente
 
-Este projeto é um sistema de pedidos de lanches adaptável para web e mobile, focado no backend.
-A aplicação é desenvolvida utilizando FastAPI, SQLAlchemy, e Docker.
+Este projeto é um sistema de pedidos de lanches adaptável para web e mobile, focado no backend. A aplicação é
+desenvolvida utilizando FastAPI, SQLAlchemy, e Docker.
 
-Você irá encontrar todos os Passos do Nosso Projeto na nossa
-[Plataforma de Documentação](https://software-architecture-fiap.github.io/tech-challenge/).
+## :octicons-package-dependencies-16: Pré-Requisitos
 
-## Pré-requisitos
+1. **Sistema Operacional**: O projeto pode ser executado em qualquer sistema operacional que suporte Docker e Python.
+Recomenda-se um sistema baseado em Unix (Linux ou macOS) para facilitar o uso de Docker;
+2. **Python**: Versão 3.8 ou Superior;
+3. **Docker**: Para Containerização da Aplicação.
+4. **Docker Compose**: Para Orquestração dos Contêineres Docker.
 
-1. **Sistema Operacional**: O projeto pode ser executado em qualquer sistema operacional que suporte Docker e Python. Recomenda-se um sistema baseado em Unix (Linux ou macOS) para facilitar o uso de Docker.
-2. **Python**: Versão 3.8 ou superior.
-3. **Docker**: Para containerização da aplicação.
-4. **Docker Compose**: Para orquestração dos contêineres Docker.
+## :simple-editorconfig: Configuração do Ambiente
 
-## Configuração do Ambiente
+### :simple-python: Instalação do Python
 
-### Instalação do Python
-
-**Linux/macOS**:
+**:simple-linux: Linux  :simple-apple: macOS**:
 
 ```sh
 sudo apt update
 sudo apt install python3 python3-pip
 ```
 
-**Windows**:
+**:fontawesome-brands-windows: Windows**:
 
-- Baixe e instale o Python no [site oficial](https://www.python.org/downloads/).
+- Baixe e instale o Python no [Site Oficial](https://www.python.org/downloads/).
 
-### Instalação do Docker
+### :simple-docker: Instalação do Docker
 
 Siga as instruções no site oficial do Docker para instalar o Docker e Docker Compose:
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
-### Clonando o Repositório
+### :simple-git: Clonando o Repositório
 
 Clone este repositório para sua máquina local:
 
@@ -44,24 +42,7 @@ git clone https://github.com/seu-usuario/tech-challenge.git
 cd tech-challenge
 ```
 
-### Configuração do Banco de Dados
-
-1. **Criar Banco de Dados e Usuário no PostgreSQL**:
-
-- Acesse o PostgreSQL (certifique-se de que o serviço está em execução).
-
-```sh
-sudo -u postgres psql
-```
-
-- Execute os comandos SQL para criar o banco de dados e o usuário:
-
-```sql
-CREATE DATABASE mydb;
-\c mydb
-CREATE USER myuser WITH ENCRYPTED PASSWORD 'mypassword';
-GRANT ALL PRIVILEGES ON DATABASE mydb TO myuser;
-```
+### :material-database-check: Banco de Dados
 
 - Crie um arquivo `.env` na raiz do projeto e defina as seguintes variáveis:
 
@@ -75,7 +56,7 @@ ADMIN_PASSWORD=your_password
 
 ```
 
-### Instalando Dependências
+### :octicons-terminal-16: Instalando Dependências
 
 - Crie e ative um ambiente virtual (opcional, mas recomendado):
 
@@ -85,7 +66,7 @@ source venv/bin/activate  # Linux/macOS
 .\venv\Scripts\activate   # Windows
 ```
 
-- Instale as dependências do projeto:
+- Instale as Dependências do Projeto:
 
 ```sh
 pip install -r requirements.txt
@@ -98,7 +79,7 @@ pip install -r requirements.txt
     alembic upgrade head
     ```
 
-### Executando a Aplicação
+### :material-infinity: Executando a Aplicação
 
 **Com Docker:**
 
@@ -121,11 +102,11 @@ uvicorn app.main:app --host 0.0.0.0 --port 2000 --reload
 
 A aplicação estará disponível em `localhost:2000`.
 
-### Documentação da API
+### :simple-swagger: Documentação da API
 
 A documentação interativa da API está disponível em `localhost:2000/docs`.
 
-### Estrutura de Arquivos e Funções
+### :material-folder: Estrutura de Arquivos
 
 - `app/main.py`: Ponto de entrada da aplicação.
 - `app/models.py`: Definição dos modelos de dados.
@@ -135,19 +116,20 @@ A documentação interativa da API está disponível em `localhost:2000/docs`.
 - `app/routers`: Roteadores FastAPI para diferentes endpoints (clientes, produtos, pedidos).
 - `app/middleware.py`: Middleware para limitação de taxa (Rate Limiting).
 
-### Limitação de Taxa
+### :material-car-speed-limiter: Limitação de Taxa
 
-Foi criado mas ainda não implementado um middleware para limitar as solicitações de um mesmo IP para o endpoint de token. Este middleware usa Redis para rastrear e limitar as solicitações:
+Foi criado mas ainda não implementado um middleware para limitar as solicitações de um mesmo IP para o endpoint de
+token. Este middleware usa Redis para rastrear e limitar as solicitações:
 
 - Limite de 10 solicitações por minuto por IP.
 - Mensagem de erro personalizada quando o limite é atingido.
 
-### Contribuição
+### :material-open-source-initiative: Contribuição
 
 Para contribuir com este projeto, siga os passos:
 
-- Fork o repositório.
-- Crie uma nova branch (`git checkout -b feature/nova-funcionalidade`).
-- Commit suas mudanças (`git commit -am 'Adicionei uma nova funcionalidade'`).
-- Push para a branch (`git push origin feature/nova-funcionalidade`).
-- Abra um Pull Request.
+- Fork o repositório;
+- Crie uma nova branch (`git checkout -b feature/nova-funcionalidade`);
+- Commit suas mudanças (`git commit -am 'Adicionei uma nova funcionalidade'`);
+- Push para a branch (`git push origin feature/nova-funcionalidade`);
+- Abra um Pull Request;
