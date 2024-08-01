@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html
 from .db.database import engine, Base, SessionLocal
-from .routers import customer, product, order, auth
+from .routers import customer, product, order, auth, category
 from .services.security import get_current_user 
 from .services.repository import create_admin_user
 from .model import schemas
@@ -50,6 +50,7 @@ app.include_router(auth.router)
 app.include_router(customer.router, prefix="/customers", tags=["customers"])
 app.include_router(product.router, prefix="/products", tags=["products"])
 app.include_router(order.router, prefix="/orders", tags=["orders"])
+app.include_router(category.router, prefix="/category", tags=["category"])
 
 @app.get("/")
 def read_root():

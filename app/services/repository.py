@@ -1,5 +1,5 @@
 import logging
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Dict
 from ..model import models, schemas
 from . import security
@@ -275,3 +275,50 @@ def get_order(db: Session, order_id: int):
     except Exception as e:
         logger.error(f"Error fetching order: {e}", exc_info=True)
         raise
+
+
+def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.Category]:
+    logger.info(f"Fetching categories with skip: {skip}, limit: {limit}")
+    categories = db.query(models.Category).options(joinedload(models.Category.products)).offset(skip).limit(limit).all()
+    category_list = []
+
+    for category in categories:
+        products = [
+            schemas.Product(
+                id=product.id,
+                name=product.name,
+                description=product.description,
+                price=product.price,
+                category=category.name
+            )
+            for product in category.products
+        ]
+        category_list.append(schemas.Category(
+            id=category.id,
+            name=category.name,
+            products=products
+        ))
+
+    return category_list
+
+
+def get_category_with_products(db: Session, category_id: int):
+    category = db.query(models.Category).options(joinedload(models.Category.products)).filter(models.Category.id == category_id).first()
+    if not category:
+        return None
+    
+    product_list = [
+        schemas.Product(
+            id=product.id,
+            name=product.name,
+            description=product.description,
+            price=product.price,
+            category=category.name
+        ) for product in category.products
+    ]
+    
+    return schemas.Category(
+        id=category.id,
+        name=category.name,
+        products=product_list
+    )

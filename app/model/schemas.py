@@ -28,7 +28,6 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Optional[str] = None
 
-
 class ProductBase(BaseModel):
     name: str
     description: str
@@ -40,6 +39,24 @@ class ProductCreate(ProductBase):
 
 class Product(ProductBase):
     id: int
+    
+    class Config:
+        from_attributes = True
+
+
+class CategoryBase(BaseModel):
+    name: str
+
+class CategoryCreate(CategoryBase):
+    description: Optional[str] = None
+
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+class Category(CategoryBase):
+    id: int
+    products: List[Product] = []
     
     class Config:
         from_attributes = True
@@ -65,7 +82,7 @@ class OrderProduct(OrderProductBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class OrderCreate(OrderBase):
     customer_id: int
@@ -78,20 +95,20 @@ class Order(OrderBase):
     updated_at: datetime
     order_products: List[OrderProduct] = []
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class OrderResponse(BaseModel):
     id: int
     customer_id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class OrderCustomerView(BaseModel):
     id: int
     customer_id: int
     status: str
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TrackingCreate(BaseModel):
     status: str
@@ -103,7 +120,8 @@ class Tracking(BaseModel):
     status: str
     created_at: datetime
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UpdateOrderStatus(BaseModel):
     status: str
+    
