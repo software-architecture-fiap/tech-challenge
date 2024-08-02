@@ -1,7 +1,18 @@
-# Passo a Passo da Fase 1
+# Passo a Passo para Testar o Backend
 
-A primeira coisa que deve ser feita é a criação de um usuário administrador para o teste do nosso backend. Você poderá
-fazer isso atráves do Swagger em [Login for Access Token](http://localhost:2000/docs#/default/login_for_access_token_token_post).
+## :material-foot-print: Passos
+Nessa documentação iremos te mostrar os Passos que você deve dar em direção aos testes. Isso irá lhe proporcionar uma
+melhor experiência durante os teste. Abaixo, clique em cada uma das caixas de passos para seguir com cada etapa.
+
+???- note "Passo 01: Login for Access Token"
+    A primeira coisa que deve ser feita é a criação de um User Admin para o iniciar o Teste do Backend. 
+    Você poderá fazer isso atráves do Swagger em
+    [Login for Access Token](http://localhost:2000/docs#/default/login_for_access_token_token_post).
+
+    ![image](assets/t01.png)
+    
+    Os campos **username** e **password** são obrigatórios! Preencha-os e Clique em Execute. Isso te dará acesso às
+    etapas que exigem camadas de autenticação do token.
 
 ## Cenários
 
