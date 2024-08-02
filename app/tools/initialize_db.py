@@ -36,7 +36,7 @@ def initialize_db(db: Session):
     
     for product in products:
         if product['name'] in existing_product_names:
-            logger.info(f"Product already exists in the database: {product['name']} - Category: {product['category']}")
+            logger.info(f"Product already exists in the database: {product['name']} - Category: {product['category_id']}")
         else:
             db_product = Product(**product)
             db.add(db_product)
