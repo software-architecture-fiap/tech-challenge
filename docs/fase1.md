@@ -23,8 +23,8 @@ melhor experiência durante os teste. Abaixo, clique em cada uma das caixas de p
     Basta clicar em Executar e o Usuário Anônimo será criado.
 
 ### Cenário 2: Cliente Cadastrado
-2. Cliente com Identificação
-    1. Cria Conta com Identificação
+    Cliente com Identificação
+    Cria Conta com Identificação
 
 3. Jornada do Cliente
     1. Cria Order
