@@ -98,5 +98,5 @@ nav:
     - Event Storming: "event-storming.md"
   - Guia:
     - Ambiente: "environment.md"
-    - Entregáveis: "testando.md"
+    - Entregáveis: "entrega.md"
     - Passo a Passo: "fase1.md"
