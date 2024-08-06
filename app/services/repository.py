@@ -157,7 +157,7 @@ def get_products(db: Session, skip: int = 0, limit: int = 10):
 
 def create_product(db: Session, product: schemas.ProductCreate):
     logger.info(f"Creating product with name: {product.name}")
-    db_product = models.Product(name=product.name, description=product.description, price=product.price, category=product.category)
+    db_product = models.Product(name=product.name, description=product.description, price=product.price, category_id=product.category_id)
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
@@ -169,7 +169,7 @@ def update_product(db: Session, db_product: models.Product, product: schemas.Pro
     db_product.name = product.name
     db_product.description = product.description
     db_product.price = product.price
-    db_product.category = product.category
+    db_product.category_id = product.category_id
     db.commit()
     db.refresh(db_product)
     logger.info(f"Product updated with ID: {db_product.id}")
@@ -180,7 +180,7 @@ def delete_product(db: Session, product_id: int):
     if db_product:
         db.delete(db_product)
         db.commit()
-        logger.info(f"Product deleted: {db_product.name} - Category: {db_product.category}")
+        logger.info(f"Product deleted: {db_product.name} - Category: {db_product.category_id}")
     else:
         logger.warning(f"Product not found: ID {product_id}")
     return db_product
@@ -215,7 +215,7 @@ def create_order(db: Session, order: schemas.OrderCreate):
             db.commit()
             db.refresh(db_order_product)
             logger.info(f"Product {db_order_product.product_id} added to order {db_order.id}")
-            
+
         create_tracking(db, db_order.id, db_order.status)
 
         return db_order
@@ -253,7 +253,7 @@ def create_tracking(db: Session, order_id: int, status: str):
         return db_tracking
     except Exception as e:
         logger.error(f"Error updating order status: {e}", exc_info=True)
-        raise 
+        raise
 
 
 def get_orders(db: Session, skip: int = 0, limit: int = 10):
@@ -306,7 +306,7 @@ def get_category_with_products(db: Session, category_id: int):
     category = db.query(models.Category).options(joinedload(models.Category.products)).filter(models.Category.id == category_id).first()
     if not category:
         return None
-    
+
     product_list = [
         schemas.Product(
             id=product.id,
@@ -316,7 +316,7 @@ def get_category_with_products(db: Session, category_id: int):
             category=category.name
         ) for product in category.products
     ]
-    
+
     return schemas.Category(
         id=category.id,
         name=category.name,

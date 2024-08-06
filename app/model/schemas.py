@@ -32,7 +32,7 @@ class ProductBase(BaseModel):
     name: str
     description: str
     price: float
-    category: str
+    category_id: int
 
 class ProductCreate(ProductBase):
     pass
