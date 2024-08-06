@@ -23,7 +23,7 @@ _É importante que os desenhos sigam os padrões utilizados na explicação._
 
 ### :material-package-variant-plus: Entregável 2
 
-2. Uma Aplicação para todo o sistema de backend (monolito) que deverá ser desenvolvido seguindo os padrões apresentados
+1. Uma Aplicação para todo o sistema de backend (monolito) que deverá ser desenvolvido seguindo os padrões apresentados
 nas aulas:
 
     - [X] Utilizando Arquitetura Hexagonal
@@ -33,15 +33,15 @@ nas aulas:
         - [X] Sem cpf: Pode ser feito pela Rota [Create Anonymous Customer](http://localhost:2000/docs#/customers/create_anonymous_customer_customers_anonymous_post)
         - [X] Identificação do Cliente via CPF: Se cadastrado com [Create Customer](http://localhost:2000/docs#/customers/create_customer_customers_admin_post)
         - [X] [Criar](http://localhost:2000/docs#/products/create_product_products__post), [Editar](http://localhost:2000/docs#/products/update_product_products__product_id__put) e [Remover](http://localhost:2000/docs#/products/delete_product_products__product_id__delete) Produtos: Necessário estar logado com Username (e-mail) e Token cadastrado com Admin;
-        - [ ] Buscar Produtos por Categoria
-        - [ ] Fake Checkout: apenas enviar os produtos escolhidos para a fila. O checkout é a finalização do pedido.
-        - [ ] Listar os Pedidos
+        - [X] Buscar Produtos por Categoria
+        - [X] Fake Checkout: apenas enviar os produtos escolhidos para a fila. O checkout é a finalização do pedido.
+        - [X] Listar os Pedidos
     - [X] Banco de Dados à sua Escolha: Escolhemos o Postgres.
         - Inicialmente, deveremos trabalhar e organizar a fila dos pedidos apenas em um banco de dados.
 
 ### :material-package-variant-plus: Entregável 3
 
-3. [X] A aplicação deve ser entregue com um Dockerfile configurado para executá-la corretamente, e um docker-compose.yaml para subir o ambiente completo.
+1. [X] A aplicação deve ser entregue com um Dockerfile configurado para executá-la corretamente, e um docker-compose.yaml para subir o ambiente completo.
 
     - [X] Disponibilizar também o [Swagger](http://localhost:2000/docs) para consumo dessas APIs.
 

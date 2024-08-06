@@ -98,4 +98,5 @@ nav:
     - Event Storming: "event-storming.md"
   - Guia:
     - Ambiente: "environment.md"
-    - Teste: "testando.md"
+    - Entrega: "entrega.md"
+    - Passo a Passo: "steps.md"
