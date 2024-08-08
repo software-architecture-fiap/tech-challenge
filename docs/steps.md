@@ -30,19 +30,19 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 ### Cenário onboarding: Cliente Cadastrado
 
 ???- note "Passo 01: Fazendo cadastro do cliente"
-Para os clientes que desejam fazer cadastro na aplicação basta usar o endpoint [customers/register](http://localhost:2000/docs#/customers/register_customer_customers_register_post) e preencher com os dados solicitados como no exemplo abaixo:
+    Para os clientes que desejam fazer cadastro na aplicação basta usar o endpoint [customers/register](http://localhost:2000/docs#/customers/register_customer_customers_register_post) e preencher com os dados solicitados como no exemplo abaixo:
 
-```json
-{
-  "name": "Abelardo",
-  "email": "abe@email.com.br",
-  "cpf": "001001001-11",
-  "password": "my_password"
-}
-```
+    ```json
+    {
+    "name": "Abelardo",
+    "email": "abe@email.com.br",
+    "cpf": "001001001-11",
+    "password": "my_password"
+    }
+    ```
 
-Para certificar que o cliente foi registrado utilize o endpoint [customers/](http://localhost:2000/docs#/customers/read_customers_customers__get) e liste todos os clientes cadastrados.
-![image](assets/customer-list.png) 
+    Para certificar que o cliente foi registrado utilize o endpoint [customers/](http://localhost:2000/docs#/customers/read_customers_customers__get) e liste todos os clientes cadastrados.
+    ![image](assets/customer-list.png) 
 
 
 
