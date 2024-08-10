@@ -14,11 +14,10 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     o número **1**. Clique no botão **Execute**, isso permitirá o acesso às etapas que exigem camadas de autenticação do token.
 
 ???- note "Authorize"
-    Além disso, ao tentar acessar um endpoint que requer autorização, clique em **Authorize** e faça login usando seu e-mail e senha.
-    ![image](assets/access-token.png)
+    Além disso, ao tentar acessar um endpoint que requer autorização, clique em **Authorize** e faça login usando seu e-mail e senha.![image](assets/access-token.png)
     
 
-### Cenário onboarding: Cliente Anônimo
+### Cenário onboarding: Cliente anônimo
 
 ???- note "Passo 01: Fazendo pedido sem identificação"
     Esse projeto foi desenvolvido com a possibilidade do cliente fazer o pedido sem ter que cadastrar seus dados. Seguindo os passos abaixo é possível executar esse fluxo.
@@ -27,7 +26,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ![image](assets/customer-anon.png)
     Clique em **Try it out** e em seguida **Execute**, o cliente anônimo será gerado.
 
-### Cenário onboarding: Cliente Cadastrado
+### Cenário onboarding: Cliente cadastrado
 
 ???- note "Passo 01: Fazendo cadastro do cliente"
     Para os clientes que desejam fazer cadastro na aplicação basta usar o endpoint [customers/register](http://localhost:2000/docs#/customers/register_customer_customers_register_post) e preencher com os dados solicitados como no exemplo abaixo:
@@ -46,30 +45,32 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 
 
 
-### Cenário pedido: Seleção do Pedido
+### Cenário pedido: Seleção do pedido
 <!-- TODO -->
 
 <!-- 1. Criar pedido no endpoint orders
     2. Adicionar produtos ao pedido -->
 
-### Cenário pagamento: Processando Pagamento
+### Cenário pagamento: Processando o pagamento do pedido
 <!-- TODO -->
 <!-- 3. Faz Pagamento (Fake Checkout) -->
 
 
-### Cenário preparação e atualização do pedido: Efetuando Pagamento
+### Cenário preparação e atualização do pedido: Atualização do status do pedido
 <!-- TODO -->
 
 
-### Cenário gerenciamento de produtos e categorias: Efetuando Pagamento
+### Cenário preparação e atualização do pedido: Pedidos concluídos com sucesso no fake checkout
 <!-- TODO -->
 
-<!-- Jornada da Lanchonete
-<!-- 1. Lista Pedidos que Tiveram Sucesso no Fake Checkout
-2. Recebe Pedido com Status Aberto
-3. Possibilidade de Filtrar por Categoria
-4. Atualiza Status para Finalizado
-3. Fluxo de Cadastro de Produto
+<!-- Lista Pedidos que Tiveram Sucesso no Fake Checkout -->
+
+### Cenário gerenciamento de produtos e categorias: Cadatro e listagem de produtos
+<!-- TODO -->
+<!--3. Fluxo de Cadastro de Produto
     1. Criar
     2. Editar
-    3. Excluir -->
+    3. Excluir --> -->
+
+### Cenário gerenciamento de produtos e categorias: Listagem de categorias
+<!-- TODO -->
