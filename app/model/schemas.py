@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import List, Optional
 
@@ -11,7 +11,7 @@ class CustomerCreate(CustomerBase):
     password: Optional[str] = None
 
 class Customer(CustomerBase):
-    id: int
+    id: str  
     
     class Config:
         from_attributes = True
@@ -19,11 +19,9 @@ class Customer(CustomerBase):
 class CPFIdentify(BaseModel):
     cpf: str
 
-
 class Token(BaseModel):
     access_token: str
-    token_type: str
-    customer_id: int
+    customer_id: str  
 
 class TokenData(BaseModel):
     username: Optional[str] = None
@@ -34,15 +32,24 @@ class ProductBase(BaseModel):
     price: float
     category: str
 
+    model_config = ConfigDict(from_attributes=True)
+
+class Product(BaseModel):
+    name: str
+    description: str
+    price: float
+    category: str
+
+    model_config = ConfigDict(from_attributes=True)
+
 class ProductCreate(ProductBase):
     pass
 
 class Product(ProductBase):
-    id: int
+    id: str  
     
     class Config:
-        from_attributes = True
-
+        model_config = ConfigDict(from_attributes=True)
 
 class CategoryBase(BaseModel):
     name: str
@@ -55,12 +62,11 @@ class CategoryUpdate(BaseModel):
     description: Optional[str] = None
 
 class Category(CategoryBase):
-    id: int
+    id: str  
     products: List[Product] = []
     
     class Config:
         from_attributes = True
-
 
 class OrderBase(BaseModel):
     status: str
@@ -72,25 +78,25 @@ class OrderBase(BaseModel):
     comments: Optional[str] = None
 
 class OrderProductBase(BaseModel):
-    product_id: int
+    product_id: str  
     comment: Optional[str] = None
 
 class OrderProductCreate(OrderProductBase):
     pass
 
 class OrderProduct(OrderProductBase):
-    id: int
+    id: str  
 
     class Config:
         from_attributes = True
 
 class OrderCreate(OrderBase):
-    customer_id: int
+    customer_id: str  
     products: List[OrderProductCreate]
 
 class Order(OrderBase):
-    id: int
-    customer_id: int
+    id: str  
+    customer_id: str  
     created_at: datetime
     updated_at: datetime
     order_products: List[OrderProduct] = []
@@ -98,25 +104,25 @@ class Order(OrderBase):
         from_attributes = True
 
 class OrderResponse(BaseModel):
-    id: int
-    customer_id: int
+    id: str  
+    customer_id: str  
     class Config:
         from_attributes = True
 
 class OrderCustomerView(BaseModel):
-    id: int
-    customer_id: int
+    id: str  
+    customer_id: str  
     status: str
     class Config:
         from_attributes = True
 
 class TrackingCreate(BaseModel):
     status: str
-    order_id: int
+    order_id: str  
 
 class Tracking(BaseModel):
-    id: int
-    order_id: int
+    id: str  
+    order_id: str  
     status: str
     created_at: datetime
     class Config:
@@ -124,4 +130,3 @@ class Tracking(BaseModel):
 
 class UpdateOrderStatus(BaseModel):
     status: str
-    
