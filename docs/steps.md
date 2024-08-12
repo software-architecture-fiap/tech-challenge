@@ -5,16 +5,15 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 
 ### Autenticação e autorização
 
-???- note "Login for Access Token"
+???- note "Login for Access Token and Authorize"
     O primeiro passo a ser feito é a o de  criação de Token usando um dos usuários administrativos. 
     Usando o Swagger, você poderá fazer isso em 
     [Login for Access Token](http://localhost:2000/docs#/default/login_for_access_token_token_post).
     ![image](assets/token-token.png).
     Clique em **Try it out** e depois preencha os campos **username** com "email@email.com.br" e **password** com "your_password", por fim, preencha o **client_id** com
     o número **1**. Clique no botão **Execute**, isso permitirá o acesso às etapas que exigem camadas de autenticação do token.
-
-???- note "Authorize"
-    Além disso, ao tentar acessar um endpoint que requer autorização, clique em **Authorize** e faça login usando seu e-mail e senha.![image](assets/access-token.png)
+    Além disso, ao tentar acessar um endpoint que requer autorização, clique em **Authorize** e faça login usando seu e-mail e senha.
+    ![image](assets/access-token.png)
     
 
 ### Cenário onboarding: Cliente anônimo
