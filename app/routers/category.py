@@ -25,7 +25,7 @@ def list_category(category_id: int, db: Session = Depends(database.get_db), curr
 
 @router.put("/{category_id}", response_model=schemas.Category)
 def update_category(category_id: int, category: schemas.CategoryCreate, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
-    db_category = repository.get_category(db, category_id=category_id)
+    db_category = repository.get_categories(db, category_id=category_id)
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category not found")
     updated_category = repository.update_category(db, db_category=db_category, category=category)

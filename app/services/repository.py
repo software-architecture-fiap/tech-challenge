@@ -289,6 +289,7 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
                 name=product.name,
                 description=product.description,
                 price=product.price,
+                category_id=category.id,
                 category=category.name
             )
             for product in category.products
@@ -313,6 +314,7 @@ def get_category_with_products(db: Session, category_id: int):
             name=product.name,
             description=product.description,
             price=product.price,
+            category_id=category.id,
             category=category.name
         ) for product in category.products
     ]
