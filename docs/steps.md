@@ -12,7 +12,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ![image](assets/token-token.png).
     Clique em **Try it out** e depois preencha os campos **username** com "email@email.com.br" e **password** com "your_password", por fim, preencha o **client_id** com
     o número **1**. Clique no botão **Execute**, isso permitirá o acesso às etapas que exigem camadas de autenticação do token.
-    Além disso, ao tentar acessar um endpoint que requer autorização, clique em **Authorize** e faça login usando seu e-mail e senha.
+    Além disso, ao tentar acessar um endpoint que requer autorização, por exemplo, **category**, **orders** e **products**. Clique em **Authorize** e faça login usando seu e-mail e senha administrativo.
     ![image](assets/access-token.png)
     
 
@@ -27,7 +27,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 
 ### Cenário onboarding: Cliente cadastrado
 
-???- note "Passo 01: Fazendo cadastro do cliente"
+???- note "Passo 02: Fazendo cadastro do cliente"
     Para os clientes que desejam fazer cadastro na aplicação basta usar o endpoint [customers/register](http://localhost:2000/docs#/customers/register_customer_customers_register_post) e preencher com os dados solicitados como no exemplo abaixo:
 
     ```json
@@ -43,12 +43,18 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ![image](assets/customer-list.png) 
 
 
-
 ### Cenário pedido: Seleção do pedido
-<!-- TODO -->
 
-<!-- 1. Criar pedido no endpoint orders
-    2. Adicionar produtos ao pedido -->
+???- note "Passo 03: Efetuando um pedido"
+
+    ```json
+    {
+    "name": "Abelardo",
+    "email": "abe@email.com.br",
+    "cpf": "001001001-11",
+    "password": "my_password"
+    }
+    ```
 
 ### Cenário pagamento: Processando o pagamento do pedido
 <!-- TODO -->
@@ -65,11 +71,210 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 <!-- Lista Pedidos que Tiveram Sucesso no Fake Checkout -->
 
 ### Cenário gerenciamento de produtos e categorias: Cadatro e listagem de produtos
-<!-- TODO -->
-<!--3. Fluxo de Cadastro de Produto
-    1. Criar
-    2. Editar
-    3. Excluir --> -->
 
-### Cenário gerenciamento de produtos e categorias: Listagem de categorias
-<!-- TODO -->
+???- note "Passo 0: Cadastro de produto"
+    Usando o endpoint [products/create_product](http://localhost:2000/docs#/products/create_product_products__post) é possível fazer o cadastro de um novo produto de acordo com as categorias previamente cadastradas. Exemplo com valores de entrada:
+
+    ```json
+    {
+    "name": "Brigadeiro",
+    "description": "Doce feito com leite condensado e achocolatado",
+    "price": 3,
+    "category_id": 5,
+    "category": "Sobremesas"
+    }
+    ```
+
+### Cenário gerenciamento de produtos e categorias: Listagem de categorias e produtos
+
+???- note "Passo 0: Listando as categorias e produtos"
+    Usando o endpoint [category/list_categories](http://localhost:2000/docs#/category/list_categories_category__get) é possível fazer o cadastro de um novo produto de acordo com as categorias previamente cadastradas. Exemplo com valores que retornam nessa operação:
+
+    ```json
+    {
+    "categories": [
+        {
+        "name": "Sanduíches",
+        "id": 1,
+        "products": [
+            {
+            "name": "Sanduíche de Frango Grelhado",
+            "description": "Grilled chicken sandwich with lettuce and tomato",
+            "price": 15,
+            "category_id": 1,
+            "category": "Sanduíches",
+            "id": 1
+            },
+            {
+            "name": "Cheeseburger Clássico",
+            "description": "Classic cheeseburger with beef patty and cheese",
+            "price": 12,
+            "category_id": 1,
+            "category": "Sanduíches",
+            "id": 2
+            },
+            {
+            "name": "Sanduíche Vegano de Grão-de-Bico",
+            "description": "Vegan sandwich with chickpea patty",
+            "price": 14,
+            "category_id": 1,
+            "category": "Sanduíches",
+            "id": 3
+            }
+        ]
+        },
+        {
+        "name": "Pizzas",
+        "id": 2,
+        "products": [
+            {
+            "name": "Pizza Margherita",
+            "description": "Pizza with tomato sauce, mozzarella, and basil",
+            "price": 25,
+            "category_id": 2,
+            "category": "Pizzas",
+            "id": 4
+            },
+            {
+            "name": "Pizza Pepperoni",
+            "description": "Pizza with tomato sauce, mozzarella, and pepperoni",
+            "price": 27,
+            "category_id": 2,
+            "category": "Pizzas",
+            "id": 5
+            },
+            {
+            "name": "Pizza Quatro Queijos",
+            "description": "Pizza with four types of cheese",
+            "price": 28,
+            "category_id": 2,
+            "category": "Pizzas",
+            "id": 6
+            }
+        ]
+        },
+        {
+        "name": "Acompanhamentos",
+        "id": 3,
+        "products": [
+            {
+            "name": "Batata Frita",
+            "description": "Portion of crispy french fries",
+            "price": 8,
+            "category_id": 3,
+            "category": "Acompanhamentos",
+            "id": 7
+            },
+            {
+            "name": "Anéis de Cebola",
+            "description": "Portion of breaded onion rings",
+            "price": 9,
+            "category_id": 3,
+            "category": "Acompanhamentos",
+            "id": 8
+            },
+            {
+            "name": "Salada Caesar",
+            "description": "Caesar salad with lettuce, croutons, and parmesan cheese",
+            "price": 10,
+            "category_id": 3,
+            "category": "Acompanhamentos",
+            "id": 9
+            }
+        ]
+        },
+        {
+        "name": "Bebidas",
+        "id": 4,
+        "products": [
+            {
+            "name": "Coca-Cola",
+            "description": "Cola soft drink",
+            "price": 5,
+            "category_id": 4,
+            "category": "Bebidas",
+            "id": 10
+            },
+            {
+            "name": "Suco de Laranja",
+            "description": "Natural orange juice",
+            "price": 6,
+            "category_id": 4,
+            "category": "Bebidas",
+            "id": 11
+            },
+            {
+            "name": "Água Mineral",
+            "description": "Still mineral water",
+            "price": 4,
+            "category_id": 4,
+            "category": "Bebidas",
+            "id": 12
+            }
+        ]
+        },
+        {
+        "name": "Sobremesas",
+        "id": 5,
+        "products": [
+            {
+            "name": "Brownie de Chocolate",
+            "description": "Chocolate brownie with walnuts",
+            "price": 7,
+            "category_id": 5,
+            "category": "Sobremesas",
+            "id": 13
+            },
+            {
+            "name": "Torta de Maçã",
+            "description": "Apple pie with cinnamon",
+            "price": 8,
+            "category_id": 5,
+            "category": "Sobremesas",
+            "id": 14
+            },
+            {
+            "name": "Sorvete de Baunilha",
+            "description": "Vanilla ice cream",
+            "price": 6,
+            "category_id": 5,
+            "category": "Sobremesas",
+            "id": 15
+            },
+            {
+            "name": "Brigadeiro",
+            "description": "Doce feito com leite condensado e achocolatado",
+            "price": 3,
+            "category_id": 5,
+            "category": "Sobremesas",
+            "id": 16
+            },
+            {
+            "name": "Brigadeiro",
+            "description": "Doce feito com leite condensado e achocolatado",
+            "price": 3,
+            "category_id": 5,
+            "category": "Sobremesas",
+            "id": 17
+            },
+            {
+            "name": "Brigadeiro",
+            "description": "Doce feito com leite condensado e achocolatado",
+            "price": 3,
+            "category_id": 5,
+            "category": "Sobremesas",
+            "id": 18
+            },
+            {
+            "name": "Brigadeiro",
+            "description": "Doce feito com leite condensado e achocolatado",
+            "price": 3,
+            "category_id": 5,
+            "category": "Sobremesas",
+            "id": 19
+            }
+        ]
+        }
+    ]
+    }
+    ```
