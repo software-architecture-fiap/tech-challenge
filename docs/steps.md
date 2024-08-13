@@ -12,9 +12,10 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ![image](assets/token-token.png).
     Clique em **Try it out** e depois preencha os campos **username** com "email@email.com.br" e **password** com "your_password", por fim, preencha o **client_id** com
     o número **1**. Clique no botão **Execute**, isso permitirá o acesso às etapas que exigem camadas de autenticação do token.
-    Além disso, ao tentar acessar um endpoint que requer autorização, por exemplo, **category**, **orders** e **products**. Clique em **Authorize** e faça login usando seu e-mail e senha administrativo.
+    Além disso, ao tentar acessar um endpoint que requer autorização, por exemplo, **category**, **orders** e **products**. 
     ![image](assets/access-token.png)
-    
+    Clique em **Authorize** e faça login usando seu e-mail e senha administrativo.
+
 
 ### Cenário onboarding: Cliente anônimo
 
@@ -25,7 +26,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ![image](assets/customer-anon.png)
     Clique em **Try it out** e em seguida **Execute**, o cliente anônimo será gerado.
 
-### Cenário onboarding: Cliente cadastrado
+### Cenário onboarding: Cliente identificado
 
 ???- note "Passo 02: Fazendo cadastro do cliente"
     Para os clientes que desejam fazer cadastro na aplicação basta usar o endpoint [customers/register](http://localhost:2000/docs#/customers/register_customer_customers_register_post) e preencher com os dados solicitados como no exemplo abaixo:
@@ -46,33 +47,92 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 ### Cenário pedido: Seleção do pedido
 
 ???- note "Passo 03: Efetuando um pedido"
+    Com o endpoint [orders/create_orders](http://localhost:2000/docs#/orders/create_order_orders__post) preencha com os valores de **customer_id** que foi cadastrado nos passos 01 ou 02 e **product_id** para adicionar o produto a um pedido, exemplo:
 
     ```json
     {
-    "name": "Abelardo",
-    "email": "abe@email.com.br",
-    "cpf": "001001001-11",
-    "password": "my_password"
+        "status": "string",
+        "user_agent": "string",
+        "ip_address": "string",
+        "os": "string",
+        "browser": "string",
+        "device": "string",
+        "comments": "string",
+        "customer_id": 4,
+        "products": [
+            {
+            "product_id": 10,
+            "comment": "sem gelo"
+            }
+        ]
     }
+    Resultado da operação de seleção do pedido:
+    ![image](assets/response_order.png) 
     ```
 
 ### Cenário pagamento: Processando o pagamento do pedido
-<!-- TODO -->
-<!-- 3. Faz Pagamento (Fake Checkout) -->
+
+???- note "Passo 04: Realizando pagamento do pedido (fake checkout)"
+    Após executar o [orders/fake_checkout](http://localhost:2000/docs#/orders/fake_checkout_orders_checkout_post) siga para o fluxo de atualização de status do pedido.
 
 
-### Cenário preparação e atualização do pedido: Atualização do status do pedido
-<!-- TODO -->
+### Cenário preparação e atualização do pedido: Status do pedido
+
+???- note "Passo 05: Atualização de status de pedido"
+    Com **order_id** é possível fazer a atualização de status de cada pedido, com o endpoint [orders/update_order_status](http://localhost:2000/docs#/orders/update_order_status_orders__order_id__status_put). Exemplo com valor de entrada usando o **order_id** 3:
+
+    ```json
+    {
+        "status": "em preparação"
+    }
+    ```
+
+???- note "Passo 06: Visualizando status do pedido"
+    Ainda com o valor do **order_id** no endpoint [orders/read_order](http://localhost:2000/docs#/orders/read_order_orders__order_id__get) visualize o status atual do pedido. Exemplo valor de retorno:
+
+    ```json
+    {
+    "id": 3,
+    "customer_id": 4,
+    "status": "em preparação"
+    }
+    ```
 
 
 ### Cenário preparação e atualização do pedido: Pedidos concluídos com sucesso no fake checkout
-<!-- TODO -->
-
 <!-- Lista Pedidos que Tiveram Sucesso no Fake Checkout -->
 
-### Cenário gerenciamento de produtos e categorias: Cadatro e listagem de produtos
+### Cenário preparação e atualização do pedido: Listando todos os pedidos registrados
+???- note "Listando pedidos"
+    Em [orders/read_orders](http://localhost:2000/docs#/orders/read_orders_orders__get
+    ) é possível listar todos os pedidos feitos por cliente.
 
-???- note "Passo 0: Cadastro de produto"
+    ```json
+        {
+        "orders": [
+            {
+            "id": 1,
+            "customer_id": 1
+            },
+            {
+            "id": 2,
+            "customer_id": 4
+            },
+            {
+            "id": 3,
+            "customer_id": 4
+            },
+            {
+            "id": 4,
+            "customer_id": 4
+            }
+        ]
+        }    
+    ```
+
+### Cenário gerenciamento de produtos e categorias: Cadatro de produto
+
+???- note "Cadastro de produto"
     Usando o endpoint [products/create_product](http://localhost:2000/docs#/products/create_product_products__post) é possível fazer o cadastro de um novo produto de acordo com as categorias previamente cadastradas. Exemplo com valores de entrada:
 
     ```json
@@ -85,9 +145,10 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     }
     ```
 
+
 ### Cenário gerenciamento de produtos e categorias: Listagem de categorias e produtos
 
-???- note "Passo 0: Listando as categorias e produtos"
+???- note "Listando categorias e produtos"
     Usando o endpoint [category/list_categories](http://localhost:2000/docs#/category/list_categories_category__get) é possível fazer o cadastro de um novo produto de acordo com as categorias previamente cadastradas. Exemplo com valores que retornam nessa operação:
 
     ```json
