@@ -24,17 +24,16 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 
 ???- note "Solução de Problemas: 401 Unhauthorized"
     Se ao tentar acessar os endpoints **category**, **orders**, ou **products** você receber uma resposta com o erro 401 Unauthorized, isso significa que as credenciais não foram validadas corretamente.
-    
-```json
-Error: Unauthorized
 
-Response body
-Download
-{
-"detail": "Could not validate credentials"
-}
-```
+    ```json
+    Error: Unauthorized
 
+    Response body
+    Download
+    {
+    "detail": "Could not validate credentials"
+    }
+    ```
     Verifique se o Token de Acesso foi gerado corretamente e se as credenciais estão corretas ao tentar autorizar o acesso.
 
 
