@@ -5,46 +5,69 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 
 ### Autenticação e autorização
 
-???- note "Login for Access Token and Authorize"
-    O primeiro passo a ser feito é a o de  criação de Token usando um dos usuários administrativos. 
-    Usando o Swagger, você poderá fazer isso em 
-    [Login for Access Token](http://localhost:2000/docs#/default/login_for_access_token_token_post).
-    ![image](assets/token-token.png).
-    Clique em **Try it out** e depois preencha os campos **username** com "email@email.com.br" e **password** com "your_password", por fim, preencha o **client_id** com
-    o número **1**. Clique no botão **Execute**, isso permitirá o acesso às etapas que exigem camadas de autenticação do token.
-    Além disso, ao tentar acessar um endpoint que requer autorização, por exemplo, **category**, **orders** e **products**. 
-    ![image](assets/access-token.png)
-    Clique em **Authorize** e faça login usando seu e-mail e senha administrativo.
+???- note "Gerar Token de Acesso e Autorizar"
+    O primeiro passo é criar um Token de Acesso usando um dos usuários administrativos. Para isso, utilize o Swagger em 
+    [Login for Access Token](http://localhost:2000/docs#/default/login_for_access_token_token_post). Siga as etapas abaixo:
+
+    - Clique em **Try it out**.
+    - Preencha os seguintes campos: 
+        - **username**: "email@email.com.br"
+        - **password**: "your_password"
+        - **client_id**: "1"
+    
+    Isso gerará o Token de Acesso necessário para prosseguir com as etapas que exigem autenticação via token.
+    ![image](assets/token-token.png)
+
+    Ao tentar acessar endpoints que requerem autorização, como **category**, **orders**, e **products**, siga estas etapas adicionais:
+    1. Clique em **Authorize**.
+    2. Faça login usando seu e-mail e senha administrativo.
+
+???- note "Solução de Problemas: 401 Unhauthorized"
+    Se ao tentar acessar os endpoints **category**, **orders**, ou **products** você receber uma resposta com o erro 401 Unauthorized, isso significa que as credenciais não foram validadas corretamente.
+    
+```json
+Error: Unauthorized
+
+Response body
+Download
+{
+"detail": "Could not validate credentials"
+}
+```
+
+    Verifique se o Token de Acesso foi gerado corretamente e se as credenciais estão corretas ao tentar autorizar o acesso.
 
 
-### Cenário onboarding: Cliente anônimo
+### Onboarding: Cliente anônimo
 
-???- note "Passo 01: Fazendo pedido sem identificação"
-    Esse projeto foi desenvolvido com a possibilidade do cliente fazer o pedido sem ter que cadastrar seus dados. Seguindo os passos abaixo é possível executar esse fluxo.
-    Usando o Swagger em 
-    [Create Anonymous Customer](http://localhost:2000/docs#/customers/create_anonymous_customer_customers_anonymous_post).
+???- note "Passo 01: Realizando pedido sem identificação"
+    Este projeto permite que o cliente faça um pedido sem a necessidade de cadastro de seus dados pessoais. Para executar esse fluxo, siga os passos abaixo:
+    1. Acesse o Swagger em [Create Anonymous Customer](http://localhost:2000/docs#/customers/create_anonymous_customer_customers_anonymous_post).
+    2. Clique em **Try it out**.
+    3. Em seguida, clique em **Execute**.
+    Após seguir esses passos, um cliente anônimo será gerado, permitindo que o pedido seja realizado sem identificação.
     ![image](assets/customer-anon.png)
-    Clique em **Try it out** e em seguida **Execute**, o cliente anônimo será gerado.
 
-### Cenário onboarding: Cliente identificado
+
+### Onboarding: Cliente identificado
 
 ???- note "Passo 02: Fazendo cadastro do cliente"
-    Para os clientes que desejam fazer cadastro na aplicação basta usar o endpoint [customers/register](http://localhost:2000/docs#/customers/register_customer_customers_register_post) e preencher com os dados solicitados como no exemplo abaixo:
+    Para os clientes que desejam se cadastrar na aplicação, basta usar o endpoint [customers/register](http://localhost:2000/docs#/customers/register_customer_customers_register_post) e preencher com os dados solicitados como no exemplo abaixo:
 
     ```json
-    {
-    "name": "Abelardo",
-    "email": "abe@email.com.br",
-    "cpf": "001001001-11",
-    "password": "my_password"
-    }
+        {
+        "name": "Abelardo",
+        "email": "abe@email.com.br",
+        "cpf": "001001001-11",
+        "password": "my_password"
+        }
     ```
 
-    Para certificar que o cliente foi registrado utilize o endpoint [customers/](http://localhost:2000/docs#/customers/read_customers_customers__get) e liste todos os clientes cadastrados.
+    Para certificar que o cliente foi registrado utilize o endpoint [customers/read_customers](http://localhost:2000/docs#/customers/read_customers_customers__get) e liste todos os clientes cadastrados.
     ![image](assets/customer-list.png) 
 
 
-### Cenário pedido: Seleção do pedido
+### Pedido: Seleção do pedido
 
 ???- note "Passo 03: Efetuando um pedido"
     Com o endpoint [orders/create_orders](http://localhost:2000/docs#/orders/create_order_orders__post) preencha com os valores de **customer_id** que foi cadastrado nos passos 01 ou 02 e **product_id** para adicionar o produto a um pedido, exemplo:
@@ -71,13 +94,13 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ![image](assets/response_order.png)
 
 
-### Cenário pagamento: Processando o pagamento do pedido
+### Pagamento: Processando o pagamento do pedido
 
 ???- note "Passo 04: Realizando pagamento do pedido (fake checkout)"
     Após executar o [orders/fake_checkout](http://localhost:2000/docs#/orders/fake_checkout_orders_checkout_post) siga para o fluxo de atualização de status do pedido.
 
 
-### Cenário preparação e atualização do pedido: Status do pedido
+### Preparação e atualização do pedido
 
 ???- note "Passo 05: Atualização de status de pedido"
     Com **order_id** é possível fazer a atualização de status de cada pedido, com o endpoint [orders/update_order_status](http://localhost:2000/docs#/orders/update_order_status_orders__order_id__status_put). Exemplo com valor de entrada usando o **order_id** 3:
@@ -99,14 +122,12 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     }
     ```
 
+???- note "Pedidos concluídos com sucesso no fake checkout"
 
-### Cenário preparação e atualização do pedido: Pedidos concluídos com sucesso no fake checkout
-<!-- Lista Pedidos que Tiveram Sucesso no Fake Checkout -->
 
-### Cenário preparação e atualização do pedido: Listando todos os pedidos registrados
-???- note "Listando pedidos"
+???- note "Listando todos os pedidos registrados"
     Em [orders/read_orders](http://localhost:2000/docs#/orders/read_orders_orders__get
-    ) é possível listar todos os pedidos feitos por cliente.
+    ) é possível listar todos os pedidos feitos por cliente. Exemplo com valores de retorno:
 
     ```json
         {
@@ -131,7 +152,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
         }    
     ```
 
-### Cenário gerenciamento de produtos e categorias: Cadatro de produto
+### Gerenciamento de produtos e categorias
 
 ???- note "Cadastro de produto"
     Usando o endpoint [products/create_product](http://localhost:2000/docs#/products/create_product_products__post) é possível fazer o cadastro de um novo produto de acordo com as categorias previamente cadastradas. Exemplo com valores de entrada:
@@ -146,10 +167,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     }
     ```
 
-
-### Cenário gerenciamento de produtos e categorias: Listagem de categorias e produtos
-
-???- note "Listando categorias e produtos"
+???- note "Listando de categorias e produtos"
     Usando o endpoint [category/list_categories](http://localhost:2000/docs#/category/list_categories_category__get) é possível fazer o cadastro de um novo produto de acordo com as categorias previamente cadastradas. Exemplo com valores que retornam nessa operação:
 
     ```json
