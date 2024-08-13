@@ -31,10 +31,11 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     Response body
     Download
     {
-    "detail": "Could not validate credentials"
+        "detail": "Could not validate credentials"
     }
     ```
     Verifique se o Token de Acesso foi gerado corretamente e se as credenciais estão corretas ao tentar autorizar o acesso.
+    
     ![image](assets/access-token.png)
 
 
@@ -55,12 +56,12 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     Para os clientes que desejam se cadastrar na aplicação, basta usar o endpoint [customers/register](http://localhost:2000/docs#/customers/register_customer_customers_register_post) e preencher com os dados solicitados como no exemplo abaixo:
 
     ```json
-        {
+    {
         "name": "Abelardo",
         "email": "abe@email.com.br",
         "cpf": "001001001-11",
         "password": "my_password"
-        }
+    }
     ```
 
     Para certificar que o cliente foi registrado utilize o endpoint [customers/read_customers](http://localhost:2000/docs#/customers/read_customers_customers__get) e liste todos os clientes cadastrados.
@@ -112,17 +113,25 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ```
 
 ???- note "Passo 06: Visualizando status do pedido"
-    Ainda com o valor do **order_id** no endpoint [orders/read_order](http://localhost:2000/docs#/orders/read_order_orders__order_id__get) visualize o status atual do pedido. Exemplo valor de retorno:
+    Para visualizar o status atual de um pedido, siga os passos abaixo:
+    - Com o valor do **order_id**, acesse o endpoint [orders/read_order](http://localhost:2000/docs#/orders/read_order_orders__order_id__get).
+    - Verifique o status atual do pedido. Exemplo de retorno:
 
     ```json
     {
-    "id": 3,
-    "customer_id": 4,
-    "status": "em preparação"
+        "id": 3,
+        "customer_id": 4,
+        "status": "em preparação"
     }
     ```
+    - Para atualizar o status do pedido para **pronto**, utilize o endpoint o[orders/update_order_status](http://localhost:2000/docs#/orders/update_order_status_orders__order_id__status_put) com o seguinte corpo de requisição:
 
-???- note "Pedidos concluídos com sucesso no fake checkout"
+    ```json
+    {
+        "status": "pronto"
+    }
+    ```
+    - Depois de atualizar o status, você pode confirmar a atualização acessando novamente o endpoint [orders/read_order](http://localhost:2000/docs#/orders/read_order_orders__order_id__get). O estado do pedido será exibido como **pronto para retirada**.
 
 
 ???- note "Listando todos os pedidos registrados"
@@ -130,7 +139,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ) é possível listar todos os pedidos feitos por cliente. Exemplo com valores de retorno:
 
     ```json
-        {
+    {
         "orders": [
             {
             "id": 1,
@@ -149,7 +158,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
             "customer_id": 4
             }
         ]
-        }    
+    }    
     ```
 
 ### Gerenciamento de produtos e categorias
@@ -159,15 +168,27 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 
     ```json
     {
-    "name": "Brigadeiro",
-    "description": "Doce feito com leite condensado e achocolatado",
-    "price": 3,
-    "category_id": 5,
-    "category": "Sobremesas"
+        "name": "Brigadeiro",
+        "description": "Doce feito com leite condensado e achocolatado",
+        "price": 3,
+        "category_id": 5,
+        "category": "Sobremesas"
     }
     ```
 
-???- note "Listando de categorias e produtos"
+???- note "Atualização de categoria"
+    Para atualizar uma categoria de produto, utilize o endpoint [category/update_category](http://localhost:2000/docs#/category/update_category_category__category_id__put):
+    - Com o valor do **category_id**, faça a requisição com o corpo de requisição similar ao exemplo abaixo:
+
+    ```json
+    {
+    "name": "Sobremesas",
+    "description": "Categoria dedicada a todos os tipos de sobremesas."
+    }    
+    ``` 
+
+
+???- note "Listando categorias e produtos"
     Usando o endpoint [category/list_categories](http://localhost:2000/docs#/category/list_categories_category__get) é possível fazer o cadastro de um novo produto de acordo com as categorias previamente cadastradas. Exemplo com valores que retornam nessa operação:
 
     ```json
