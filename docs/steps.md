@@ -19,8 +19,8 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ![image](assets/token-token.png)
 
     Ao tentar acessar endpoints que requerem autorização, como **category**, **orders**, e **products**, siga estas etapas adicionais:
-    1. Clique em **Authorize**.
-    2. Faça login usando seu e-mail e senha administrativo.
+    - Clique em **Authorize**.
+    - Faça login usando seu e-mail e senha administrativo.
 
 ???- note "Solução de Problemas: 401 Unhauthorized"
     Se ao tentar acessar os endpoints **category**, **orders**, ou **products** você receber uma resposta com o erro 401 Unauthorized, isso significa que as credenciais não foram validadas corretamente.
@@ -35,6 +35,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     }
     ```
     Verifique se o Token de Acesso foi gerado corretamente e se as credenciais estão corretas ao tentar autorizar o acesso.
+    ![image](assets/access-token.png)
 
 
 ### Onboarding: Cliente anônimo
