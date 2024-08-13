@@ -66,9 +66,10 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
             }
         ]
     }
+    ```    
     Resultado da operação de seleção do pedido:
-    ![image](assets/response_order.png) 
-    ```
+    ![image](assets/response_order.png)
+
 
 ### Cenário pagamento: Processando o pagamento do pedido
 
