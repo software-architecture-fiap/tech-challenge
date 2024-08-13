@@ -132,6 +132,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     }
     ```
     - Depois de atualizar o status, você pode confirmar a atualização acessando novamente o endpoint [orders/read_order](http://localhost:2000/docs#/orders/read_order_orders__order_id__get). O estado do pedido será exibido como **pronto para retirada**.
+    ![image](assets/ready_status.png)
 
 
 ???- note "Listando todos os pedidos registrados"
