@@ -19,8 +19,12 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ![image](assets/token-token.png)
 
     Ao tentar acessar endpoints que requerem autorização, como **category**, **orders**, e **products**, siga estas etapas adicionais:
-    - Clique em **Authorize**.
+
+    - Clique em **Authorize** (símbolo de cadeado).
     - Faça login usando seu e-mail e senha administrativo.
+        - **username**: "email@email.com.br"
+        - **password**: "your_password"
+        - **client_id**: 1
 
 ???- note "Solução de Problemas: 401 Unhauthorized"
     Se ao tentar acessar os endpoints **category**, **orders**, ou **products** você receber uma resposta com o erro 401 Unauthorized, isso significa que as credenciais não foram validadas corretamente.
@@ -34,9 +38,12 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
         "detail": "Could not validate credentials"
     }
     ```
-    Verifique se o Token de Acesso foi gerado corretamente e se as credenciais estão corretas ao tentar autorizar o acesso.
+    Verifique se o Token de Acesso foi gerado corretamente e se as credenciais estão corretas ao tentar autorizar o acesso. 
+
+    ![image](assets/security.png)
+    ![image](assets/access-token.png)    
     
-    ![image](assets/access-token.png)
+    Para garantir a segurança, o token expira a cada operação (GET, PUT ou POST). Para ajustar o tempo de expiração do token, você deve definir a variável de ambiente TIMETOKEN no arquivo .env com o valor desejado para o tempo de expiração personalizado.
 
 
 ### Onboarding: Cliente anônimo
