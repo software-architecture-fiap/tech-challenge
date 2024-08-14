@@ -4,6 +4,7 @@ Este projeto é um sistema de pedidos de lanches adaptável para web e mobile, f
 desenvolvida utilizando FastAPI, SQLAlchemy, e Docker.
 
 ## :octicons-package-dependencies-16: Pré-Requisitos
+> Nota: Essa é uma etapa indispensável para habilitar o ambiente de avaliação do tech challenge!
 
 1. **Sistema Operacional**: O projeto pode ser executado em qualquer sistema operacional que suporte Docker e Python.
 Recomenda-se um sistema baseado em Unix (Linux ou macOS) para facilitar o uso de Docker;
@@ -36,13 +37,16 @@ Siga as instruções no site oficial do Docker para instalar o Docker e Docker C
 ### :simple-git: Clonando o Repositório
 
 Clone este repositório para sua máquina local:
+> Nota: Essa é uma etapa indispensável para habilitar o ambiente de avaliação do tech challenge!
+
 
 ```sh
 git clone https://github.com/seu-usuario/tech-challenge.git
 cd tech-challenge
 ```
 
-### :material-database-check: Banco de Dados
+### :material-database-check: Banco de Dados 
+> Nota: Essa é uma etapa indispensável para habilitar o ambiente de avaliação do tech challenge!
 
 - Crie um arquivo `.env` na raiz do projeto e defina as seguintes variáveis:
 
@@ -57,6 +61,7 @@ ADMIN_PASSWORD=your_password
 ```
 
 ### :octicons-terminal-16: Instalando Dependências
+> Nota: Essa é uma etapa indispensável para habilitar o ambiente de avaliação do tech challenge!
 
 - Crie e ative um ambiente virtual (opcional, mas recomendado):
 
@@ -73,6 +78,7 @@ pip install -r requirements.txt
 ```
 
 - Execute as migrações do Alembic para criar o banco de dados e as tabelas necessárias:
+> Nota: Etapa opcional para habilitar o ambiente de avaliação do tech challenge
 
     ```sh
     alembic revision --autogenerate -m 'initial migration'
@@ -80,6 +86,7 @@ pip install -r requirements.txt
     ```
 
 ### :material-infinity: Executando a Aplicação
+> Nota: Essa é uma etapa indispensável para habilitar o ambiente de avaliação do tech challenge!
 
 **Com Docker:**
 
@@ -93,6 +100,7 @@ docker-compose up --build
 A aplicação estará disponível em `localhost:2000`.
 
 **Sem Docker:**
+> Nota: Etapa opcional para habilitar o ambiente de avaliação do tech challenge
 
 Execute o servidor FastAPI:
 
