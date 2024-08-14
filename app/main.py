@@ -30,7 +30,6 @@ logger.info("Application startup")
 origins = [
     "http://localhost",
     "http://localhost:8000",
-    # Adicione outras origens permitidas aqui
 ]
 
 app.add_middleware(
