@@ -1,11 +1,13 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from ..model import schemas
 from ..services import repository
 from ..db.database import get_db
 from ..tools.logging import logger
+from ..services import security
 
 router = APIRouter()
 
@@ -21,9 +23,15 @@ def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_
     return created_customer
 
 @router.get("/{customer_id}", response_model=schemas.Customer)
-def read_customer(customer_id: int, db: Session = Depends(get_db)):
+def read_customer(customer_id: str, db: Session = Depends(get_db)):
     logger.info(f"Fetching customer with ID: {customer_id}")
-    db_customer = repository.get_customer(db, customer_id=customer_id)
+    try:
+        customer_id_int = security.short_id_to_int(customer_id)
+    except (ValueError, IndexError):
+        logger.warning(f"Invalid customer ID format: {customer_id}")
+        raise HTTPException(status_code=400, detail="Invalid customer ID format")
+
+    db_customer = repository.get_customer(db, customer_id=customer_id_int)
     if db_customer is None:
         logger.warning(f"Customer with ID {customer_id} not found")
         raise HTTPException(status_code=404, detail="Customer not found")
@@ -61,4 +69,3 @@ def create_anonymous_customer(db: Session = Depends(get_db)):
     anonymous_customer = repository.create_anonymous_customer(db)
     logger.info(f"Anonymous customer created with ID: {anonymous_customer.id}")
     return anonymous_customer
-

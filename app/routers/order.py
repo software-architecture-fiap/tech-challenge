@@ -20,10 +20,16 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db), curr
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.put("/{order_id}/status", response_model=schemas.OrderResponse)
-def update_order_status(order_id: int, update_data: schemas.UpdateOrderStatus, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+def update_order_status(order_id: str, update_data: schemas.UpdateOrderStatus, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
     logger.info(f"Update order status endpoint called for order ID: {order_id} with status: {update_data.status}")
     try:
-        db_order = repository.update_order_status(db, order_id=order_id, status=update_data.status)
+        order_id_int = security.short_id_to_int(order_id)
+    except (ValueError, IndexError):
+        logger.warning(f"Invalid order ID format: {order_id}")
+        raise HTTPException(status_code=400, detail="Invalid order ID format")
+
+    try:
+        db_order = repository.update_order_status(db, order_id=order_id_int, status=update_data.status)
         if db_order is None:
             logger.warning(f"Order not found: {order_id}")
             raise HTTPException(status_code=404, detail="Order not found")
@@ -45,10 +51,16 @@ def read_orders(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), c
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.get("/{order_id}", response_model=schemas.OrderCustomerView)
-def read_order(order_id: int, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+def read_order(order_id: str, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
     logger.info(f"Read order endpoint called for order_id: {order_id}")
     try:
-        db_order = repository.get_order(db, order_id=order_id)
+        order_id_int = security.short_id_to_int(order_id)
+    except (ValueError, IndexError):
+        logger.warning(f"Invalid order ID format: {order_id}")
+        raise HTTPException(status_code=400, detail="Invalid order ID format")
+
+    try:
+        db_order = repository.get_order(db, order_id=order_id_int)
         if db_order is None:
             logger.warning(f"Order not found: {order_id}")
             raise HTTPException(status_code=404, detail="Order not found")

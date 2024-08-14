@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from ..services import repository
 from ..services import security
-from ..model import models, schemas
+from ..model import schemas
 from ..db import database
 
 router = APIRouter()
@@ -20,23 +20,38 @@ def read_products(skip: int = 0, limit: int = 10, db: Session = Depends(database
     return categorized_products
 
 @router.get("/{product_id}", response_model=schemas.Product)
-def read_product(product_id: int, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
-    db_product = repository.get_product(db, product_id=product_id)
+def read_product(product_id: str, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+    try:
+        product_id_int = security.short_id_to_int(product_id)
+    except (ValueError, IndexError):
+        raise HTTPException(status_code=400, detail="Invalid product ID format")
+
+    db_product = repository.get_product(db, product_id=product_id_int)
     if db_product is None:
         raise HTTPException(status_code=404, detail="Product not found")
     return db_product
 
 @router.put("/{product_id}", response_model=schemas.Product)
-def update_product(product_id: int, product: schemas.ProductCreate, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
-    db_product = repository.get_product(db, product_id=product_id)
+def update_product(product_id: str, product: schemas.ProductCreate, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+    try:
+        product_id_int = security.short_id_to_int(product_id)
+    except (ValueError, IndexError):
+        raise HTTPException(status_code=400, detail="Invalid product ID format")
+
+    db_product = repository.get_product(db, product_id=product_id_int)
     if db_product is None:
         raise HTTPException(status_code=404, detail="Product not found")
     updated_product = repository.update_product(db, db_product=db_product, product=product)
     return updated_product
 
 @router.delete("/{product_id}", response_model=schemas.Product)
-def delete_product(product_id: int, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
-    db_product = repository.get_product(db, product_id=product_id)
+def delete_product(product_id: str, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+    try:
+        product_id_int = security.short_id_to_int(product_id)
+    except (ValueError, IndexError):
+        raise HTTPException(status_code=400, detail="Invalid product ID format")
+
+    db_product = repository.get_product(db, product_id=product_id_int)
     if db_product is None:
         raise HTTPException(status_code=404, detail="Product not found")
-    return repository.delete_product(db=db, product_id=product_id)
+    return repository.delete_product(db=db, product_id=product_id_int)
