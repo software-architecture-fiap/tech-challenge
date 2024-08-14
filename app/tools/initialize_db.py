@@ -36,11 +36,11 @@ def initialize_db(db: Session):
     
     for product in products:
         if product['name'] in existing_product_names:
-            logger.info(f"Product already exists in the database: {product['name']} - Category: {product['category_id']}")
+            logger.debug(f"Product already exists in the database: {product['name']} - Category: {product['category_id']}")
         else:
             db_product = Product(**product)
             db.add(db_product)
-            logger.info(f"Product added: {db_product.name} - Category: {db_product.category}")
+            logger.debug(f"Product added: {db_product.name} - Category: {db_product.category}")
             
     categories = [
     {"name": "Sanduíches"},
@@ -54,11 +54,11 @@ def initialize_db(db: Session):
 
     for category in categories:
         if category['name'] in existing_categories_names:
-            logger.info(f"Category already exists in the database: Category: {category['name']}")
+            logger.debug(f"Category already exists in the database: Category: {category['name']}")
         else:
             db_category = Category(**category)
             db.add(db_category)
-            logger.info(f"Category added: {db_category.name}")
+            logger.debug(f"Category added: {db_category.name}")
 
     db.commit()
-    logger.info("Database initialization completed.")
+    logger.debug("Database initialization completed.")
