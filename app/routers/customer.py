@@ -26,7 +26,7 @@ def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_
 def read_customer(customer_id: str, db: Session = Depends(get_db)):
     logger.info(f"Fetching customer with ID: {customer_id}")
     try:
-        customer_id_int = security.short_id_to_int(customer_id)
+        customer_id_int = customer_id
     except (ValueError, IndexError):
         logger.warning(f"Invalid customer ID format: {customer_id}")
         raise HTTPException(status_code=400, detail="Invalid customer ID format")
