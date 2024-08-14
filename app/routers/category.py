@@ -23,12 +23,12 @@ def list_category(category_id: int, db: Session = Depends(database.get_db), curr
         logger.error(f"Category not found for ID: {category_id}")
         raise HTTPException(status_code=404, detail="Category not found")
     
-    # Preparar a resposta
+    # Montar a resposta
     category_response = schemas.Category(
-        id=str(db_category.id),  # Convertendo o ID para string
+        id=str(db_category.id),
         name=db_category.name,
         products=[schemas.Product(
-            id=str(product.id),  # Convertendo o ID do produto para string
+            id=str(product.id),
             name=product.name,
             description=product.description,
             price=product.price,
@@ -80,16 +80,15 @@ def update_category(category_id: int, category: schemas.CategoryCreate, db: Sess
         raise HTTPException(status_code=404, detail="Category not found")
     
     # Atualizar a categoria
-    db_category.name = category.name  # Atualiza o nome da categoria
+    db_category.name = category.name
     db.commit()
     db.refresh(db_category)
     
-    # Preparar a resposta
     category_response = schemas.Category(
-        id=str(db_category.id),  # Convertendo o ID para string
+        id=str(db_category.id),
         name=db_category.name,
         products=[schemas.Product(
-            id=str(product.id),  # Convertendo o ID do produto para string
+            id=str(product.id),
             name=product.name,
             description=product.description,
             price=product.price,

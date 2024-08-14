@@ -14,7 +14,7 @@ load_dotenv()
 
 logger = logging.getLogger("Application")
 
-def create_token(db: Session, token: str, user_id: int):  # Alterado para int
+def create_token(db: Session, token: str, user_id: int):
     logger.info(f"Creating token for user ID: {user_id}")
     db_token = models.Token(token=token, user_id=user_id)
     db.add(db_token)
@@ -120,7 +120,7 @@ def get_customers_count(db: Session):
     logger.info("Fetching total count of customers")
     return db.query(models.Customer).count()
 
-def get_customer(db: Session, customer_id: int):  # Alterado para int
+def get_customer(db: Session, customer_id: int):
     logger.debug(f"Fetching customer with ID: {customer_id}")
     try:
         return db.query(models.Customer).filter(models.Customer.id == customer_id).first()
@@ -145,7 +145,7 @@ def categorize_products(products: List[models.Product]) -> Dict[str, List[schema
     categorized_products = {}
     for product in products:
         product_data = {
-            "id": str(product.id),  # Mantendo como string para compatibilidade com schemas.Product
+            "id": str(product.id),
             "name": product.name,
             "description": product.description,
             "price": product.price,
@@ -159,7 +159,7 @@ def categorize_products(products: List[models.Product]) -> Dict[str, List[schema
     
     return categorized_products
 
-def get_product(db: Session, product_id: int):  # Alterado para int
+def get_product(db: Session, product_id: int):
     logger.debug(f"Fetching product with ID: {product_id}")
     try:
         return db.query(models.Product).filter(models.Product.id == product_id).first()
@@ -191,7 +191,7 @@ def update_product(db: Session, db_product: models.Product, product: schemas.Pro
     logger.info(f"Product updated with ID: {db_product.id}")
     return db_product
 
-def delete_product(db: Session, product_id: int):  # Alterado para int
+def delete_product(db: Session, product_id: int):
     logger.debug(f"Deleting product with ID: {product_id}")
     try:
         db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
@@ -209,7 +209,7 @@ def delete_product(db: Session, product_id: int):  # Alterado para int
 def create_order(db: Session, order: schemas.OrderCreate):
     logger.debug(f"Creating order for customer ID: {order.customer_id}")
     try:
-        customer_id_int = order.customer_id  # Usando diretamente o ID
+        customer_id_int = order.customer_id
         db_order = models.Order(
             status=order.status,
             user_agent=order.user_agent,
@@ -228,7 +228,7 @@ def create_order(db: Session, order: schemas.OrderCreate):
         logger.info(f"Order created with ID: {db_order.id}")
 
         for product in order.products:
-            product_id_int = product.product_id  # Usando diretamente o ID
+            product_id_int = product.product_id
             db_order_product = models.OrderProduct(
                 order_id=db_order.id,
                 product_id=product_id_int,
@@ -246,7 +246,7 @@ def create_order(db: Session, order: schemas.OrderCreate):
         logger.error(f"Error creating order: {e}", exc_info=True)
         raise
 
-def update_order_status(db: Session, order_id: int, status: str):  # Alterado para int
+def update_order_status(db: Session, order_id: int, status: str):
     logger.debug(f"Updating order status for order ID: {order_id} to {status}")
     try:
         db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
@@ -262,7 +262,7 @@ def update_order_status(db: Session, order_id: int, status: str):  # Alterado pa
         logger.error(f"Error updating order status: {e}", exc_info=True)
         raise
 
-def create_tracking(db: Session, order_id: int, status: str):  # Alterado para int
+def create_tracking(db: Session, order_id: int, status: str):
     logger.debug(f"Creating tracking entry for order ID: {order_id} with status: {status}")
     try:
         db_tracking = models.Tracking(
@@ -289,7 +289,7 @@ def get_orders(db: Session, skip: int = 0, limit: int = 10):
         logger.error(f"Error fetching orders: {e}", exc_info=True)
         raise
 
-def get_order(db: Session, order_id: int):  # Alterado para int
+def get_order(db: Session, order_id: int):
     logger.debug(f"Fetching order with ID: {order_id}")
     try:
         order = db.query(models.Order).filter(models.Order.id == order_id).first()
@@ -317,7 +317,7 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
 
         product_list = [
             schemas.Product(
-                id=product.id,  # Usando diretamente o ID
+                id=product.id,
                 name=product.name,
                 description=product.description,
                 price=product.price,
@@ -327,14 +327,14 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
         ]
 
         category_list.append(schemas.Category(
-            id=category.id,  # Usando diretamente o ID
+            id=category.id,
             name=category.name,
             products=product_list
         ))
 
     return category_list
 
-def get_category_with_products(db: Session, category_id: int):  # Alterado para int
+def get_category_with_products(db: Session, category_id: int):
     logger.debug(f"Fetching category with ID: {category_id}")
     try:
         result = db.execute(
@@ -347,19 +347,15 @@ def get_category_with_products(db: Session, category_id: int):  # Alterado para 
                 {"category_id": category_id}
             ).fetchall()
 
-            # Criando uma lista de Product usando diretamente os atributos
             product_list = [schemas.Product(**dict(product)) for product in products]
-
-            # Retornando Category usando diretamente os atributos
             return schemas.Category(**dict(result), products=product_list)
     except Exception as e:
         logger.error(f"Error fetching category: {e}")
         return None
 
-def get_category(db: Session, category_id: int):  # Alterado para int
+def get_category(db: Session, category_id: int):
     logger.debug(f"Fetching category with ID: {category_id}")
     try:
-        # Utilize o SQLAlchemy ORM para buscar a categoria diretamente
         category = db.query(models.Category).filter(models.Category.id == category_id).first()
         if category:
             return category
@@ -372,7 +368,6 @@ def get_category(db: Session, category_id: int):  # Alterado para int
 def update_category(db: Session, db_category: models.Category, category: schemas.CategoryCreate):
     logger.debug(f"Updating category with ID: {db_category.id}")
     try:
-        # Atualizando a categoria usando o SQLAlchemy ORM
         db_category.id = category.id
         db.commit()
         db.refresh(db_category)
@@ -384,7 +379,6 @@ def update_category(db: Session, db_category: models.Category, category: schemas
 def delete_category(db: Session, db_category: models.Category):
     logger.debug(f"Deleting category with ID: {db_category.id}")
     try:
-        # Deletando a categoria usando o SQLAlchemy ORM
         db.delete(db_category)
         db.commit()
         return db_category

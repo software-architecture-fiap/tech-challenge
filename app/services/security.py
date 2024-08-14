@@ -62,7 +62,7 @@ def get_current_user(db: Session = Depends(database.get_db), token: str = Depend
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get("sub")  # Deixe como inteiro
+        user_id: int = payload.get("sub")
         exp: int = payload.get("exp")
         current_time = datetime.now(timezone.utc)
         logger.info(f"Token decoded, user_id: {user_id}, exp: {exp}, current_time: {current_time.isoformat()}")

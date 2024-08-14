@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from uuid import UUID
 
 from ..services import security
 from ..model import schemas
@@ -24,7 +23,7 @@ def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2Passw
         )
     access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
-        data={"sub": str(user.id)},  # Convertendo o user.id para string
+        data={"sub": str(user.id)},
         expires_delta=access_token_expires
     )
 

@@ -20,7 +20,7 @@ def create_product(product: schemas.ProductCreate, db: Session = Depends(databas
         name=product.name,
         description=product.description,
         price=product.price,
-        category_id=db_category.id  # Associar o ID da categoria ao produto, que deve ser um inteiro
+        category_id=db_category.id
     )
     db.add(db_product)
     db.commit()
@@ -28,11 +28,11 @@ def create_product(product: schemas.ProductCreate, db: Session = Depends(databas
     
     # Retornar o produto criado
     product_response = schemas.Product(
-        id=str(db_product.id),  # Transformar o ID em string, conforme esperado pelo Pydantic
+        id=str(db_product.id),
         name=db_product.name,
         description=db_product.description,
         price=db_product.price,
-        category=db_category.name  # Retornando o nome da categoria como string
+        category=db_category.name
     )
     return product_response
 
@@ -48,13 +48,12 @@ def read_product(product_id: int, db: Session = Depends(database.get_db), curren
     if db_product is None:
         raise HTTPException(status_code=404, detail="Product not found")
     
-    # Ajustando os campos para serem strings, conforme esperado pelo Pydantic
     product_response = schemas.Product(
         id=str(db_product.id),
         name=db_product.name,
         description=db_product.description,
         price=db_product.price,
-        category=db_product.category.name  # Supondo que `category` seja um objeto, pegue o nome dele.
+        category=db_product.category.name
     )
     return product_response
 
@@ -84,7 +83,7 @@ def update_product(product_id: int, product: schemas.ProductCreate, db: Session 
         name=db_product.name,
         description=db_product.description,
         price=db_product.price,
-        category=db_category.name  # Retornando o nome da categoria como string
+        category=db_category.name
     )
     return product_response
 
@@ -100,11 +99,8 @@ def delete_product(product_id: int, db: Session = Depends(database.get_db), curr
         name=db_product.name,
         description=db_product.description,
         price=db_product.price,
-        category=db_product.category.name  # Carregar o nome da categoria enquanto o produto ainda está associado à sessão
+        category=db_product.category.name
     )
     
-    # Deletar o produto
     repository.delete_product(db=db, product_id=product_id)
-    
-    # Retornar a resposta com os dados do produto que foi excluído
     return product_response
