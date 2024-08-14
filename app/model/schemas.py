@@ -11,7 +11,7 @@ class CustomerCreate(CustomerBase):
     password: Optional[str] = None
 
 class Customer(CustomerBase):
-    id: str  
+    id: int  
     
     class Config:
         from_attributes = True
@@ -21,7 +21,7 @@ class CPFIdentify(BaseModel):
 
 class Token(BaseModel):
     access_token: str
-    customer_id: str  
+    customer_id: int  
 
 class TokenData(BaseModel):
     username: Optional[str] = None
@@ -42,11 +42,16 @@ class Product(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-class ProductCreate(ProductBase):
-    pass
+class ProductCreate(BaseModel):
+    name: str
+    description: str
+    price: float
+    category_id: int
+    
+    model_config = ConfigDict(from_attributes=True)
 
 class Product(ProductBase):
-    id: str  
+    id: int  
     
     class Config:
         model_config = ConfigDict(from_attributes=True)
@@ -62,7 +67,7 @@ class CategoryUpdate(BaseModel):
     description: Optional[str] = None
 
 class Category(CategoryBase):
-    id: str  
+    id: int  
     products: List[Product] = []
     
     class Config:
@@ -78,25 +83,25 @@ class OrderBase(BaseModel):
     comments: Optional[str] = None
 
 class OrderProductBase(BaseModel):
-    product_id: str  
+    product_id: int  
     comment: Optional[str] = None
 
 class OrderProductCreate(OrderProductBase):
     pass
 
 class OrderProduct(OrderProductBase):
-    id: str  
+    id: int  
 
     class Config:
         from_attributes = True
 
 class OrderCreate(OrderBase):
-    customer_id: str  
+    customer_id: int  
     products: List[OrderProductCreate]
 
 class Order(OrderBase):
-    id: str  
-    customer_id: str  
+    id: int  
+    customer_id: int  
     created_at: datetime
     updated_at: datetime
     order_products: List[OrderProduct] = []
@@ -104,25 +109,25 @@ class Order(OrderBase):
         from_attributes = True
 
 class OrderResponse(BaseModel):
-    id: str  
-    customer_id: str  
+    id: int  
+    customer_id: int  
     class Config:
         from_attributes = True
 
 class OrderCustomerView(BaseModel):
-    id: str  
-    customer_id: str  
+    id: int  
+    customer_id: int  
     status: str
     class Config:
         from_attributes = True
 
 class TrackingCreate(BaseModel):
     status: str
-    order_id: str  
+    order_id: int  
 
 class Tracking(BaseModel):
-    id: str  
-    order_id: str  
+    id: int  
+    order_id: int  
     status: str
     created_at: datetime
     class Config:

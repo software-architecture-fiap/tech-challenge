@@ -7,7 +7,6 @@ from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from hashids import Hashids
 
 from ..model import schemas
 from ..db import database
@@ -21,24 +20,9 @@ SECRET_KEY = env.get('SECRET_KEY')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1
 
-# Contexto para hash de senha, Token, IDs
+# Contexto para hash de senha e Token
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-hashids = Hashids(salt="ID generated with salt", min_length=8)
-
-def int_to_short_id(int_id: int) -> str:
-    return hashids.encode(int_id)
-
-def short_id_to_int(short_id: str) -> int:
-    try:
-        decoded = hashids.decode(short_id)
-        if not decoded:
-            logger.error(f"Failed to decode short_id: {short_id}")
-            raise ValueError(f"Invalid short_id: {short_id}")
-        return decoded[0]
-    except Exception as e:
-        logger.error(f"Error decoding short_id: {e}")
-        raise ValueError(f"Invalid short_id: {short_id}")
 
 def verify_password(plain_password, hashed_password):
     logger.debug(f"Verifying password for user")
@@ -68,7 +52,6 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     logger.info(f"JWT created: {encoded_jwt}")
     return encoded_jwt
 
-
 def get_current_user(db: Session = Depends(database.get_db), token: str = Depends(oauth2_scheme)):
     logger.info("Fetching current user from token")
     credentials_exception = HTTPException(
@@ -79,12 +62,12 @@ def get_current_user(db: Session = Depends(database.get_db), token: str = Depend
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id_str: str = payload.get("sub")
+        user_id: int = payload.get("sub")  # Deixe como inteiro
         exp: int = payload.get("exp")
         current_time = datetime.now(timezone.utc)
-        logger.info(f"Token decoded, user_id: {user_id_str}, exp: {exp}, current_time: {current_time.isoformat()}")
+        logger.info(f"Token decoded, user_id: {user_id}, exp: {exp}, current_time: {current_time.isoformat()}")
 
-        if user_id_str is None:
+        if user_id is None:
             logger.warning("User ID not found in token payload")
             raise credentials_exception
 
@@ -97,10 +80,10 @@ def get_current_user(db: Session = Depends(database.get_db), token: str = Depend
         logger.warning("Token has already been used")
         raise HTTPException(status_code=401, detail="Token has already been used")
 
-    # Tenta buscar o usuário pelo UUID diretamente
-    user = repository.get_customer(db, customer_id=user_id_str)
+    # Busca o usuário pelo ID
+    user = repository.get_customer(db, customer_id=user_id)
     if user is None:
-        logger.warning(f"User not found with ID: {user_id_str}")
+        logger.warning(f"User not found with ID: {user_id}")
         raise credentials_exception
 
     # Marca o token como usado
@@ -109,7 +92,7 @@ def get_current_user(db: Session = Depends(database.get_db), token: str = Depend
 
     # Retorna os dados do usuário
     return schemas.Customer(
-        id=user_id_str,
+        id=user_id,
         name=user.name,
         email=user.email,
         cpf=user.cpf

@@ -7,24 +7,20 @@ from . import security
 from jose import jwt
 from datetime import datetime, timedelta, timezone
 from ..tools.logging import logger
-from hashids import Hashids
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Configuração para gerar IDs curtos
-hashids = Hashids(salt="ID generated with salt", min_length=8)
-
 logger = logging.getLogger("Application")
 
-def create_token(db: Session, token: str, user_id: str):
+def create_token(db: Session, token: str, user_id: int):  # Alterado para int
     logger.info(f"Creating token for user ID: {user_id}")
     db_token = models.Token(token=token, user_id=user_id)
     db.add(db_token)
     db.commit()
     db.refresh(db_token)
-    logger.info(f"Token created: {db_token.token}")
+    logger.debug(f"Token created: {db_token.token}")
     return db_token
 
 def mark_token_as_used(db: Session, token: str):
@@ -34,22 +30,22 @@ def mark_token_as_used(db: Session, token: str):
         db_token.is_used = True
         db.commit()
         db.refresh(db_token)
-        logger.info(f"Token marked as used: {token}")
+        logger.debug(f"Token marked as used: {token}")
     else:
         logger.warning(f"Token not found: {token}")
     return db_token
 
 def is_token_used(db: Session, token: str):
-    logger.info(f"Checking if token is used: {token}")
+    logger.debug(f"Checking if token is used: {token}")
     db_token = db.query(models.Token).filter(models.Token.token == token).first()
     if db_token and db_token.is_used:
-        logger.info(f"Token is used: {token}")
+        logger.debug(f"Token is used: {token}")
         return True
-    logger.info(f"Token is not used: {token}")
+    logger.debug(f"Token is not used: {token}")
     return False
 
 def create_access_token(data: dict, expires_delta: timedelta):
-    logger.info("Creating access token")
+    logger.debug("Creating access token")
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
@@ -62,7 +58,7 @@ def get_user_by_email(db: Session, email: str):
     return db.query(models.Customer).filter(models.Customer.email == email).first()
 
 def create_user(db: Session, user: schemas.CustomerCreate):
-    logger.info(f"Creating user with email: {user.email}")
+    logger.debug(f"Creating user with email: {user.email}")
     hashed_password = security.get_password_hash(user.password)
     db_user = models.Customer(name=user.name, email=user.email, cpf=user.cpf, hashed_password=hashed_password)
     db.add(db_user)
@@ -72,7 +68,7 @@ def create_user(db: Session, user: schemas.CustomerCreate):
     return db_user
 
 def create_anonymous_customer(db: Session):
-    logger.info("Creating anonymous customer")
+    logger.debug("Creating anonymous customer")
     anonymous_customer = models.Customer(
         name="Anonymous",
         email=None,
@@ -86,7 +82,7 @@ def create_anonymous_customer(db: Session):
     return anonymous_customer
 
 def get_customer_by_cpf(db: Session, cpf: str):
-    logger.info(f"Fetching customer with CPF: {cpf}")
+    logger.debug(f"Fetching customer with CPF: {cpf}")
     return db.query(models.Customer).filter(models.Customer.cpf == cpf).first()
 
 def create_admin_user(db: Session):
@@ -100,7 +96,7 @@ def create_admin_user(db: Session):
             logger.error("Admin user details are not set in environment variables.")
             return
 
-        logger.info(f"Admin email: {admin_email}, Admin name: {admin_name}")
+        logger.debug(f"Admin email: {admin_email}, Admin name: {admin_name}")
 
         user = db.query(models.Customer).filter(models.Customer.email == admin_email).first()
         if not user:
@@ -114,9 +110,9 @@ def create_admin_user(db: Session):
             db.add(admin_user)
             db.commit()
             db.refresh(admin_user)
-            logger.info(f"Admin user created with email: {admin_email}")
+            logger.debug(f"Admin user created with email: {admin_email}")
         else:
-            logger.info(f"Admin user already exists with email: {admin_email}")
+            logger.debug(f"Admin user already exists with email: {admin_email}")
     except Exception as e:
         logger.error(f"Error creating admin user: {e}")
 
@@ -124,21 +120,20 @@ def get_customers_count(db: Session):
     logger.info("Fetching total count of customers")
     return db.query(models.Customer).count()
 
-def get_customer(db: Session, customer_id: str):
-    logger.info(f"Fetching customer with ID: {customer_id}")
+def get_customer(db: Session, customer_id: int):  # Alterado para int
+    logger.debug(f"Fetching customer with ID: {customer_id}")
     try:
-        customer_id_int = security.short_id_to_int(customer_id)
-        return db.query(models.Customer).filter(models.Customer.id == customer_id_int).first()
+        return db.query(models.Customer).filter(models.Customer.id == customer_id).first()
     except Exception as e:
-        logger.error(f"Error converting short ID to int: {e}")
+        logger.error(f"Error fetching customer: {e}")
         return None
 
 def get_customers(db: Session, skip: int = 0, limit: int = 10):
-    logger.info(f"Fetching customers with skip: {skip}, limit: {limit}")
+    logger.debug(f"Fetching customers with skip: {skip}, limit: {limit}")
     return db.query(models.Customer).offset(skip).limit(limit).all()
 
 def create_customer(db: Session, customer: schemas.CustomerCreate):
-    logger.info(f"Creating customer with email: {customer.email}")
+    logger.debug(f"Creating customer with email: {customer.email}")
     db_customer = models.Customer(name=customer.name, email=customer.email, cpf=customer.cpf)
     db.add(db_customer)
     db.commit()
@@ -150,7 +145,7 @@ def categorize_products(products: List[models.Product]) -> Dict[str, List[schema
     categorized_products = {}
     for product in products:
         product_data = {
-            "id": str(product.id),
+            "id": str(product.id),  # Mantendo como string para compatibilidade com schemas.Product
             "name": product.name,
             "description": product.description,
             "price": product.price,
@@ -164,21 +159,20 @@ def categorize_products(products: List[models.Product]) -> Dict[str, List[schema
     
     return categorized_products
 
-def get_product(db: Session, product_id: str):
-    logger.info(f"Fetching product with ID: {product_id}")
+def get_product(db: Session, product_id: int):  # Alterado para int
+    logger.debug(f"Fetching product with ID: {product_id}")
     try:
-        product_id_int = security.short_id_to_int(product_id)
-        return db.query(models.Product).filter(models.Product.id == product_id_int).first()
+        return db.query(models.Product).filter(models.Product.id == product_id).first()
     except Exception as e:
-        logger.error(f"Error converting short ID to int: {e}")
+        logger.error(f"Error fetching product: {e}")
         return None
 
 def get_products(db: Session, skip: int = 0, limit: int = 10):
-    logger.info(f"Fetching products with skip: {skip}, limit: {limit}")
+    logger.debug(f"Fetching products with skip: {skip}, limit: {limit}")
     return db.query(models.Product).offset(skip).limit(limit).all()
 
 def create_product(db: Session, product: schemas.ProductCreate):
-    logger.info(f"Creating product with name: {product.name}")
+    logger.debug(f"Creating product with name: {product.name}")
     db_product = models.Product(name=product.name, description=product.description, price=product.price, category=product.category)
     db.add(db_product)
     db.commit()
@@ -187,7 +181,7 @@ def create_product(db: Session, product: schemas.ProductCreate):
     return db_product
 
 def update_product(db: Session, db_product: models.Product, product: schemas.ProductCreate):
-    logger.info(f"Updating product with name: {product.name}")
+    logger.debug(f"Updating product with name: {product.name}")
     db_product.name = product.name
     db_product.description = product.description
     db_product.price = product.price
@@ -197,11 +191,10 @@ def update_product(db: Session, db_product: models.Product, product: schemas.Pro
     logger.info(f"Product updated with ID: {db_product.id}")
     return db_product
 
-def delete_product(db: Session, product_id: str):
-    logger.info(f"Deleting product with ID: {product_id}")
+def delete_product(db: Session, product_id: int):  # Alterado para int
+    logger.debug(f"Deleting product with ID: {product_id}")
     try:
-        product_id_int = security.short_id_to_int(product_id)
-        db_product = db.query(models.Product).filter(models.Product.id == product_id_int).first()
+        db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
         if db_product:
             db.delete(db_product)
             db.commit()
@@ -210,13 +203,13 @@ def delete_product(db: Session, product_id: str):
             logger.warning(f"Product not found: ID {product_id}")
         return db_product
     except Exception as e:
-        logger.error(f"Error converting short ID to int: {e}")
+        logger.error(f"Error deleting product: {e}")
         return None
 
 def create_order(db: Session, order: schemas.OrderCreate):
-    logger.info(f"Creating order for customer ID: {order.customer_id}")
+    logger.debug(f"Creating order for customer ID: {order.customer_id}")
     try:
-        customer_id_int = security.short_id_to_int(order.customer_id)
+        customer_id_int = order.customer_id  # Usando diretamente o ID
         db_order = models.Order(
             status=order.status,
             user_agent=order.user_agent,
@@ -235,7 +228,7 @@ def create_order(db: Session, order: schemas.OrderCreate):
         logger.info(f"Order created with ID: {db_order.id}")
 
         for product in order.products:
-            product_id_int = security.short_id_to_int(product.product_id)
+            product_id_int = product.product_id  # Usando diretamente o ID
             db_order_product = models.OrderProduct(
                 order_id=db_order.id,
                 product_id=product_id_int,
@@ -253,11 +246,10 @@ def create_order(db: Session, order: schemas.OrderCreate):
         logger.error(f"Error creating order: {e}", exc_info=True)
         raise
 
-def update_order_status(db: Session, order_id: str, status: str):
-    logger.info(f"Updating order status for order ID: {order_id} to {status}")
+def update_order_status(db: Session, order_id: int, status: str):  # Alterado para int
+    logger.debug(f"Updating order status for order ID: {order_id} to {status}")
     try:
-        order_id_int = security.short_id_to_int(order_id)
-        db_order = db.query(models.Order).filter(models.Order.id == order_id_int).first()
+        db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
         if db_order:
             db_order.status = status
             db_order.updated_at = datetime.now(timezone.utc)
@@ -270,12 +262,11 @@ def update_order_status(db: Session, order_id: str, status: str):
         logger.error(f"Error updating order status: {e}", exc_info=True)
         raise
 
-def create_tracking(db: Session, order_id: str, status: str):
-    logger.info(f"Creating tracking entry for order ID: {order_id} with status: {status}")
+def create_tracking(db: Session, order_id: int, status: str):  # Alterado para int
+    logger.debug(f"Creating tracking entry for order ID: {order_id} with status: {status}")
     try:
-        order_id_int = security.short_id_to_int(order_id)
         db_tracking = models.Tracking(
-            order_id=order_id_int,
+            order_id=order_id,
             status=status,
             created_at=datetime.now(timezone.utc)
         )
@@ -289,7 +280,7 @@ def create_tracking(db: Session, order_id: str, status: str):
         raise
 
 def get_orders(db: Session, skip: int = 0, limit: int = 10):
-    logger.info(f"Fetching orders with skip: {skip}, limit: {limit}")
+    logger.debug(f"Fetching orders with skip: {skip}, limit: {limit}")
     try:
         orders = db.query(models.Order).offset(skip).limit(limit).all()
         logger.info(f"Orders fetched successfully")
@@ -298,11 +289,10 @@ def get_orders(db: Session, skip: int = 0, limit: int = 10):
         logger.error(f"Error fetching orders: {e}", exc_info=True)
         raise
 
-def get_order(db: Session, order_id: str):
-    logger.info(f"Fetching order with ID: {order_id}")
+def get_order(db: Session, order_id: int):  # Alterado para int
+    logger.debug(f"Fetching order with ID: {order_id}")
     try:
-        order_id_int = security.short_id_to_int(order_id)
-        order = db.query(models.Order).filter(models.Order.id == order_id_int).first()
+        order = db.query(models.Order).filter(models.Order.id == order_id).first()
         logger.info(f"Order fetched successfully")
         return order
     except Exception as e:
@@ -310,7 +300,7 @@ def get_order(db: Session, order_id: str):
         raise
 
 def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.Category]:
-    logger.info(f"Fetching categories with skip: {skip}, limit: {limit}")
+    logger.debug(f"Fetching categories with skip: {skip}, limit: {limit}")
     
     categories = db.execute(
         text("SELECT id, name FROM categories LIMIT :limit OFFSET :skip"),
@@ -327,7 +317,7 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
 
         product_list = [
             schemas.Product(
-                id=security.int_to_short_id(product.id),
+                id=product.id,  # Usando diretamente o ID
                 name=product.name,
                 description=product.description,
                 price=product.price,
@@ -337,73 +327,67 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
         ]
 
         category_list.append(schemas.Category(
-            id=security.int_to_short_id(category.id),
+            id=category.id,  # Usando diretamente o ID
             name=category.name,
             products=product_list
         ))
 
     return category_list
 
-def get_category_with_products(db: Session, category_id: str):
-    logger.info(f"Fetching category with ID: {category_id}")
+def get_category_with_products(db: Session, category_id: int):  # Alterado para int
+    logger.debug(f"Fetching category with ID: {category_id}")
     try:
-        category_id_int = security.short_id_to_int(category_id)
         result = db.execute(
             text("SELECT * FROM categories WHERE id = :category_id"),
-            {"category_id": category_id_int}
+            {"category_id": category_id}
         ).fetchone()
         if result:
             products = db.execute(
                 text("SELECT * FROM products WHERE category_id = :category_id"),
-                {"category_id": category_id_int}
+                {"category_id": category_id}
             ).fetchall()
 
-            # Criando uma lista de Product usando Pydantic com from_attributes
+            # Criando uma lista de Product usando diretamente os atributos
             product_list = [schemas.Product(**dict(product)) for product in products]
 
-            # Retornando Category usando Pydantic com from_attributes
+            # Retornando Category usando diretamente os atributos
             return schemas.Category(**dict(result), products=product_list)
     except Exception as e:
         logger.error(f"Error fetching category: {e}")
         return None
 
-def get_category(db: Session, category_id: str):
-    logger.info(f"Fetching category with ID: {category_id}")
+def get_category(db: Session, category_id: int):  # Alterado para int
+    logger.debug(f"Fetching category with ID: {category_id}")
     try:
-        category_id_int = security.short_id_to_int(category_id)
-        result = db.execute(
-            text("SELECT * FROM categories WHERE id = :category_id"),
-            {"category_id": category_id_int}
-        ).fetchone()
-        if result:
-            return schemas.Category.from_attributes(result)
+        # Utilize o SQLAlchemy ORM para buscar a categoria diretamente
+        category = db.query(models.Category).filter(models.Category.id == category_id).first()
+        if category:
+            return category
+        else:
+            return None
     except Exception as e:
         logger.error(f"Error fetching category: {e}")
         return None
 
-def update_category(db: Session, db_category: schemas.Category, category: schemas.CategoryCreate):
-    logger.info(f"Updating category with ID: {db_category.id}")
+def update_category(db: Session, db_category: models.Category, category: schemas.CategoryCreate):
+    logger.debug(f"Updating category with ID: {db_category.id}")
     try:
-        category_id_int = security.short_id_to_int(db_category.id)
-        db.execute(
-            text("UPDATE categories SET name = :name WHERE id = :category_id"),
-            {"name": category.name, "category_id": category_id_int}
-        )
+        # Atualizando a categoria usando o SQLAlchemy ORM
+        db_category.id = category.id
         db.commit()
-        return schemas.Category(id=db_category.id, name=category.name)
+        db.refresh(db_category)
+        return db_category
     except Exception as e:
         logger.error(f"Error updating category: {e}")
         return None
 
-def delete_category(db: Session, db_category: schemas.Category):
-    logger.info(f"Deleting category with ID: {db_category.id}")
+def delete_category(db: Session, db_category: models.Category):
+    logger.debug(f"Deleting category with ID: {db_category.id}")
     try:
-        category_id_int = security.short_id_to_int(db_category.id)
-        db.execute(
-            text("DELETE FROM categories WHERE id = :category_id"),
-            {"category_id": category_id_int}
-        )
+        # Deletando a categoria usando o SQLAlchemy ORM
+        db.delete(db_category)
         db.commit()
+        return db_category
     except Exception as e:
         logger.error(f"Error deleting category: {e}")
         return None

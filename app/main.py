@@ -54,12 +54,12 @@ app.include_router(category.router, prefix="/category", tags=["category"])
 
 @app.get("/")
 def read_root():
-    logger.info("Status endpoint accessed")
+    logger.debug("Status endpoint accessed")
     return {"status": "Operational"}
 
 @app.get("/users/me", response_model=schemas.Customer)
 def read_users_me(current_user: schemas.Customer = Depends(get_current_user)):
-    logger.info(f"User endpoint accessed by {current_user.id}")
+    logger.debug(f"User endpoint accessed by {current_user.id}")
     return current_user
 
 # Adiciona a rota para a documentação do ReDoc
