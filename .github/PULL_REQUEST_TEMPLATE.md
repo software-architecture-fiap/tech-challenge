@@ -21,21 +21,6 @@
 
 ---
 
-## ✅ Testes
-
-*Descreva os testes realizados para garantir que a mudança funciona conforme esperado. Inclua se você escreveu novos testes ou atualizou os existentes.*
-
----
-
-## ✔️ Checklist
-
-- [ ] O código está comentado adequadamente.
-- [ ] A documentação foi atualizada (se aplicável).
-- [ ] Os testes passaram localmente.
-- [ ] O código foi revisado por outro membro da equipe (se aplicável).
-
----
-
 ## 📸 Capturas de Tela (se aplicável)
 
 *Adicione capturas de tela ou GIFs que ajudam a ilustrar as mudanças, se necessário.*
