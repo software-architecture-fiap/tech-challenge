@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "tech-challenge"
 version = "0.1.0"
-description = ""
+description = "Projeto Backend da Turma de Pós Graduação em Software Architecture da FIAP em 2024."
 authors = ["rikemorais <rikeaju@hotmail.com>"]
 readme = "README.md"
 
