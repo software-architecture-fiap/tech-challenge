@@ -1,18 +1,22 @@
-# Usando uma imagem base do Python
-FROM python:3.8-slim
+FROM python:3.10-slim
 
-# Definindo o diretório de trabalho
 WORKDIR /app
 
-# Instalando dependências
-COPY requirements.txt requirements.txt
-RUN apt-get update && apt-get install -y curl
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && \
+    apt-get install -y curl build-essential && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copiando o código da aplicação
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+ENV PATH="${PATH}:/root/.local/bin"
+
+COPY pyproject.toml poetry.lock* ./
+
+RUN poetry install --no-root
+
 COPY . .
 
 EXPOSE 2000
 
-# Comando para rodar a aplicação
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "2000", "--reload"]
+CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "2000", "--reload"]
