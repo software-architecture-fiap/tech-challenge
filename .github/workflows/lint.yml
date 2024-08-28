@@ -9,4 +9,4 @@ on:
 
 jobs:
   Validating:
-    uses: software-architecture-fiap/lint-flake8-workflow/blob/main/.github/workflows/lint-flake8-pr-changed-files.yml@main
+    uses: software-architecture-fiap/lint-flake8-workflow/.github/workflows/lint-flake8-pr-changed-files.yml@main
