@@ -1,4 +1,4 @@
-# Challenge - Fase 1
+# Challenge - Fase 2
 
 Este projeto é um Sistema de Pedidos para uma Lanchonete adaptável para web e mobile, focado no backend.
 A aplicação é desenvolvida utilizando FastAPI, SQLAlchemy, e Docker.
