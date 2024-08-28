@@ -1,18 +1,21 @@
 import logging
+import os
+from datetime import datetime, timedelta, timezone
+from typing import Dict, List
+
+from dotenv import load_dotenv
+from jose import jwt
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from typing import List, Dict
+
 from ..model import models, schemas
-from . import security
-from jose import jwt
-from datetime import datetime, timedelta, timezone
 from ..tools.logging import logger
-import os
-from dotenv import load_dotenv
+from . import security
 
 load_dotenv()
 
 logger = logging.getLogger("Application")
+
 
 def create_token(db: Session, token: str, user_id: int):
     logger.info(f"Creating token for user ID: {user_id}")
@@ -22,6 +25,7 @@ def create_token(db: Session, token: str, user_id: int):
     db.refresh(db_token)
     logger.debug(f"Token created: {db_token.token}")
     return db_token
+
 
 def mark_token_as_used(db: Session, token: str):
     logger.info(f"Marking token as used: {token}")
@@ -35,6 +39,7 @@ def mark_token_as_used(db: Session, token: str):
         logger.warning(f"Token not found: {token}")
     return db_token
 
+
 def is_token_used(db: Session, token: str):
     logger.debug(f"Checking if token is used: {token}")
     db_token = db.query(models.Token).filter(models.Token.token == token).first()
@@ -43,6 +48,7 @@ def is_token_used(db: Session, token: str):
         return True
     logger.debug(f"Token is not used: {token}")
     return False
+
 
 def create_access_token(data: dict, expires_delta: timedelta):
     logger.debug("Creating access token")
@@ -53,9 +59,11 @@ def create_access_token(data: dict, expires_delta: timedelta):
     logger.info("Access token created")
     return encoded_jwt
 
+
 def get_user_by_email(db: Session, email: str):
     logger.info(f"Fetching user with email: {email}")
     return db.query(models.Customer).filter(models.Customer.email == email).first()
+
 
 def create_user(db: Session, user: schemas.CustomerCreate):
     logger.debug(f"Creating user with email: {user.email}")
@@ -66,6 +74,7 @@ def create_user(db: Session, user: schemas.CustomerCreate):
     db.refresh(db_user)
     logger.info(f"User created with ID: {db_user.id}")
     return db_user
+
 
 def create_anonymous_customer(db: Session):
     logger.debug("Creating anonymous customer")
@@ -81,9 +90,11 @@ def create_anonymous_customer(db: Session):
     logger.info(f"Anonymous customer created with ID: {anonymous_customer.id}")
     return anonymous_customer
 
+
 def get_customer_by_cpf(db: Session, cpf: str):
     logger.debug(f"Fetching customer with CPF: {cpf}")
     return db.query(models.Customer).filter(models.Customer.cpf == cpf).first()
+
 
 def create_admin_user(db: Session):
     try:
@@ -116,9 +127,11 @@ def create_admin_user(db: Session):
     except Exception as e:
         logger.error(f"Error creating admin user: {e}")
 
+
 def get_customers_count(db: Session):
     logger.info("Fetching total count of customers")
     return db.query(models.Customer).count()
+
 
 def get_customer(db: Session, customer_id: int):
     logger.debug(f"Fetching customer with ID: {customer_id}")
@@ -128,9 +141,11 @@ def get_customer(db: Session, customer_id: int):
         logger.error(f"Error fetching customer: {e}")
         return None
 
+
 def get_customers(db: Session, skip: int = 0, limit: int = 10):
     logger.debug(f"Fetching customers with skip: {skip}, limit: {limit}")
     return db.query(models.Customer).offset(skip).limit(limit).all()
+
 
 def create_customer(db: Session, customer: schemas.CustomerCreate):
     logger.debug(f"Creating customer with email: {customer.email}")
@@ -140,6 +155,7 @@ def create_customer(db: Session, customer: schemas.CustomerCreate):
     db.refresh(db_customer)
     logger.info(f"Customer created with ID: {db_customer.id}")
     return db_customer
+
 
 def categorize_products(products: List[models.Product]) -> Dict[str, List[schemas.Product]]:
     categorized_products = {}
@@ -154,10 +170,11 @@ def categorize_products(products: List[models.Product]) -> Dict[str, List[schema
 
         if product.category.name not in categorized_products:
             categorized_products[product.category.name] = []
-        
+
         categorized_products[product.category.name].append(schemas.Product(**product_data))
-    
+
     return categorized_products
+
 
 def get_product(db: Session, product_id: int):
     logger.debug(f"Fetching product with ID: {product_id}")
@@ -167,9 +184,11 @@ def get_product(db: Session, product_id: int):
         logger.error(f"Error fetching product: {e}")
         return None
 
+
 def get_products(db: Session, skip: int = 0, limit: int = 10):
     logger.debug(f"Fetching products with skip: {skip}, limit: {limit}")
     return db.query(models.Product).offset(skip).limit(limit).all()
+
 
 def create_product(db: Session, product: schemas.ProductCreate):
     logger.debug(f"Creating product with name: {product.name}")
@@ -179,6 +198,7 @@ def create_product(db: Session, product: schemas.ProductCreate):
     db.refresh(db_product)
     logger.info(f"Product created with ID: {db_product.id}")
     return db_product
+
 
 def update_product(db: Session, db_product: models.Product, product: schemas.ProductCreate):
     logger.debug(f"Updating product with name: {product.name}")
@@ -190,6 +210,7 @@ def update_product(db: Session, db_product: models.Product, product: schemas.Pro
     db.refresh(db_product)
     logger.info(f"Product updated with ID: {db_product.id}")
     return db_product
+
 
 def delete_product(db: Session, product_id: int):
     logger.debug(f"Deleting product with ID: {product_id}")
@@ -205,6 +226,7 @@ def delete_product(db: Session, product_id: int):
     except Exception as e:
         logger.error(f"Error deleting product: {e}")
         return None
+
 
 def create_order(db: Session, order: schemas.OrderCreate):
     logger.debug(f"Creating order for customer ID: {order.customer_id}")
@@ -238,13 +260,14 @@ def create_order(db: Session, order: schemas.OrderCreate):
             db.commit()
             db.refresh(db_order_product)
             logger.info(f"Product {db_order_product.product_id} added to order {db_order.id}")
-            
+
         create_tracking(db, db_order.id, db_order.status)
 
         return db_order
     except Exception as e:
         logger.error(f"Error creating order: {e}", exc_info=True)
         raise
+
 
 def update_order_status(db: Session, order_id: int, status: str):
     logger.debug(f"Updating order status for order ID: {order_id} to {status}")
@@ -261,6 +284,7 @@ def update_order_status(db: Session, order_id: int, status: str):
     except Exception as e:
         logger.error(f"Error updating order status: {e}", exc_info=True)
         raise
+
 
 def create_tracking(db: Session, order_id: int, status: str):
     logger.debug(f"Creating tracking entry for order ID: {order_id} with status: {status}")
@@ -279,34 +303,37 @@ def create_tracking(db: Session, order_id: int, status: str):
         logger.error(f"Error creating tracking entry: {e}", exc_info=True)
         raise
 
+
 def get_orders(db: Session, skip: int = 0, limit: int = 10):
     logger.debug(f"Fetching orders with skip: {skip}, limit: {limit}")
     try:
         orders = db.query(models.Order).offset(skip).limit(limit).all()
-        logger.info(f"Orders fetched successfully")
+        logger.info("Orders fetched successfully")
         return orders
     except Exception as e:
         logger.error(f"Error fetching orders: {e}", exc_info=True)
         raise
 
+
 def get_order(db: Session, order_id: int):
     logger.debug(f"Fetching order with ID: {order_id}")
     try:
         order = db.query(models.Order).filter(models.Order.id == order_id).first()
-        logger.info(f"Order fetched successfully")
+        logger.info("Order fetched successfully")
         return order
     except Exception as e:
         logger.error(f"Error fetching order: {e}", exc_info=True)
         raise
 
+
 def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.Category]:
     logger.debug(f"Fetching categories with skip: {skip}, limit: {limit}")
-    
+
     categories = db.execute(
         text("SELECT id, name FROM categories LIMIT :limit OFFSET :skip"),
         {"limit": limit, "skip": skip}
     ).fetchall()
-    
+
     category_list = []
     for category in categories:
         category_id = category.id
@@ -334,6 +361,7 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
 
     return category_list
 
+
 def get_category_with_products(db: Session, category_id: int):
     logger.debug(f"Fetching category with ID: {category_id}")
     try:
@@ -353,6 +381,7 @@ def get_category_with_products(db: Session, category_id: int):
         logger.error(f"Error fetching category: {e}")
         return None
 
+
 def get_category(db: Session, category_id: int):
     logger.debug(f"Fetching category with ID: {category_id}")
     try:
@@ -365,6 +394,7 @@ def get_category(db: Session, category_id: int):
         logger.error(f"Error fetching category: {e}")
         return None
 
+
 def update_category(db: Session, db_category: models.Category, category: schemas.CategoryCreate):
     logger.debug(f"Updating category with ID: {db_category.id}")
     try:
@@ -375,6 +405,7 @@ def update_category(db: Session, db_category: models.Category, category: schemas
     except Exception as e:
         logger.error(f"Error updating category: {e}")
         return None
+
 
 def delete_category(db: Session, db_category: models.Category):
     logger.debug(f"Deleting category with ID: {db_category.id}")

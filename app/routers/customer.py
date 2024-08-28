@@ -1,15 +1,15 @@
 from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from uuid import UUID
 
+from ..db.database import get_db
 from ..model import schemas
 from ..services import repository
-from ..db.database import get_db
 from ..tools.logging import logger
-from ..services import security
 
 router = APIRouter()
+
 
 @router.post("/admin", response_model=schemas.Customer)
 def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_db)):
@@ -21,6 +21,7 @@ def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_
     created_customer = repository.create_user(db=db, user=customer)
     logger.info(f"Customer created with ID: {created_customer.id}")
     return created_customer
+
 
 @router.get("/{customer_id}", response_model=schemas.Customer)
 def read_customer(customer_id: str, db: Session = Depends(get_db)):
@@ -37,11 +38,13 @@ def read_customer(customer_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Customer not found")
     return db_customer
 
+
 @router.get("/", response_model=List[schemas.Customer])
 def read_customers(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     logger.info(f"Fetching customers with skip: {skip}, limit: {limit}")
     customers = repository.get_customers(db, skip=skip, limit=limit)
     return customers
+
 
 @router.post("/identify", response_model=schemas.Customer)
 def identify_customer(cpf: schemas.CPFIdentify, db: Session = Depends(get_db)):
@@ -51,6 +54,7 @@ def identify_customer(cpf: schemas.CPFIdentify, db: Session = Depends(get_db)):
         logger.warning(f"Customer with CPF {cpf.cpf} not found")
         raise HTTPException(status_code=404, detail="Customer not found")
     return db_customer
+
 
 @router.post("/register", response_model=schemas.Customer)
 def register_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_db)):
@@ -62,6 +66,7 @@ def register_customer(customer: schemas.CustomerCreate, db: Session = Depends(ge
     created_customer = repository.create_user(db=db, user=customer)
     logger.info(f"Customer registered with ID: {created_customer.id}")
     return created_customer
+
 
 @router.post("/anonymous", response_model=schemas.Customer)
 def create_anonymous_customer(db: Session = Depends(get_db)):

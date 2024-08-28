@@ -1,7 +1,8 @@
-import os
 import fnmatch
+import os
 
 IGNORED_DIRS = ["node_modules", "build", "public", ".venv", "__pycache__", ".git", "log", "install"]
+
 
 def generate_directory_tree(root_dir, output_file, ignore_patterns=None):
     if ignore_patterns is None:
@@ -23,6 +24,7 @@ def generate_directory_tree(root_dir, output_file, ignore_patterns=None):
             output.write(f"{indent}- {os.path.basename(dirpath)}/\n")
             for filename in sorted(filenames):
                 output.write(f"{indent}  - {filename}\n")
+
 
 if __name__ == "__main__":
     root_directory = "./"

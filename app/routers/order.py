@@ -1,12 +1,15 @@
+from typing import Dict, List
+
 from fastapi import APIRouter, Depends, HTTPException
-from typing import List, Dict
 from sqlalchemy.orm import Session
-from ..services import security, repository
+
 from ..db.database import get_db
 from ..model import schemas
+from ..services import repository, security
 from ..tools.logging import logger
 
 router = APIRouter()
+
 
 @router.post("/", response_model=schemas.OrderResponse)
 def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
@@ -18,6 +21,7 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db), curr
     except Exception as e:
         logger.error(f"Error creating order: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
 
 @router.put("/{order_id}/status", response_model=schemas.OrderResponse)
 def update_order_status(order_id: str, update_data: schemas.UpdateOrderStatus, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
@@ -39,6 +43,7 @@ def update_order_status(order_id: str, update_data: schemas.UpdateOrderStatus, d
         logger.error(f"Error updating order status: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
+
 @router.get("/", response_model=Dict[str, List[schemas.OrderResponse]])
 def read_orders(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
     logger.info("Read orders endpoint called")
@@ -49,6 +54,7 @@ def read_orders(skip: int = 0, limit: int = 10, db: Session = Depends(get_db), c
     except Exception as e:
         logger.error(f"Error fetching orders: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
 
 @router.get("/{order_id}", response_model=schemas.OrderCustomerView)
 def read_order(order_id: str, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
@@ -69,6 +75,7 @@ def read_order(order_id: str, db: Session = Depends(get_db), current_user: schem
     except Exception as e:
         logger.error(f"Error fetching order: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
 
 @router.post("/checkout", response_model=schemas.OrderResponse)
 def fake_checkout(order: schemas.OrderCreate, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)):

@@ -1,18 +1,21 @@
 from __future__ import with_statement
-from alembic import context
-from sqlalchemy import engine_from_config, pool
-from logging.config import fileConfig
+
 import os
 import sys
+from logging.config import fileConfig
+
+from sqlalchemy import engine_from_config, pool
+
+from alembic import context
 
 # Adiciona o caminho do diretório raiz do projeto ao sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from app.db.database import Base
-from app.model.models import Customer
-
 # Carrega variáveis de ambiente do .env
 from dotenv import load_dotenv
+
+from app.db.database import Base
+
 load_dotenv()
 
 config = context.config
@@ -23,9 +26,11 @@ fileConfig(config.config_file_name)
 # Metadata para autogeração
 target_metadata = Base.metadata
 
+
 # Obter URL do banco de dados a partir da variável de ambiente
 def get_url():
     return os.getenv("DATABASE_URL")
+
 
 def run_migrations_offline():
     """Executa as migrações no modo offline."""
@@ -34,6 +39,7 @@ def run_migrations_offline():
 
     with context.begin_transaction():
         context.run_migrations()
+
 
 def run_migrations_online():
     """Executa as migrações no modo online."""
@@ -49,6 +55,7 @@ def run_migrations_online():
 
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()
