@@ -1,14 +1,10 @@
-import logging
 import time
 
 from aioredis import Redis, from_url
 from fastapi import HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
 
 from ..tools.logging import logger
-
-logger = logging.getLogger("Application")
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -51,6 +47,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             added = await self.redis.zadd(key, {current_time: current_time})
             logger.info(f"Added {added} requests at time {current_time} for key {key}")
 
+            # Set expiration time for the key
             expiration_set = await self.redis.expire(key, self.rate_limit_period)
             logger.info(f"Set expiration for key {key}: {expiration_set}")
 

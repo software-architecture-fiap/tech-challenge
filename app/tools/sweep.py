@@ -8,7 +8,7 @@ def generate_directory_tree(root_dir, output_file, ignore_patterns=None):
     if ignore_patterns is None:
         ignore_patterns = []
 
-    with open(output_file, "w") as output:
+    with open(output_file, "w", encoding="utf-8") as output:
         output.write("# Directory Tree\n\n")
 
         for dirpath, dirnames, filenames in os.walk(root_dir):
@@ -16,13 +16,13 @@ def generate_directory_tree(root_dir, output_file, ignore_patterns=None):
             dirnames[:] = [d for d in dirnames if d not in IGNORED_DIRS]
             # Filtra as pastas e arquivos ignorados pelo padrão .gitignore
             dirnames[:] = [d for d in dirnames if not any(fnmatch.fnmatch(d, pat) for pat in ignore_patterns)]
-            filenames = [f for f in filenames if not any(fnmatch.fnmatch(f, pat) for pat in ignore_patterns)]
+            filtered_filenames = [f for f in filenames if not any(fnmatch.fnmatch(f, pat) for pat in ignore_patterns)]
 
             depth = dirpath.count(os.sep) - root_dir.count(os.sep)
             indent = "  " * depth
 
             output.write(f"{indent}- {os.path.basename(dirpath)}/\n")
-            for filename in sorted(filenames):
+            for filename in sorted(filtered_filenames):
                 output.write(f"{indent}  - {filename}\n")
 
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     ignore_patterns = []
     if os.path.exists(gitignore_path):
-        with open(gitignore_path, "r") as gitignore_file:
+        with open(gitignore_path, "r", encoding="utf-8") as gitignore_file:
             ignore_patterns = gitignore_file.read().splitlines()
 
     generate_directory_tree(root_directory, output_file, ignore_patterns)

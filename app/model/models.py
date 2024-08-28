@@ -40,7 +40,8 @@ class Order(Base):
     device = Column(String)
     comments = Column(Text)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc),
+                        onupdate=lambda: datetime.now(timezone.utc))
 
     customer_id = Column(Integer, ForeignKey('customers.id'))
     customer = relationship("Customer", back_populates="orders")

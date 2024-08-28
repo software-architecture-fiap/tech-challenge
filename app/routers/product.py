@@ -11,7 +11,11 @@ router = APIRouter()
 
 
 @router.post("/", response_model=schemas.Product)
-def create_product(product: schemas.ProductCreate, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+def create_product(
+    product: schemas.ProductCreate,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user)
+):
     # Buscar a categoria no banco de dados
     db_category = repository.get_category(db, category_id=product.category_id)
     if not db_category:
@@ -40,14 +44,23 @@ def create_product(product: schemas.ProductCreate, db: Session = Depends(databas
 
 
 @router.get("/", response_model=Dict[str, List[schemas.Product]])
-def read_products(skip: int = 0, limit: int = 10, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+def read_products(
+    skip: int = 0,
+    limit: int = 10,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user)
+):
     products = repository.get_products(db, skip=skip, limit=limit)
     categorized_products = repository.categorize_products(products)
     return categorized_products
 
 
 @router.get("/{product_id}", response_model=schemas.Product)
-def read_product(product_id: int, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+def read_product(
+    product_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user)
+):
     db_product = repository.get_product(db, product_id=product_id)
     if db_product is None:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -63,7 +76,12 @@ def read_product(product_id: int, db: Session = Depends(database.get_db), curren
 
 
 @router.put("/{product_id}", response_model=schemas.Product)
-def update_product(product_id: int, product: schemas.ProductCreate, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+def update_product(
+    product_id: int,
+    product: schemas.ProductCreate,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user)
+):
     db_product = repository.get_product(db, product_id=product_id)
     if db_product is None:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -94,7 +112,11 @@ def update_product(product_id: int, product: schemas.ProductCreate, db: Session 
 
 
 @router.delete("/{product_id}", response_model=schemas.Product)
-def delete_product(product_id: int, db: Session = Depends(database.get_db), current_user: schemas.Customer = Depends(security.get_current_user)):
+def delete_product(
+    product_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user)
+):
     db_product = repository.get_product(db, product_id=product_id)
     if db_product is None:
         raise HTTPException(status_code=404, detail="Product not found")

@@ -1,4 +1,3 @@
-import logging
 import os
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List
@@ -13,8 +12,6 @@ from ..tools.logging import logger
 from . import security
 
 load_dotenv()
-
-logger = logging.getLogger("Application")
 
 
 def create_token(db: Session, token: str, user_id: int):
@@ -192,11 +189,20 @@ def get_products(db: Session, skip: int = 0, limit: int = 10):
 
 def create_product(db: Session, product: schemas.ProductCreate):
     logger.debug(f"Creating product with name: {product.name}")
-    db_product = models.Product(name=product.name, description=product.description, price=product.price, category=product.category)
+
+    db_product = models.Product(
+        name=product.name,
+        description=product.description,
+        price=product.price,
+        category=product.category
+    )
+
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
+
     logger.info(f"Product created with ID: {db_product.id}")
+
     return db_product
 
 
