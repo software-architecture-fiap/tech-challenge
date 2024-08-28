@@ -126,6 +126,7 @@ class Order(OrderBase):
     created_at: datetime
     updated_at: datetime
     order_products: List[OrderProduct] = []
+
     class Config:
         from_attributes = True
 
@@ -133,6 +134,7 @@ class Order(OrderBase):
 class OrderResponse(BaseModel):
     id: int
     customer_id: int
+
     class Config:
         from_attributes = True
 
@@ -141,6 +143,7 @@ class OrderCustomerView(BaseModel):
     id: int
     customer_id: int
     status: str
+
     class Config:
         from_attributes = True
 
@@ -155,6 +158,7 @@ class Tracking(BaseModel):
     order_id: int
     status: str
     created_at: datetime
+
     class Config:
         from_attributes = True
 

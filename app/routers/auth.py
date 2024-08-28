@@ -23,10 +23,7 @@ def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2Passw
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = security.create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=access_token_expires
-    )
+    access_token = security.create_access_token(data={"sub": str(user.id)}, expires_delta=access_token_expires)
 
     logger.info(f"Token created for user ID: {user.id}")
-    return {"access_token": f'bearer {access_token}', "customer_id": str(user.id)}
+    return {"access_token": f"bearer {access_token}", "customer_id": str(user.id)}

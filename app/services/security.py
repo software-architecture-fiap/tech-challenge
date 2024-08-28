@@ -17,7 +17,7 @@ from . import repository
 load_dotenv()
 
 # Configurações do JWT
-SECRET_KEY = env.get('SECRET_KEY')
+SECRET_KEY = env.get("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1
 
@@ -97,9 +97,4 @@ def get_current_user(db: Session = Depends(database.get_db), token: str = Depend
     logger.info(f"User authenticated: {user.email}")
 
     # Retorna os dados do usuário
-    return schemas.Customer(
-        id=user_id,
-        name=user.name,
-        email=user.email,
-        cpf=user.cpf
-    )
+    return schemas.Customer(id=user_id, name=user.name, email=user.email, cpf=user.cpf)

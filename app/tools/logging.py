@@ -18,10 +18,7 @@ logging.basicConfig(
         "%(asctime)s - %(filename)s - %(pathname)s - %(name)s - "
         "%(lineno)s - %(levelname)s - %(funcName)s - %(threadName)s - %(message)s"
     ),
-    handlers=[
-        logging.FileHandler(log_filepath),
-        logging.StreamHandler()
-    ]
+    handlers=[logging.FileHandler(log_filepath), logging.StreamHandler()],
 )
 
 logging.getLogger("passlib.registry").setLevel(logging.WARNING)

@@ -38,10 +38,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
             if request_count >= self.rate_limit:
                 logger.warning(f"Rate limit exceeded for key {key}")
-                raise HTTPException(
-                    status_code=429,
-                    detail="Too many requests from this IP. Please try again later."
-                )
+                raise HTTPException(status_code=429, detail="Too many requests from this IP. Please try again later.")
 
             # Add current request
             added = await self.redis.zadd(key, {current_time: current_time})
@@ -57,10 +54,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         except Exception as e:
             logger.error(f"Error in RateLimitMiddleware: {e}")
-            raise HTTPException(
-                status_code=500,
-                detail="Internal server error"
-            )
+            raise HTTPException(status_code=500, detail="Internal server error")
 
 
 class ExceptionLoggingMiddleware(BaseHTTPMiddleware):

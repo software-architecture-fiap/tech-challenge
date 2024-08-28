@@ -75,12 +75,7 @@ def create_user(db: Session, user: schemas.CustomerCreate):
 
 def create_anonymous_customer(db: Session):
     logger.debug("Creating anonymous customer")
-    anonymous_customer = models.Customer(
-        name="Anonymous",
-        email=None,
-        cpf=None,
-        hashed_password=None
-    )
+    anonymous_customer = models.Customer(name="Anonymous", email=None, cpf=None, hashed_password=None)
     db.add(anonymous_customer)
     db.commit()
     db.refresh(anonymous_customer)
@@ -110,10 +105,7 @@ def create_admin_user(db: Session):
         if not user:
             hashed_password = security.get_password_hash(admin_password)
             admin_user = models.Customer(
-                name=admin_name,
-                email=admin_email,
-                cpf=admin_cpf,
-                hashed_password=hashed_password
+                name=admin_name, email=admin_email, cpf=admin_cpf, hashed_password=hashed_password
             )
             db.add(admin_user)
             db.commit()
@@ -162,7 +154,7 @@ def categorize_products(products: List[models.Product]) -> Dict[str, List[schema
             "name": product.name,
             "description": product.description,
             "price": product.price,
-            "category": product.category.name
+            "category": product.category.name,
         }
 
         if product.category.name not in categorized_products:
@@ -191,10 +183,7 @@ def create_product(db: Session, product: schemas.ProductCreate):
     logger.debug(f"Creating product with name: {product.name}")
 
     db_product = models.Product(
-        name=product.name,
-        description=product.description,
-        price=product.price,
-        category=product.category
+        name=product.name, description=product.description, price=product.price, category=product.category
     )
 
     db.add(db_product)
@@ -248,7 +237,7 @@ def create_order(db: Session, order: schemas.OrderCreate):
             comments=order.comments,
             customer_id=customer_id_int,
             created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc)
+            updated_at=datetime.now(timezone.utc),
         )
         db.add(db_order)
         db.commit()
@@ -258,9 +247,7 @@ def create_order(db: Session, order: schemas.OrderCreate):
         for product in order.products:
             product_id_int = product.product_id
             db_order_product = models.OrderProduct(
-                order_id=db_order.id,
-                product_id=product_id_int,
-                comment=product.comment
+                order_id=db_order.id, product_id=product_id_int, comment=product.comment
             )
             db.add(db_order_product)
             db.commit()
@@ -295,11 +282,7 @@ def update_order_status(db: Session, order_id: int, status: str):
 def create_tracking(db: Session, order_id: int, status: str):
     logger.debug(f"Creating tracking entry for order ID: {order_id} with status: {status}")
     try:
-        db_tracking = models.Tracking(
-            order_id=order_id,
-            status=status,
-            created_at=datetime.now(timezone.utc)
-        )
+        db_tracking = models.Tracking(order_id=order_id, status=status, created_at=datetime.now(timezone.utc))
         db.add(db_tracking)
         db.commit()
         db.refresh(db_tracking)
@@ -336,8 +319,7 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
     logger.debug(f"Fetching categories with skip: {skip}, limit: {limit}")
 
     categories = db.execute(
-        text("SELECT id, name FROM categories LIMIT :limit OFFSET :skip"),
-        {"limit": limit, "skip": skip}
+        text("SELECT id, name FROM categories LIMIT :limit OFFSET :skip"), {"limit": limit, "skip": skip}
     ).fetchall()
 
     category_list = []
@@ -345,7 +327,7 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
         category_id = category.id
         products = db.execute(
             text("SELECT id, name, description, price FROM products WHERE category_id = :category_id"),
-            {"category_id": category_id}
+            {"category_id": category_id},
         ).fetchall()
 
         product_list = [
@@ -354,16 +336,12 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
                 name=product.name,
                 description=product.description,
                 price=product.price,
-                category=category.name
+                category=category.name,
             )
             for product in products
         ]
 
-        category_list.append(schemas.Category(
-            id=category.id,
-            name=category.name,
-            products=product_list
-        ))
+        category_list.append(schemas.Category(id=category.id, name=category.name, products=product_list))
 
     return category_list
 
@@ -372,13 +350,11 @@ def get_category_with_products(db: Session, category_id: int):
     logger.debug(f"Fetching category with ID: {category_id}")
     try:
         result = db.execute(
-            text("SELECT * FROM categories WHERE id = :category_id"),
-            {"category_id": category_id}
+            text("SELECT * FROM categories WHERE id = :category_id"), {"category_id": category_id}
         ).fetchone()
         if result:
             products = db.execute(
-                text("SELECT * FROM products WHERE category_id = :category_id"),
-                {"category_id": category_id}
+                text("SELECT * FROM products WHERE category_id = :category_id"), {"category_id": category_id}
             ).fetchall()
 
             product_list = [schemas.Product(**dict(product)) for product in products]

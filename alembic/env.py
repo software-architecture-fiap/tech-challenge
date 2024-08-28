@@ -9,7 +9,7 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 
 # Adiciona o caminho do diretório raiz do projeto ao sys.path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 # Carrega variáveis de ambiente do .env
 from dotenv import load_dotenv
@@ -44,10 +44,7 @@ def run_migrations_offline():
 def run_migrations_online():
     """Executa as migrações no modo online."""
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-        url=get_url()
+        config.get_section(config.config_ini_section), prefix="sqlalchemy.", poolclass=pool.NullPool, url=get_url()
     )
 
     with connectable.connect() as connection:

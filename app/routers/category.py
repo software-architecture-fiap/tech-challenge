@@ -13,10 +13,10 @@ router = APIRouter()
 
 @router.get("/", response_model=Dict[str, List[schemas.Category]])
 def list_categories(
-        skip: int = 0,
-        limit: int = 10,
-        db: Session = Depends(database.get_db),
-        current_user: schemas.Customer = Depends(security.get_current_user)
+    skip: int = 0,
+    limit: int = 10,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user),
 ):
     categories = repository.get_categories(db, skip=skip, limit=limit)
     return {"categories": categories}
@@ -24,9 +24,10 @@ def list_categories(
 
 @router.get("/{category_id}", response_model=schemas.Category)
 def get_category(
-        category_id: int,
-        db: Session = Depends(database.get_db),
-        current_user: schemas.Customer = Depends(security.get_current_user)):
+    category_id: int,
+    db: Session = Depends(database.get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user),
+):
     logger.info(f"Received category ID: {category_id}")
 
     # Buscar a categoria no banco de dados
@@ -46,9 +47,10 @@ def get_category(
                 name=product.name,
                 description=product.description,
                 price=product.price,
-                category=db_category.name
-            ) for product in db_category.products
-        ]
+                category=db_category.name,
+            )
+            for product in db_category.products
+        ],
     )
 
     logger.info(f"Returning category: {category_response}")
@@ -59,7 +61,7 @@ def get_category(
 def create_category(
     category: schemas.CategoryCreate,
     db: Session = Depends(database.get_db),
-    current_user: schemas.Customer = Depends(security.get_current_user)
+    current_user: schemas.Customer = Depends(security.get_current_user),
 ):
     logger.info(f"Received request to create category with name: {category.name}")
 
@@ -78,11 +80,7 @@ def create_category(
         logger.info(f"Category created successfully with ID: {db_category.id}")
 
         # Retornar a categoria criada
-        return schemas.Category(
-            id=db_category.id,
-            name=db_category.name,
-            products=[]
-        )
+        return schemas.Category(id=db_category.id, name=db_category.name, products=[])
 
     except Exception as e:
         logger.error(f"Error creating category: {e}")
@@ -94,7 +92,7 @@ def update_category(
     category_id: int,
     category: schemas.CategoryCreate,
     db: Session = Depends(database.get_db),
-    current_user: schemas.Customer = Depends(security.get_current_user)
+    current_user: schemas.Customer = Depends(security.get_current_user),
 ):
     # Buscar a categoria existente no banco de dados
     db_category = repository.get_category(db, category_id=category_id)
@@ -115,9 +113,10 @@ def update_category(
                 name=product.name,
                 description=product.description,
                 price=product.price,
-                category=db_category.name
-            ) for product in db_category.products
-        ]
+                category=db_category.name,
+            )
+            for product in db_category.products
+        ],
     )
 
     return category_response
@@ -127,7 +126,7 @@ def update_category(
 def delete_category(
     category_id: str,
     db: Session = Depends(database.get_db),
-    current_user: schemas.Customer = Depends(security.get_current_user)
+    current_user: schemas.Customer = Depends(security.get_current_user),
 ):
     try:
         category_id_int = category_id
