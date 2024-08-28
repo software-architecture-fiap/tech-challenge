@@ -1,0 +1,35 @@
+name: Lint Flake8
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Determine Changed Files
+        id: changes
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.sha }} --depth=1
+          changed_files=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }})
+          files_to_lint=$(echo "$changed_files" | grep '\.py$' | cat)
+          DELIMITER=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "files_to_lint<<$DELIMITER" >> "$GITHUB_OUTPUT"
+          echo $files_to_lint >> "$GITHUB_OUTPUT"
+          echo "$DELIMITER" >> "$GITHUB_OUTPUT"
+
+      - name: Install Flake8
+        run: pip install --user flake8
+
+      - name: Run Lint On Changed Files
+        run: |
+          files_to_lint="${{ steps.changes.outputs.files_to_lint }}"
+          if [ -z "$files_to_lint" ]; then
+            exit 0
+          else
+            flake8 --show-source --statistics $files_to_lint
+          fi
