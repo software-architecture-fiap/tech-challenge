@@ -88,6 +88,12 @@ ruff = "^0.6.2"
 taskipy = "^1.13.0"
 interrogate = "^1.7.0"
 
+[tool.interrogate]
+ignore-init-method = false
+generate-badge = "docs/assets/"
+badge-format = "svg"
+--badge-style = "flat-square-modified"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
