@@ -107,6 +107,14 @@ extend-exclude = ['migrations']
 preview = true
 quote-style = 'single'
 
+[tool.taskipy.tasks]
+run = 'fastapi dev fastapi_template/app.py'
+pre_test = 'task lint'
+test = 'pytest --cov=fastapi_template -vv'
+lint = 'ruff check . && ruff check . --diff'
+format = 'ruff check . --fix && ruff format .'
+post_test = 'coverage html'
+
 [tool.ruff.lint]
 preview = true
 select = ['I', 'F', 'E', 'W', 'PL', 'PT']
