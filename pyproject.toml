@@ -87,6 +87,7 @@ passlib = "^1.7.4"
 ruff = "^0.6.2"
 taskipy = "^1.13.0"
 interrogate = "^1.7.0"
+pre-commit = "^3.8.0"
 
 [tool.interrogate]
 ignore-init-method = false
