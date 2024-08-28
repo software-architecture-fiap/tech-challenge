@@ -86,6 +86,7 @@ python-jose = "^3.3.0"
 passlib = "^1.7.4"
 ruff = "^0.6.2"
 taskipy = "^1.13.0"
+interrogate = "^1.7.0"
 
 [build-system]
 requires = ["poetry-core"]
