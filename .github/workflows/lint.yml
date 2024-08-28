@@ -9,4 +9,4 @@ on:
 
 jobs:
   Validating:
-    uses: software-architecture-fiap/tech-challenge/.github/pep8.yml@main
+    uses: software-architecture-fiap/tech-challenge/.github/lint-flake8-pr-changed-files.yml@main
