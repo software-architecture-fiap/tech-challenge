@@ -74,7 +74,7 @@ source venv/bin/activate  # Linux/macOS
 - Instale as Dependências do Projeto:
 
 ```sh
-pip install -r requirements.txt
+poetry install
 ```
 
 - Execute as migrações do Alembic para criar o banco de dados e as tabelas necessárias:
