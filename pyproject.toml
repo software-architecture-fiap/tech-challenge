@@ -95,6 +95,10 @@ generate-badge = "docs/assets/"
 badge-format = "svg"
 --badge-style = "flat-square-modified"
 
+[tool.pytest.ini_options]
+pythonpath = "."
+addopts = '-p no:warnings'
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
