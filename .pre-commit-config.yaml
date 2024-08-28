@@ -1,4 +1,4 @@
-exclude: "docs/|poetry.lock"
+exclude: "docs/|poetry.lock|mkdocs.yml"
 fail_fast: true
 default_language_version:
   python: python3
