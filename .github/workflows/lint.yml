@@ -1,0 +1,12 @@
+name: Linters
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  Validating:
+    uses: software-architecture-fiap/lint-flake8-workflow/.github/workflows/lint-flake8-pr-changed-files.yml@main

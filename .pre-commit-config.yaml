@@ -1,0 +1,96 @@
+exclude: "docs/|poetry.lock|mkdocs.yml"
+fail_fast: true
+default_language_version:
+  python: python3
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        name: Remove Trailing Whitespace
+
+      - id: end-of-file-fixer
+        name: Ensure End of File
+
+      - id: check-json
+        name: Validate JSON Syntax
+
+      - id: check-toml
+        name: Validate TOML Syntax
+
+      - id: check-yaml
+        name: Validate YAML Syntax
+
+      - id: check-docstring-first
+        name: Check Docstring Position
+
+      - id: check-added-large-files
+        name: Prevent Commit of Large Files
+
+      - id: debug-statements
+        name: Check Debug Statements
+
+      - id: check-case-conflict
+        name: Check Case Conflict
+
+      - id: check-executables-have-shebangs
+        name: Ensure Executables Have a Shebang
+
+      - id: check-merge-conflict
+        name: Check String Merge Conflicts
+
+      - id: check-symlinks
+        name: Check Empty Symbolic Links
+
+      - id: detect-private-key
+        name: Detect Exposed Private Keys
+
+      - id: mixed-line-ending
+        name: Check Mixed Line Endings
+
+      - id: no-commit-to-branch
+        name: Block Commits to Configured Branches
+        args: [--branch, main]
+
+      - id: sort-simple-yaml
+        name: Sort YAML File Contents
+
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-check-blanket-noqa
+        name: Check Excessive NOQA Usage
+
+      - id: python-check-mock-methods
+        name: Validate Mock Usage
+
+      - id: python-no-eval
+        name: Prevent Eval Function Usage in Python Code
+
+      - id: python-no-log-warn
+        name: Check LOG Method Calls
+
+      - id: python-use-type-annotations
+        name: Check Type Hints Usage
+
+      - id: text-unicode-replacement-char
+        name: Check Unicode Characters Usage
+
+  - repo: https://github.com/asottile/blacken-docs
+    rev: 1.13.0
+    hooks:
+      - id: blacken-docs
+        name: Run Black Formatting on Documentation
+
+  - repo: https://gitlab.com/smop/pre-commit-hooks
+    rev: v1.0.0
+    hooks:
+      - id: check-poetry
+        name: Check Poetry Dependency Consistency
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: iSort
+        args: ["--profile", "black", --line-length=120]

@@ -84,6 +84,43 @@ pytest-coverage = "^0.0"
 python-dotenv = "^1.0.1"
 python-jose = "^3.3.0"
 passlib = "^1.7.4"
+ruff = "^0.6.2"
+taskipy = "^1.13.0"
+interrogate = "^1.7.0"
+pre-commit = "^3.8.0"
+
+[tool.interrogate]
+ignore-init-method = false
+generate-badge = "docs/assets/"
+badge-format = "svg"
+--badge-style = "flat-square-modified"
+
+[tool.pytest.ini_options]
+pythonpath = "."
+addopts = '-p no:warnings'
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ['migrations']
+
+[tool.ruff.format]
+preview = true
+quote-style = 'single'
+
+[tool.taskipy.tasks]
+run = 'fastapi dev fastapi_template/app.py'
+pre_test = 'task lint'
+test = 'pytest --cov=fastapi_template -vv'
+lint = 'ruff check . && ruff check . --diff'
+format = 'ruff check . --fix && ruff format .'
+post_test = 'coverage html'
+pre-commit = 'pre-commit run --all-files'
+docs = 'mkdocs serve'
+compose = 'docker compose up --build'
+
+[tool.ruff.lint]
+preview = true
+select = ['I', 'F', 'E', 'W', 'PL', 'PT']
 
 [build-system]
 requires = ["poetry-core"]

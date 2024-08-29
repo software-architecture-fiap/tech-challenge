@@ -1,4 +1,3 @@
-from .middleware import RateLimitMiddleware
-from .middleware import ExceptionLoggingMiddleware
+from .middleware import ExceptionLoggingMiddleware, RateLimitMiddleware
 
 __all__ = ['RateLimitMiddleware', 'ExceptionLoggingMiddleware']
