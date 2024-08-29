@@ -76,12 +76,6 @@ repos:
       - id: text-unicode-replacement-char
         name: Check Unicode Characters Usage
 
-  - repo: https://github.com/asottile/yesqa
-    rev: v1.4.0
-    hooks:
-      - id: yesqa
-        name: Check Code Quality Briefly
-
   - repo: https://github.com/asottile/blacken-docs
     rev: 1.13.0
     hooks:
@@ -100,10 +94,3 @@ repos:
       - id: isort
         name: iSort
         args: ["--profile", "black", --line-length=120]
-
-  - repo: https://github.com/psf/black
-    rev: 23.3.0
-    hooks:
-      - id: black
-        name: Black
-        args: [--line-length=120]

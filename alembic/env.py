@@ -4,17 +4,13 @@ import os
 import sys
 from logging.config import fileConfig
 
+from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
-# Adiciona o caminho do diretório raiz do projeto ao sys.path
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-# Carrega variáveis de ambiente do .env
-from dotenv import load_dotenv
-
 from app.db.database import Base
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 load_dotenv()
 
@@ -29,7 +25,7 @@ target_metadata = Base.metadata
 
 # Obter URL do banco de dados a partir da variável de ambiente
 def get_url():
-    return os.getenv("DATABASE_URL")
+    return os.getenv('DATABASE_URL')
 
 
 def run_migrations_offline():
@@ -44,7 +40,7 @@ def run_migrations_offline():
 def run_migrations_online():
     """Executa as migrações no modo online."""
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section), prefix="sqlalchemy.", poolclass=pool.NullPool, url=get_url()
+        config.get_section(config.config_ini_section), prefix='sqlalchemy.', poolclass=pool.NullPool, url=get_url()
     )
 
     with connectable.connect() as connection:

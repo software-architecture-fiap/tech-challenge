@@ -10,7 +10,7 @@ from ..services import repository, security
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.Product)
+@router.post('/', response_model=schemas.Product)
 def create_product(
     product: schemas.ProductCreate,
     db: Session = Depends(database.get_db),
@@ -19,7 +19,7 @@ def create_product(
     # Buscar a categoria no banco de dados
     db_category = repository.get_category(db, category_id=product.category_id)
     if not db_category:
-        raise HTTPException(status_code=404, detail="Category not found")
+        raise HTTPException(status_code=404, detail='Category not found')
 
     # Criar o produto associando a categoria correta
     db_product = models.Product(
@@ -40,7 +40,7 @@ def create_product(
     return product_response
 
 
-@router.get("/", response_model=Dict[str, List[schemas.Product]])
+@router.get('/', response_model=Dict[str, List[schemas.Product]])
 def read_products(
     skip: int = 0,
     limit: int = 10,
@@ -52,7 +52,7 @@ def read_products(
     return categorized_products
 
 
-@router.get("/{product_id}", response_model=schemas.Product)
+@router.get('/{product_id}', response_model=schemas.Product)
 def read_product(
     product_id: int,
     db: Session = Depends(database.get_db),
@@ -60,7 +60,7 @@ def read_product(
 ):
     db_product = repository.get_product(db, product_id=product_id)
     if db_product is None:
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise HTTPException(status_code=404, detail='Product not found')
 
     product_response = schemas.Product(
         id=str(db_product.id),
@@ -72,7 +72,7 @@ def read_product(
     return product_response
 
 
-@router.put("/{product_id}", response_model=schemas.Product)
+@router.put('/{product_id}', response_model=schemas.Product)
 def update_product(
     product_id: int,
     product: schemas.ProductCreate,
@@ -81,12 +81,12 @@ def update_product(
 ):
     db_product = repository.get_product(db, product_id=product_id)
     if db_product is None:
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise HTTPException(status_code=404, detail='Product not found')
 
     # Buscar a categoria no banco de dados
     db_category = repository.get_category(db, category_id=product.category_id)
     if not db_category:
-        raise HTTPException(status_code=404, detail="Category not found")
+        raise HTTPException(status_code=404, detail='Category not found')
 
     # Atualizar o produto associando a categoria correta
     db_product.name = product.name
@@ -108,7 +108,7 @@ def update_product(
     return product_response
 
 
-@router.delete("/{product_id}", response_model=schemas.Product)
+@router.delete('/{product_id}', response_model=schemas.Product)
 def delete_product(
     product_id: int,
     db: Session = Depends(database.get_db),
@@ -116,7 +116,7 @@ def delete_product(
 ):
     db_product = repository.get_product(db, product_id=product_id)
     if db_product is None:
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise HTTPException(status_code=404, detail='Product not found')
 
     # Carregar todos os dados necessários antes de deletar
     product_response = schemas.Product(

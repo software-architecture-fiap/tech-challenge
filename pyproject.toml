@@ -115,6 +115,8 @@ lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
 post_test = 'coverage html'
 pre-commit = 'pre-commit run --all-files'
+docs = 'mkdocs serve'
+compose = 'docker compose up --build'
 
 [tool.ruff.lint]
 preview = true
