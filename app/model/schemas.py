@@ -61,13 +61,6 @@ class ProductCreate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class Product(ProductBase):
-    id: int
-
-    class Config:
-        model_config = ConfigDict(from_attributes=True)
-
-
 class CategoryBase(BaseModel):
     name: str
 

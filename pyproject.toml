@@ -114,6 +114,7 @@ test = 'pytest --cov=fastapi_template -vv'
 lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
 post_test = 'coverage html'
+pre-commit = 'pre-commit run --all-files'
 
 [tool.ruff.lint]
 preview = true
