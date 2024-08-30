@@ -96,5 +96,5 @@ repos:
     rev: 1.7.0
     hooks:
       - id: interrogate
-        args: [ --quiet, --fail-under=50 ]
+        args: [ --quiet, --fail-under=95 ]
         pass_filenames: false
