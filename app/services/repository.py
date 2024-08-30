@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
 from jose import jwt
@@ -14,7 +14,17 @@ from . import security
 load_dotenv()
 
 
-def create_token(db: Session, token: str, user_id: int):
+def create_token(db: Session, token: str, user_id: int) -> models.Token:
+    """Cria um novo token para um usuário específico.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        token (str): O token a ser criado.
+        user_id (int): ID do usuário para o qual o token será criado.
+
+    Returns:
+        models.Token: O token criado.
+    """
     logger.info(f'Creating token for user ID: {user_id}')
     db_token = models.Token(token=token, user_id=user_id)
     db.add(db_token)
@@ -24,7 +34,16 @@ def create_token(db: Session, token: str, user_id: int):
     return db_token
 
 
-def mark_token_as_used(db: Session, token: str):
+def mark_token_as_used(db: Session, token: str) -> models.Token:
+    """Marca um token como usado.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        token (str): O token a ser marcado como usado.
+
+    Returns:
+        models.Token: O token marcado como usado, ou None se o token não for encontrado.
+    """
     logger.info(f'Marking token as used: {token}')
     db_token = db.query(models.Token).filter(models.Token.token == token).first()
     if db_token:
@@ -37,7 +56,16 @@ def mark_token_as_used(db: Session, token: str):
     return db_token
 
 
-def is_token_used(db: Session, token: str):
+def is_token_used(db: Session, token: str) -> bool:
+    """Verifica se um token já foi usado.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        token (str): O token a ser verificado.
+
+    Returns:
+        bool: True se o token já foi usado, False caso contrário.
+    """
     logger.debug(f'Checking if token is used: {token}')
     db_token = db.query(models.Token).filter(models.Token.token == token).first()
     if db_token and db_token.is_used:
@@ -47,7 +75,16 @@ def is_token_used(db: Session, token: str):
     return False
 
 
-def create_access_token(data: dict, expires_delta: timedelta):
+def create_access_token(data: dict, expires_delta: timedelta) -> str:
+    """Cria um token de acesso JWT.
+
+    Args:
+        data (dict): Os dados a serem codificados no token.
+        expires_delta (timedelta): O tempo até a expiração do token.
+
+    Returns:
+        str: O token de acesso JWT.
+    """
     logger.debug('Creating access token')
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + expires_delta
@@ -57,12 +94,30 @@ def create_access_token(data: dict, expires_delta: timedelta):
     return encoded_jwt
 
 
-def get_user_by_email(db: Session, email: str):
+def get_user_by_email(db: Session, email: str) -> models.Customer:
+    """Obtém um usuário pelo endereço de e-mail.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        email (str): O endereço de e-mail do usuário.
+
+    Returns:
+        models.Customer: O usuário encontrado, ou None se nenhum usuário for encontrado.
+    """
     logger.info(f'Fetching user with email: {email}')
     return db.query(models.Customer).filter(models.Customer.email == email).first()
 
 
-def create_user(db: Session, user: schemas.CustomerCreate):
+def create_user(db: Session, user: schemas.CustomerCreate) -> models.Customer:
+    """Cria um novo usuário.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        user (schemas.CustomerCreate): Os dados do usuário a ser criado.
+
+    Returns:
+        models.Customer: O usuário criado.
+    """
     logger.debug(f'Creating user with email: {user.email}')
     hashed_password = security.get_password_hash(user.password)
     db_user = models.Customer(name=user.name, email=user.email, cpf=user.cpf, hashed_password=hashed_password)
@@ -73,7 +128,15 @@ def create_user(db: Session, user: schemas.CustomerCreate):
     return db_user
 
 
-def create_anonymous_customer(db: Session):
+def create_anonymous_customer(db: Session) -> models.Customer:
+    """Cria um cliente anônimo.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+
+    Returns:
+        models.Customer: O cliente anônimo criado.
+    """
     logger.debug('Creating anonymous customer')
     anonymous_customer = models.Customer(name='Anonymous', email=None, cpf=None, hashed_password=None)
     db.add(anonymous_customer)
@@ -83,12 +146,32 @@ def create_anonymous_customer(db: Session):
     return anonymous_customer
 
 
-def get_customer_by_cpf(db: Session, cpf: str):
+def get_customer_by_cpf(db: Session, cpf: str) -> models.Customer:
+    """Obtém um cliente pelo CPF.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        cpf (str): O CPF do cliente.
+
+    Returns:
+        models.Customer: O cliente encontrado, ou None se nenhum cliente for encontrado.
+    """
     logger.debug(f'Fetching customer with CPF: {cpf}')
     return db.query(models.Customer).filter(models.Customer.cpf == cpf).first()
 
 
-def create_admin_user(db: Session):
+def create_admin_user(db: Session) -> None:
+    """Cria um usuário administrador se ele ainda não existir.
+
+    Os detalhes do administrador (nome, email, senha, CPF) devem ser fornecidos
+    através de variáveis de ambiente: `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_CPF`, `ADMIN_NAME`.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+
+    Raises:
+        Exception: Se houver algum erro ao criar o usuário administrador.
+    """
     try:
         admin_email = os.getenv('ADMIN_EMAIL')
         admin_password = os.getenv('ADMIN_PASSWORD')
@@ -117,12 +200,29 @@ def create_admin_user(db: Session):
         logger.error(f'Error creating admin user: {e}')
 
 
-def get_customers_count(db: Session):
+def get_customers_count(db: Session) -> int:
+    """Obtém a contagem total de clientes.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+
+    Returns:
+        int: O número total de clientes.
+    """
     logger.info('Fetching total count of customers')
     return db.query(models.Customer).count()
 
 
-def get_customer(db: Session, customer_id: int):
+def get_customer(db: Session, customer_id: int) -> Optional[models.Customer]:
+    """Obtém um cliente pelo ID.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        customer_id (int): ID do cliente.
+
+    Returns:
+        Optional[models.Customer]: O cliente encontrado ou None se nenhum cliente for encontrado.
+    """
     logger.debug(f'Fetching customer with ID: {customer_id}')
     try:
         return db.query(models.Customer).filter(models.Customer.id == customer_id).first()
@@ -131,12 +231,31 @@ def get_customer(db: Session, customer_id: int):
         return None
 
 
-def get_customers(db: Session, skip: int = 0, limit: int = 10):
+def get_customers(db: Session, skip: int = 0, limit: int = 10) -> List[models.Customer]:
+    """Obtém uma lista de clientes com paginação.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        skip (int, optional): Número de registros a pular. Defaults to 0.
+        limit (int, optional): Número máximo de registros a retornar. Defaults to 10.
+
+    Returns:
+        List[models.Customer]: Lista de clientes.
+    """
     logger.debug(f'Fetching customers with skip: {skip}, limit: {limit}')
     return db.query(models.Customer).offset(skip).limit(limit).all()
 
 
-def create_customer(db: Session, customer: schemas.CustomerCreate):
+def create_customer(db: Session, customer: schemas.CustomerCreate) -> models.Customer:
+    """Cria um novo cliente.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        customer (schemas.CustomerCreate): Dados do cliente a ser criado.
+
+    Returns:
+        models.Customer: O cliente criado.
+    """
     logger.debug(f'Creating customer with email: {customer.email}')
     db_customer = models.Customer(name=customer.name, email=customer.email, cpf=customer.cpf)
     db.add(db_customer)
@@ -147,6 +266,14 @@ def create_customer(db: Session, customer: schemas.CustomerCreate):
 
 
 def categorize_products(products: List[models.Product]) -> Dict[str, List[schemas.Product]]:
+    """Categoriza produtos com base em sua categoria.
+
+    Args:
+        products (List[models.Product]): Lista de produtos a serem categorizados.
+
+    Returns:
+        Dict[str, List[schemas.Product]]: Dicionário com produtos categorizados por categoria.
+    """
     categorized_products = {}
     for product in products:
         product_data = {
@@ -165,7 +292,16 @@ def categorize_products(products: List[models.Product]) -> Dict[str, List[schema
     return categorized_products
 
 
-def get_product(db: Session, product_id: int):
+def get_product(db: Session, product_id: int) -> Optional[models.Product]:
+    """Obtém um produto pelo ID.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        product_id (int): ID do produto.
+
+    Returns:
+        Optional[models.Product]: O produto encontrado ou None se nenhum produto for encontrado.
+    """
     logger.debug(f'Fetching product with ID: {product_id}')
     try:
         return db.query(models.Product).filter(models.Product.id == product_id).first()
@@ -174,12 +310,31 @@ def get_product(db: Session, product_id: int):
         return None
 
 
-def get_products(db: Session, skip: int = 0, limit: int = 10):
+def get_products(db: Session, skip: int = 0, limit: int = 10) -> List[models.Product]:
+    """Obtém uma lista de produtos com paginação.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        skip (int, optional): Número de registros a pular. Defaults to 0.
+        limit (int, optional): Número máximo de registros a retornar. Defaults to 10.
+
+    Returns:
+        List[models.Product]: Lista de produtos.
+    """
     logger.debug(f'Fetching products with skip: {skip}, limit: {limit}')
     return db.query(models.Product).offset(skip).limit(limit).all()
 
 
-def create_product(db: Session, product: schemas.ProductCreate):
+def create_product(db: Session, product: schemas.ProductCreate) -> models.Product:
+    """Cria um novo produto.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        product (schemas.ProductCreate): Dados do produto a ser criado.
+
+    Returns:
+        models.Product: O produto criado.
+    """
     logger.debug(f'Creating product with name: {product.name}')
 
     db_product = models.Product(
@@ -195,7 +350,17 @@ def create_product(db: Session, product: schemas.ProductCreate):
     return db_product
 
 
-def update_product(db: Session, db_product: models.Product, product: schemas.ProductCreate):
+def update_product(db: Session, db_product: models.Product, product: schemas.ProductCreate) -> models.Product:
+    """Atualiza as informações de um produto existente.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        db_product (models.Product): Instância do produto existente no banco de dados.
+        product (schemas.ProductCreate): Dados atualizados do produto.
+
+    Returns:
+        models.Product: O produto atualizado.
+    """
     logger.debug(f'Updating product with name: {product.name}')
     db_product.name = product.name
     db_product.description = product.description
@@ -207,7 +372,16 @@ def update_product(db: Session, db_product: models.Product, product: schemas.Pro
     return db_product
 
 
-def delete_product(db: Session, product_id: int):
+def delete_product(db: Session, product_id: int) -> Optional[models.Product]:
+    """Deleta um produto do banco de dados.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        product_id (int): ID do produto a ser deletado.
+
+    Returns:
+        Optional[models.Product]: O produto deletado, ou None se não encontrado.
+    """
     logger.debug(f'Deleting product with ID: {product_id}')
     try:
         db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
@@ -223,7 +397,16 @@ def delete_product(db: Session, product_id: int):
         return None
 
 
-def create_order(db: Session, order: schemas.OrderCreate):
+def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
+    """Cria um novo pedido no banco de dados.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        order (schemas.OrderCreate): Dados do pedido a ser criado.
+
+    Returns:
+        models.Order: O pedido criado.
+    """
     logger.debug(f'Creating order for customer ID: {order.customer_id}')
     try:
         customer_id_int = order.customer_id
@@ -262,7 +445,17 @@ def create_order(db: Session, order: schemas.OrderCreate):
         raise
 
 
-def update_order_status(db: Session, order_id: int, status: str):
+def update_order_status(db: Session, order_id: int, status: str) -> Optional[models.Order]:
+    """Atualiza o status de um pedido existente.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        order_id (int): ID do pedido a ser atualizado.
+        status (str): Novo status do pedido.
+
+    Returns:
+        Optional[models.Order]: O pedido atualizado, ou None se não encontrado.
+    """
     logger.debug(f'Updating order status for order ID: {order_id} to {status}')
     try:
         db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
@@ -279,7 +472,17 @@ def update_order_status(db: Session, order_id: int, status: str):
         raise
 
 
-def create_tracking(db: Session, order_id: int, status: str):
+def create_tracking(db: Session, order_id: int, status: str) -> models.Tracking:
+    """Cria uma nova entrada de rastreamento para um pedido.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        order_id (int): ID do pedido a ser rastreado.
+        status (str): Status atual do pedido.
+
+    Returns:
+        models.Tracking: A entrada de rastreamento criada.
+    """
     logger.debug(f'Creating tracking entry for order ID: {order_id} with status: {status}')
     try:
         db_tracking = models.Tracking(order_id=order_id, status=status, created_at=datetime.now(timezone.utc))
@@ -293,7 +496,17 @@ def create_tracking(db: Session, order_id: int, status: str):
         raise
 
 
-def get_orders(db: Session, skip: int = 0, limit: int = 10):
+def get_orders(db: Session, skip: int = 0, limit: int = 10) -> List[models.Order]:
+    """Obtém uma lista de pedidos com paginação.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        skip (int, optional): Número de registros a pular. Defaults to 0.
+        limit (int, optional): Número máximo de registros a retornar. Defaults to 10.
+
+    Returns:
+        List[models.Order]: Lista de pedidos.
+    """
     logger.debug(f'Fetching orders with skip: {skip}, limit: {limit}')
     try:
         orders = db.query(models.Order).offset(skip).limit(limit).all()
@@ -304,7 +517,16 @@ def get_orders(db: Session, skip: int = 0, limit: int = 10):
         raise
 
 
-def get_order(db: Session, order_id: int):
+def get_order(db: Session, order_id: int) -> Optional[models.Order]:
+    """Obtém um pedido pelo ID.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        order_id (int): ID do pedido a ser obtido.
+
+    Returns:
+        Optional[models.Order]: O pedido correspondente, ou None se não encontrado.
+    """
     logger.debug(f'Fetching order with ID: {order_id}')
     try:
         order = db.query(models.Order).filter(models.Order.id == order_id).first()
@@ -316,8 +538,17 @@ def get_order(db: Session, order_id: int):
 
 
 def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.Category]:
-    logger.debug(f'Fetching categories with skip: {skip}, limit: {limit}')
+    """Obtém uma lista de categorias com paginação, incluindo os produtos associados.
 
+    Args:
+        db (Session): Sessão do banco de dados.
+        skip (int, optional): Número de registros a pular. Defaults to 0.
+        limit (int, optional): Número máximo de registros a retornar. Defaults to 10.
+
+    Returns:
+        List[schemas.Category]: Lista de categorias com seus produtos.
+    """
+    logger.debug(f'Fetching categories with skip: {skip}, limit: {limit}')
     categories = db.execute(
         text('SELECT id, name FROM categories LIMIT :limit OFFSET :skip'), {'limit': limit, 'skip': skip}
     ).fetchall()
@@ -346,7 +577,16 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
     return category_list
 
 
-def get_category_with_products(db: Session, category_id: int):
+def get_category_with_products(db: Session, category_id: int) -> Optional[schemas.Category]:
+    """Obtém uma categoria específica e seus produtos associados.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        category_id (int): ID da categoria a ser obtida.
+
+    Returns:
+        Optional[schemas.Category]: A categoria com seus produtos, ou None se não encontrada.
+    """
     logger.debug(f'Fetching category with ID: {category_id}')
     try:
         result = db.execute(
@@ -364,23 +604,41 @@ def get_category_with_products(db: Session, category_id: int):
         return None
 
 
-def get_category(db: Session, category_id: int):
+def get_category(db: Session, category_id: int) -> Optional[models.Category]:
+    """Obtém uma categoria pelo ID.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        category_id (int): ID da categoria a ser obtida.
+
+    Returns:
+        Optional[models.Category]: A categoria correspondente, ou None se não encontrada.
+    """
     logger.debug(f'Fetching category with ID: {category_id}')
     try:
         category = db.query(models.Category).filter(models.Category.id == category_id).first()
-        if category:
-            return category
-        else:
-            return None
+        return category
     except Exception as e:
         logger.error(f'Error fetching category: {e}')
         return None
 
 
-def update_category(db: Session, db_category: models.Category, category: schemas.CategoryCreate):
+def update_category(
+    db: Session, db_category: models.Category, category: schemas.CategoryCreate
+) -> (Optional)[models.Category]:
+    """Atualiza as informações de uma categoria existente.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        db_category (models.Category): Instância da categoria existente no banco de dados.
+        category (schemas.CategoryCreate): Dados atualizados da categoria.
+
+    Returns:
+        Optional[models.Category]: A categoria atualizada, ou None em caso de erro.
+    """
     logger.debug(f'Updating category with ID: {db_category.id}')
     try:
-        db_category.id = category.id
+        db_category.name = category.name
         db.commit()
         db.refresh(db_category)
         return db_category
@@ -389,7 +647,16 @@ def update_category(db: Session, db_category: models.Category, category: schemas
         return None
 
 
-def delete_category(db: Session, db_category: models.Category):
+def delete_category(db: Session, db_category: models.Category) -> Optional[models.Category]:
+    """Deleta uma categoria do banco de dados.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        db_category (models.Category): Instância da categoria a ser deletada.
+
+    Returns:
+        Optional[models.Category]: A categoria deletada, ou None em caso de erro.
+    """
     logger.debug(f'Deleting category with ID: {db_category.id}')
     try:
         db.delete(db_category)

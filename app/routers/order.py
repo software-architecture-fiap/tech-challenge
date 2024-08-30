@@ -16,15 +16,28 @@ def create_order(
     order: schemas.OrderCreate,
     db: Session = Depends(get_db),
     current_user: schemas.Customer = Depends(security.get_current_user),
-):
-    logger.info('Create order endpoint called')
+) -> schemas.OrderResponse:
+    """Cria um novo pedido com os dados fornecidos.
+
+    Args:
+        order (schemas.OrderCreate): Os dados do pedido a ser criado.
+        db (Session): A sessão do banco de dados.
+        current_user (schemas.Customer): O usuário autenticado atualmente.
+
+    Raises:
+        HTTPException: Se ocorrer um erro ao criar o pedido.
+
+    Returns:
+        schemas.OrderResponse: O pedido criado.
+    """
+    logger.info('Endpoint de criação de pedido chamado')
     try:
         db_order = repository.create_order(db=db, order=order)
-        logger.info('Order created successfully')
+        logger.info('Pedido criado com sucesso')
         return db_order
     except Exception as e:
-        logger.error(f'Error creating order: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Internal Server Error')
+        logger.error(f'Erro ao criar o pedido: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
 
 
 @router.put('/{order_id}/status', response_model=schemas.OrderResponse)
@@ -33,24 +46,41 @@ def update_order_status(
     update_data: schemas.UpdateOrderStatus,
     db: Session = Depends(get_db),
     current_user: schemas.Customer = Depends(security.get_current_user),
-):
-    logger.info(f'Update order status endpoint called for order ID: {order_id} ' f'with status: {update_data.status}')
+) -> schemas.OrderResponse:
+    """Atualiza o status de um pedido existente.
+
+    Args:
+        order_id (str): O ID do pedido a ser atualizado.
+        update_data (schemas.UpdateOrderStatus): Os dados de atualização de status.
+        db (Session): A sessão do banco de dados.
+        current_user (schemas.Customer): O usuário autenticado atualmente.
+
+    Raises:
+        HTTPException: Se o formato do ID do pedido for inválido, o pedido não for encontrado, ou ocorrer um erro.
+
+    Returns:
+        schemas.OrderResponse: O pedido atualizado.
+    """
+    logger.info(
+        f'Endpoint de atualização de status do pedido chamado para o ID do pedido: {order_id} com status: '
+        f'{update_data.status}'
+    )
     try:
         order_id_int = order_id
     except (ValueError, IndexError):
-        logger.warning(f'Invalid order ID format: {order_id}')
-        raise HTTPException(status_code=400, detail='Invalid order ID format')
+        logger.warning(f'Formato de ID do pedido inválido: {order_id}')
+        raise HTTPException(status_code=400, detail='Formato de ID do pedido inválido')
 
     try:
         db_order = repository.update_order_status(db, order_id=order_id_int, status=update_data.status)
         if db_order is None:
-            logger.warning(f'Order not found: {order_id}')
-            raise HTTPException(status_code=404, detail='Order not found')
-        logger.info(f'Order ID {order_id} status updated to {update_data.status}')
+            logger.warning(f'Pedido não encontrado: {order_id}')
+            raise HTTPException(status_code=404, detail='Pedido não encontrado')
+        logger.info(f'Status do ID do pedido {order_id} atualizado para {update_data.status}')
         return db_order
     except Exception as e:
-        logger.error(f'Error updating order status: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Internal Server Error')
+        logger.error(f'Erro ao atualizar o status do pedido: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
 
 
 @router.get('/', response_model=Dict[str, List[schemas.OrderResponse]])
@@ -59,38 +89,62 @@ def read_orders(
     limit: int = 10,
     db: Session = Depends(get_db),
     current_user: schemas.Customer = Depends(security.get_current_user),
-):
-    logger.info('Read orders endpoint called')
+) -> Dict[str, List[schemas.OrderResponse]]:
+    """Recupera uma lista de pedidos com paginação.
+
+    Args:
+        skip (int): O número de registros a serem ignorados.
+        limit (int): O número máximo de registros a serem retornados.
+        db (Session): A sessão do banco de dados.
+        current_user (schemas.Customer): O usuário autenticado atualmente.
+
+    Returns:
+        Dict[str, List[schemas.OrderResponse]]: Um dicionário contendo uma lista de pedidos.
+    """
+    logger.info('Endpoint de leitura de pedidos chamado')
     try:
         orders = repository.get_orders(db, skip=skip, limit=limit)
-        logger.info('Orders fetched successfully')
+        logger.info('Pedidos recuperados com sucesso')
         return {'orders': orders}
     except Exception as e:
-        logger.error(f'Error fetching orders: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Internal Server Error')
+        logger.error(f'Erro ao recuperar os pedidos: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
 
 
 @router.get('/{order_id}', response_model=schemas.OrderCustomerView)
 def read_order(
     order_id: str, db: Session = Depends(get_db), current_user: schemas.Customer = Depends(security.get_current_user)
-):
-    logger.info(f'Read order endpoint called for order_id: {order_id}')
+) -> schemas.OrderCustomerView:
+    """Recupera um pedido específico pelo seu ID.
+
+    Args:
+        order_id (str): O ID do pedido a ser recuperado.
+        db (Session): A sessão do banco de dados.
+        current_user (schemas.Customer): O usuário autenticado atualmente.
+
+    Raises:
+        HTTPException: Se o formato do ID do pedido for inválido, o pedido não for encontrado, ou ocorrer um erro.
+
+    Returns:
+        schemas.OrderCustomerView: Os detalhes do pedido.
+    """
+    logger.info(f'Endpoint de leitura de pedido chamado para o ID do pedido: {order_id}')
     try:
         order_id_int = order_id
     except (ValueError, IndexError):
-        logger.warning(f'Invalid order ID format: {order_id}')
-        raise HTTPException(status_code=400, detail='Invalid order ID format')
+        logger.warning(f'Formato de ID do pedido inválido: {order_id}')
+        raise HTTPException(status_code=400, detail='Formato de ID do pedido inválido')
 
     try:
         db_order = repository.get_order(db, order_id=order_id_int)
         if db_order is None:
-            logger.warning(f'Order not found: {order_id}')
-            raise HTTPException(status_code=404, detail='Order not found')
-        logger.info(f'Order fetched successfully for order_id: {order_id}')
+            logger.warning(f'Pedido não encontrado: {order_id}')
+            raise HTTPException(status_code=404, detail='Pedido não encontrado')
+        logger.info(f'Pedido recuperado com sucesso para o ID do pedido: {order_id}')
         return db_order
     except Exception as e:
-        logger.error(f'Error fetching order: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Internal Server Error')
+        logger.error(f'Erro ao recuperar o pedido: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
 
 
 @router.post('/checkout', response_model=schemas.OrderResponse)
@@ -98,12 +152,25 @@ def fake_checkout(
     order: schemas.OrderCreate,
     db: Session = Depends(get_db),
     current_user: schemas.Customer = Depends(security.get_current_user),
-):
-    logger.info('Fake checkout endpoint called')
+) -> schemas.OrderResponse:
+    """Cria um novo pedido como parte de um processo de checkout fictício.
+
+    Args:
+        order (schemas.OrderCreate): Os dados do pedido a ser criado.
+        db (Session): A sessão do banco de dados.
+        current_user (schemas.Customer): O usuário autenticado atualmente.
+
+    Raises:
+        HTTPException: Se ocorrer um erro durante o checkout fictício.
+
+    Returns:
+        schemas.OrderResponse: O pedido criado.
+    """
+    logger.info('Endpoint de checkout fictício chamado')
     try:
         db_order = repository.create_order(db=db, order=order)
-        logger.info('Checkout order created successfully')
+        logger.info('Pedido de checkout criado com sucesso')
         return db_order
     except Exception as e:
-        logger.error(f'Error during fake checkout: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Internal Server Error')
+        logger.error(f'Erro durante o checkout fictício: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')

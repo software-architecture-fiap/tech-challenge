@@ -7,7 +7,15 @@ from ..model.models import Category, Product
 logger = logging.getLogger('Application')
 
 
-def initialize_db(db: Session):
+def initialize_db(db: Session) -> None:
+    """Inicializa o banco de dados com dados padrão para produtos e categorias.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+
+    Returns:
+        None
+    """
     products = [
         {
             'name': 'Sanduíche de Frango Grelhado',
