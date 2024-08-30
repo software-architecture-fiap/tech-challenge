@@ -41,6 +41,10 @@ class Customer(CustomerBase):
     id: int
 
     class Config:
+        """
+        Configurações específicas para o modelo Pydantic `Tracking`.
+        """
+
         from_attributes = True
 
 
@@ -184,6 +188,10 @@ class Category(CategoryBase):
     products: List[Product] = []
 
     class Config:
+        """
+        Configurações específicas para o modelo Pydantic `Tracking`.
+        """
+
         from_attributes = True
 
 
@@ -242,6 +250,10 @@ class OrderProduct(OrderProductBase):
     id: int
 
     class Config:
+        """
+        Configurações específicas para o modelo Pydantic `Tracking`.
+        """
+
         from_attributes = True
 
 
@@ -277,6 +289,10 @@ class Order(OrderBase):
     order_products: List[OrderProduct] = []
 
     class Config:
+        """
+        Configurações específicas para o modelo Pydantic `Tracking`.
+        """
+
         from_attributes = True
 
 
@@ -293,6 +309,10 @@ class OrderResponse(BaseModel):
     customer_id: int
 
     class Config:
+        """
+        Configurações específicas para o modelo Pydantic `Tracking`.
+        """
+
         from_attributes = True
 
 
@@ -311,6 +331,10 @@ class OrderCustomerView(BaseModel):
     status: str
 
     class Config:
+        """
+        Configurações específicas para o modelo Pydantic `Tracking`.
+        """
+
         from_attributes = True
 
 
@@ -344,6 +368,10 @@ class Tracking(BaseModel):
     created_at: datetime
 
     class Config:
+        """
+        Configurações específicas para o modelo Pydantic `Tracking`.
+        """
+
         from_attributes = True
 
 

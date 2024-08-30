@@ -91,3 +91,10 @@ repos:
       - id: isort
         name: iSort
         args: ["--profile", "black", --line-length=120]
+
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: [ --quiet, --fail-under=50 ]
+        pass_filenames: false
