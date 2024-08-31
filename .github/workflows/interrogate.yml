@@ -1,9 +1,9 @@
-name: Interrogate
+name: Docstring
 
 on: [push]
 
 jobs:
-  coverage:
+  Coverage:
     runs-on: ubuntu-latest
 
     steps:

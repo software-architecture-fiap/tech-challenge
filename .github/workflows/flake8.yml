@@ -1,4 +1,4 @@
-name: Linters
+name: PEP8
 on:
   push:
     branches:
@@ -8,5 +8,5 @@ on:
       - main
 
 jobs:
-  Validating:
+  Validator:
     uses: software-architecture-fiap/lint-flake8-workflow/.github/workflows/lint-flake8-pr-changed-files.yml@main
