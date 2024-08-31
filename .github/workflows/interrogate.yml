@@ -1,16 +1,16 @@
-name: Docstring Coverage
+name: Interrogate
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   coverage:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out repository
+    - name: Check Out Repository
       uses: actions/checkout@v3
 
-    - name: Set up Python
+    - name: Set Up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
@@ -24,12 +24,12 @@ jobs:
         poetry install --no-root
         poetry add interrogate --group dev
 
-    - name: Run interrogate
+    - name: Run Interrogate
       run: |
         poetry run interrogate -vv . --config pyproject.toml
       continue-on-error: true
 
-    - name: Check coverage
+    - name: Check Coverage
       if: failure()
       run: |
         echo "Docstring coverage is below 95%"
