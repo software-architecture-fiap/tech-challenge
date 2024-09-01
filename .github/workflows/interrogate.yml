@@ -3,7 +3,7 @@ name: Docstring
 on: [push]
 
 jobs:
-  Coverage:
+  Scanning:
     runs-on: ubuntu-latest
 
     steps:

@@ -2,7 +2,7 @@ name: Pytest
 on: [push]
 
 jobs:
-  Teste:
+  Testing:
     runs-on: ubuntu-latest
 
     steps:
