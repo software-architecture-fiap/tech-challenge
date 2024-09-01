@@ -111,7 +111,7 @@ quote-style = 'single'
 [tool.taskipy.tasks]
 run = 'fastapi dev fastapi_template/app.py'
 pre_test = 'task lint'
-test = 'pytest --cov=fastapi_template -vv'
+test = 'pytest -vv'
 lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
 post_test = 'coverage html'
