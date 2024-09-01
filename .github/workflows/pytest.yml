@@ -5,6 +5,14 @@ jobs:
   Testing:
     runs-on: ubuntu-latest
 
+    env:
+      ADMIN_CPF: {{ secrets.ADMIN_CPF }}
+      ADMIN_EMAIL: {{ secrets. }}
+      ADMIN_NAME: {{ secrets.ADMIN_EMAIL }}
+      ADMIN_PASSWORD: {{ secrets.ADMIN_PASSWORD }}
+      DATABASE_URL: {{ secrets.DATABASE_URL }}
+      SECRET_KEY: {{ secrets.SECRET_KEY }}
+
     steps:
       - name: Copiando os Arquivos do Repositório
         uses: actions/checkout@v3
