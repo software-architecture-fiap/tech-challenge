@@ -21,4 +21,4 @@ jobs:
         run: poetry install
 
       - name: Executando os Testes
-        run: pytest --v
+        run: poetry run task test
