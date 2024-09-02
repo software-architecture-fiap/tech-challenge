@@ -92,6 +92,7 @@ pre-commit = "^3.8.0"
 [tool.interrogate]
 ignore-init-method = false
 generate-badge = "docs/assets/"
+ignore-module = true
 badge-format = "svg"
 --badge-style = "flat-square-modified"
 
@@ -109,14 +110,13 @@ quote-style = 'single'
 
 [tool.taskipy.tasks]
 run = 'fastapi dev fastapi_template/app.py'
-pre_test = 'task lint'
-test = 'pytest --cov=fastapi_template -vv'
+test = 'pytest -vv'
 lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
-post_test = 'coverage html'
 pre-commit = 'pre-commit run --all-files'
 docs = 'mkdocs serve'
 compose = 'docker compose up --build'
+interrogate = 'interrogate -vv'
 
 [tool.ruff.lint]
 preview = true

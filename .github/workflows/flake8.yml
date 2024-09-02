@@ -1,4 +1,4 @@
-name: Linters
+name: PEP8
 on:
   push:
     branches:

@@ -1,10 +1,21 @@
 import fnmatch
 import os
+from typing import List, Optional
 
 IGNORED_DIRS = ['node_modules', 'build', 'public', '.venv', '__pycache__', '.git', 'log', 'install']
 
 
-def generate_directory_tree(root_dir, output_file, ignore_patterns=None):
+def generate_directory_tree(root_dir: str, output_file: str, ignore_patterns: Optional[List[str]] = None) -> None:
+    """Gera um arquivo com a árvore de diretórios a partir do diretório raiz especificado.
+
+    Args:
+        root_dir (str): Diretório raiz para gerar a árvore de diretórios.
+        output_file (str): Caminho do arquivo de saída onde a árvore será salva.
+        ignore_patterns (Optional[List[str]]): Lista de padrões para ignorar arquivos e diretórios.
+
+    Returns:
+        None
+    """
     if ignore_patterns is None:
         ignore_patterns = []
 

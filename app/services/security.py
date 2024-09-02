@@ -26,17 +26,44 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verifica se a senha fornecida corresponde à senha criptografada.
+
+    Args:
+        plain_password (str): Senha fornecida pelo usuário.
+        hashed_password (str): Senha criptografada armazenada.
+
+    Returns:
+        bool: True se a senha corresponder, False caso contrário.
+    """
     logger.debug('Verifying password for user')
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password):
+def get_password_hash(password: str) -> str:
+    """Gera um hash para a senha fornecida.
+
+    Args:
+        password (str): Senha a ser criptografada.
+
+    Returns:
+        str: Senha criptografada.
+    """
     logger.debug('Hashing password')
     return pwd_context.hash(password)
 
 
-def authenticate_user(db: Session, username: str, password: str):
+def authenticate_user(db: Session, username: str, password: str) -> Union[schemas.Customer, bool]:
+    """Autentica um usuário com base no nome de usuário e senha fornecidos.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        username (str): Nome de usuário ou e-mail.
+        password (str): Senha fornecida pelo usuário.
+
+    Returns:
+        Union[schemas.User, bool]: O usuário autenticado ou False se a autenticação falhar.
+    """
     user = repository.get_user_by_email(db, email=username)
     if not user:
         return False
@@ -45,7 +72,16 @@ def authenticate_user(db: Session, username: str, password: str):
     return user
 
 
-def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
+def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None) -> str:
+    """Cria um token JWT com base nos dados fornecidos e tempo de expiração.
+
+    Args:
+        data (dict): Dados a serem incluídos no token.
+        expires_delta (Union[timedelta, None], optional): Tempo adicional para expiração do token. Defaults to None.
+
+    Returns:
+        str: Token JWT gerado.
+    """
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -58,7 +94,19 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-def get_current_user(db: Session = Depends(database.get_db), token: str = Depends(oauth2_scheme)):
+def get_current_user(db: Session = Depends(database.get_db), token: str = Depends(oauth2_scheme)) -> schemas.Customer:
+    """Obtém o usuário atual com base no token JWT fornecido.
+
+    Args:
+        db (Session, optional): Sessão do banco de dados. Defaults to Depends(database.get_db).
+        token (str, optional): Token JWT fornecido. Defaults to Depends(oauth2_scheme).
+
+    Returns:
+        schemas.Customer: Dados do usuário autenticado.
+
+    Raises:
+        HTTPException: Se o token for inválido, expirado ou o usuário não for encontrado.
+    """
     logger.info('Fetching current user from token')
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

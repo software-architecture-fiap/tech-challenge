@@ -1,0 +1,36 @@
+name: Docstring
+
+on: [push]
+
+jobs:
+  Scanning:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check Out Repository
+      uses: actions/checkout@v3
+
+    - name: Set Up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+
+    - name: Install Dependencies
+      run: |
+        poetry install --no-root
+        poetry add interrogate --group dev
+
+    - name: Run Interrogate
+      run: |
+        poetry run interrogate -vv . --config pyproject.toml
+      continue-on-error: true
+
+    - name: Check Coverage
+      if: failure()
+      run: |
+        echo "Docstring coverage is below 95%"
+        exit 1

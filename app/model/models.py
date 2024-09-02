@@ -7,6 +7,18 @@ from ..db.database import Base
 
 
 class Customer(Base):
+    """
+    Representa um Cliente na Base de Dados.
+
+    Attributes:
+        id (int): Identificador único do cliente.
+        name (str): Nome do cliente.
+        email (str): Email do cliente.
+        cpf (str): CPF do cliente.
+        hashed_password (str): Senha do cliente criptografada.
+        orders (relationship): Relacionamento com pedidos associados ao cliente.
+    """
+
     __tablename__ = 'customers'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -19,7 +31,20 @@ class Customer(Base):
 
 
 class Product(Base):
+    """
+    Representa um Produto na Base de Dados.
+
+    Attributes:
+        id (int): Identificador único do produto.
+        name (str): Nome do produto.
+        description (str): Descrição do produto.
+        price (float): Preço do produto.
+        category_id (int): Identificador da categoria à qual o produto pertence.
+        category (relationship): Relacionamento com a categoria do produto.
+    """
+
     __tablename__ = 'products'
+
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     description = Column(String)
@@ -29,6 +54,27 @@ class Product(Base):
 
 
 class Order(Base):
+    """
+    Representa um Pedido na Base de Dados.
+
+    Attributes:
+        id (int): Identificador único do pedido.
+        status (str): Status do pedido.
+        user_agent (str): User-agent do pedido.
+        ip_address (str): Endereço IP do pedido.
+        os (str): Sistema operacional do pedido.
+        browser (str): Navegador do pedido.
+        device (str): Dispositivo do pedido.
+        comments (str): Comentários associados ao pedido.
+        created_at (datetime): Data e hora em que o pedido foi criado.
+        updated_at (datetime): Data e hora em que o pedido foi atualizado pela última vez.
+        customer_id (int): Identificador do cliente associado ao pedido.
+        customer (relationship): Relacionamento com o cliente associado ao pedido.
+        order_items (relationship): Relacionamento com os itens do pedido.
+        order_products (relationship): Relacionamento com os produtos do pedido.
+        tracking (relationship): Relacionamento com o rastreamento do pedido.
+    """
+
     __tablename__ = 'orders'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -52,6 +98,18 @@ class Order(Base):
 
 
 class OrderItem(Base):
+    """
+    Representa um Item em um Pedido.
+
+    Attributes:
+        id (int): Identificador único do item do pedido.
+        order_id (int): Identificador do pedido ao qual o item pertence.
+        product_id (int): Identificador do produto do item.
+        comment (str): Comentário associado ao item do pedido.
+        order (relationship): Relacionamento com o pedido ao qual o item pertence.
+        product (relationship): Relacionamento com o produto do item.
+    """
+
     __tablename__ = 'order_items'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -64,6 +122,18 @@ class OrderItem(Base):
 
 
 class OrderProduct(Base):
+    """
+    Representa um Produto Específico em um Pedido.
+
+    Attributes:
+        id (int): Identificador único do produto no pedido.
+        order_id (int): Identificador do pedido ao qual o produto pertence.
+        product_id (int): Identificador do produto.
+        comment (str): Comentário associado ao produto do pedido.
+        order (relationship): Relacionamento com o pedido ao qual o produto pertence.
+        product (relationship): Relacionamento com o produto.
+    """
+
     __tablename__ = 'order_products'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -76,6 +146,17 @@ class OrderProduct(Base):
 
 
 class Tracking(Base):
+    """
+    Representa o Rastreamento de um Pedido.
+
+    Attributes:
+        id (int): Identificador único do rastreamento.
+        order_id (int): Identificador do pedido rastreado.
+        status (str): Status do rastreamento.
+        created_at (datetime): Data e hora em que o rastreamento foi criado.
+        order (relationship): Relacionamento com o pedido rastreado.
+    """
+
     __tablename__ = 'tracking'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -87,6 +168,17 @@ class Tracking(Base):
 
 
 class Token(Base):
+    """
+    Representa um Token de Autenticação.
+
+    Attributes:
+        id (int): Identificador único do token.
+        token (str): Valor do token.
+        is_used (bool): Indica se o token foi utilizado.
+        user_id (int): Identificador do cliente associado ao token.
+        user (relationship): Relacionamento com o cliente associado ao token.
+    """
+
     __tablename__ = 'tokens'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -98,6 +190,15 @@ class Token(Base):
 
 
 class Category(Base):
+    """
+    Representa uma Categoria de Produtos.
+
+    Attributes:
+        id (int): Identificador único da categoria.
+        name (str): Nome da categoria.
+        products (relationship): Relacionamento com os produtos pertencentes à categoria.
+    """
+
     __tablename__ = 'categories'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
