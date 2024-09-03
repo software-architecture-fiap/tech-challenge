@@ -110,12 +110,12 @@ quote-style = 'single'
 
 [tool.taskipy.tasks]
 run = 'fastapi dev fastapi_template/app.py'
-test = 'pytest -vv'
+test = 'docker compose run tests'
 lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
 pre-commit = 'pre-commit run --all-files'
 docs = 'mkdocs serve'
-compose = 'docker compose up --build'
+compose = 'docker compose up web'
 interrogate = 'interrogate -vv'
 
 [tool.ruff.lint]
