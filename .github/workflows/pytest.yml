@@ -9,16 +9,16 @@ jobs:
       - name: Copiando os Arquivos do Repositório
         uses: actions/checkout@v3
 
-      - name: Instalando o Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
+      - name: Instalando o Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
-      - name: Instalando o Poetry
-        run: pipx install poetry
-
-      - name: Instalando Dependências
-        run: poetry install
+      - name: Construindo e Subindo os Containers
+        run: docker-compose up -d --build
 
       - name: Executando os Testes
-        run: poetry run task test
+        run: docker-compose run tests
+
+      - name: Derrubando os Containers
+        run: docker-compose down
