@@ -307,6 +307,7 @@ class OrderResponse(BaseModel):
 
     id: int
     customer_id: int
+    status: str
     created_at: datetime
 
     class Config:
