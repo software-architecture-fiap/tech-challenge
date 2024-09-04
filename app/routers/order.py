@@ -111,8 +111,9 @@ def read_orders(
     logger.info('Endpoint de leitura de pedidos chamado')
     try:
         orders = repository.get_orders(db, skip=skip, limit=limit)
+        filtered_orders = [order for order in orders if order.status != 'Finalizado']
         logger.info('Pedidos recuperados com sucesso')
-        return {'orders': orders}
+        return {'orders': filtered_orders}
     except Exception as e:
         logger.error(f'Erro ao recuperar os pedidos: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
