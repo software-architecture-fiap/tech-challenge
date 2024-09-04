@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict
@@ -376,7 +377,6 @@ class Tracking(BaseModel):
 
         from_attributes = True
 
-
 class UpdateOrderStatus(BaseModel):
     """
     Modelo para Atualização do Status de um Pedido.
@@ -386,3 +386,9 @@ class UpdateOrderStatus(BaseModel):
     """
 
     status: str
+
+class OrderStatus(str, Enum):
+    PRONTO = "Pronto"
+    EM_PREP = "Em preparação"
+    RECEBIDO = "Recebido"
+    FINALIZADO = "Finalizado"

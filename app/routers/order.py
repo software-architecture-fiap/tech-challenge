@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..db.database import get_db
 from ..model import schemas
+from ..model.schemas import OrderStatus
 from ..services import repository, security
 from ..tools.logging import logger
 
@@ -65,6 +66,12 @@ def update_order_status(
         f'Endpoint de atualização de status do pedido chamado para o ID do pedido: {order_id} com status: '
         f'{update_data.status}'
     )
+    try:
+        update_data.status = OrderStatus(update_data.status)
+    except (ValueError, IndexError):
+        logger.warning(f'Status {update_data.status} não é permitido')
+        raise HTTPException(status_code=422, detail='Status não permitido')
+
     try:
         order_id_int = order_id
     except (ValueError, IndexError):
