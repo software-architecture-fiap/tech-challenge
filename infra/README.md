@@ -1,5 +1,42 @@
 ## Infra Kubernetes
 
+### Arquitetura
+
+```mermaid
+flowchart TD
+    subgraph Control_Plane["Control Plane"]
+        A[etcd]
+        B[CoreDNS]
+        C[Kindnet]
+        D[Kube-Proxy]
+        E[Kube-Apiserver]
+        F[Kube-Controller-Manager]
+        G[Kube-Scheduler]
+        
+        A --> E
+        B --> E
+        C --> E
+        D --> E
+        E --> F
+        E --> G
+    end
+
+    subgraph Worker_Node["lanchonete-k8s-worker"]
+        H[Pod: Postgres_DB]
+        I[Pod: Web_APP]
+        
+        H --> J[Service: db]
+        I --> K[Service: web]
+        H --> L[PersistentVolumeClaim: db-pvc]
+        I --> M[PersistentVolumeClaim: logs-pvc]
+        
+        K --> H
+        J --> I
+    end
+
+    Client[Client Access] --> K
+```
+
 ### Pré-requisitos
 - [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 - [Kubectl](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
