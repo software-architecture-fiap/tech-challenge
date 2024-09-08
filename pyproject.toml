@@ -96,6 +96,7 @@ generate-badge = "docs/assets/"
 ignore-module = true
 badge-format = "svg"
 --badge-style = "flat-square-modified"
+exclude = ["setup.py", "docs", "build", "app/tests"]
 
 [tool.pytest.ini_options]
 pythonpath = "."
