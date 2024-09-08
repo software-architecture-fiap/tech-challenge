@@ -69,6 +69,7 @@ mkdocs-material = "^9.5.33"
 mkdocstrings = "^0.25.2"
 mkdocstrings-python = "^1.10.8"
 mkdocs-glightbox = "^0.4.0"
+pytest-mock = "^3.14.0"
 
 [tool.poetry.group.doc.dependencies]
 mkdocs-material = "^9.5.33"
