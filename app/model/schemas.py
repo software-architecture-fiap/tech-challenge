@@ -5,6 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 
 
+
 class CustomerBase(BaseModel):
     """
     Modelo Base para Dados de Clientes.
@@ -405,3 +406,23 @@ class UpdateOrderPaymentStatus(BaseModel):
     """
 
     payment_status: str
+
+class WebhookBase(BaseModel):
+    id: int
+    order_id: int
+    status: str
+    customer_id: int
+    payment_status: str
+    received_at: datetime
+
+class WebhookCreate(BaseModel):
+    order_id: int
+    customer_id: int
+    received_at: datetime
+
+class WebhookResponse(BaseModel):
+    order_id: int
+    status: str
+    customer_id: int
+    payment_status: str
+    received_at: datetime
