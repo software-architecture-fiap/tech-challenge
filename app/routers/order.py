@@ -182,3 +182,45 @@ def fake_checkout(
     except Exception as e:
         logger.error(f'Erro durante o checkout fictício: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+
+@router.patch('/{order_id}/payment', response_model=schemas.OrderResponse)
+def update_order_payment_status(
+    order_id: str,
+    update_data: schemas.UpdateOrderPaymentStatus,
+    db: Session = Depends(get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user),
+) -> schemas.OrderResponse:
+    """Atualiza o status de pagamento um pedido criado.
+
+    Args:
+        order_id (str): O ID do pedido a ser atualizado.
+        update_data (schemas.UpdateOrderPaymentStatus): Os dados de atualização de status de pagamento.
+        db (Session): A sessão do banco de dados.
+        current_user (schemas.Customer): O usuário autenticado atualmente.
+
+    Raises:
+        HTTPException: Se o formato do ID do pedido for inválido, o pedido não for encontrado, ou ocorrer um erro.
+
+    Returns:
+        schemas.OrderResponse: O pedido atualizado.
+    """
+    logger.info(
+        f'Endpoint de atualização de status do pedido chamado para o ID do pedido: {order_id} com status: '
+        f'{update_data.payment_status}'
+    )
+    try:
+        order_id_int = order_id
+    except (ValueError, IndexError):
+        logger.warning(f'Formato de ID do pedido inválido: {order_id}')
+        raise HTTPException(status_code=400, detail='Formato de ID do pedido inválido')
+
+    try:
+        db_order = repository.update_order_payment_status(db, order_id=order_id_int, payment_status=update_data.payment_status)
+        if db_order is None:
+            logger.warning(f'Pedido não encontrado: {order_id}')
+            raise HTTPException(status_code=404, detail='Pedido não encontrado')
+        logger.info(f'Status de pagamento do ID do pedido {order_id} atualizado para {update_data.payment_status}')
+        return db_order
+    except Exception as e:
+        logger.error(f'Erro ao atualizar o status de pagamento do pedido: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')

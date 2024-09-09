@@ -79,6 +79,7 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     status = Column(String, index=True, default='created')
+    payment_status=Column(String, default='pendente')
     user_agent = Column(String)
     ip_address = Column(String)
     os = Column(String)
