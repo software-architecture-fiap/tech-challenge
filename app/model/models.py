@@ -96,7 +96,7 @@ class Order(Base):
     order_items = relationship('OrderItem', back_populates='order')
     order_products = relationship('OrderProduct', back_populates='order')
     tracking = relationship('Tracking', back_populates='order')
-
+    webhook = relationship('Webhook', back_populates='order')
 
 class OrderItem(Base):
     """
@@ -204,3 +204,17 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
     products = relationship('Product', back_populates='category')
+
+
+class Webhook(Base):
+
+    __tablename__ = 'webhook'
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey('orders.id'))
+    status = Column(String)
+    payment_status=Column(String)
+    received_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    customer_id = Column(Integer)
+    order = relationship('Order', back_populates='webhook')

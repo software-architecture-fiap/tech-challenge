@@ -183,6 +183,7 @@ def fake_checkout(
         logger.error(f'Erro durante o checkout fictício: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
 
+
 @router.patch('/{order_id}/payment', response_model=schemas.OrderResponse)
 def update_order_payment_status(
     order_id: str,
@@ -223,4 +224,23 @@ def update_order_payment_status(
         return db_order
     except Exception as e:
         logger.error(f'Erro ao atualizar o status de pagamento do pedido: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+
+
+@router.post('/webhook', response_model=schemas.WebhookResponse)
+def create_webhook(
+    webhook: schemas.WebhookCreate,
+    db: Session = Depends(get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user),
+) -> schemas.WebhookResponse:
+
+    logger.info('Endpoint de criação de webhook chamado')
+    try:
+        db_webhook = repository.create_webhook(db=db, webhook=webhook)
+        logger.info(
+            f'Endpoint de atualização de status do pedido chamado para o ID de pedido: {webhook.order_id}'
+        )
+        return db_webhook
+    except Exception as e:
+        logger.error(f'Erro ao criar o pedido: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
