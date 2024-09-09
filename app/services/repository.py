@@ -419,6 +419,7 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
             device=order.device,
             comments=order.comments,
             customer_id=customer_id_int,
+            payment_status=order.payment_status,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
         )
@@ -469,6 +470,32 @@ def update_order_status(db: Session, order_id: int, status: str) -> Optional[mod
         return db_order
     except Exception as e:
         logger.error(f'Error updating order status: {e}', exc_info=True)
+        raise
+
+def update_order_payment_status(db: Session, order_id: int, payment_status: str) -> Optional[models.Order]:
+    """Atualiza o status de um pedido existente.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        order_id (int): ID do pedido a ser atualizado.
+        status (str): Novo status do pedido.
+
+    Returns:
+        Optional[models.Order]: O pedido atualizado, ou None se não encontrado.
+    """
+    logger.debug(f'Updating order payment status for order ID: {order_id} to {payment_status}')
+    try:
+        db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
+        if db_order:
+            db_order.payment_status = payment_status
+            db_order.updated_at = datetime.now(timezone.utc)
+            db.commit()
+            db.refresh(db_order)
+            logger.info(f'Order ID {db_order.id} payment status updated to {payment_status}')
+            create_tracking(db, db_order.id, payment_status)
+        return db_order
+    except Exception as e:
+        logger.error(f'Error updating order payment status: {e}', exc_info=True)
         raise
 
 

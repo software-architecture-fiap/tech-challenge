@@ -211,6 +211,7 @@ class OrderBase(BaseModel):
     """
 
     status: str
+    payment_status: str
     user_agent: str
     ip_address: str
     os: str
@@ -310,6 +311,7 @@ class OrderResponse(BaseModel):
     customer_id: int
     status: str
     created_at: datetime
+    payment_status: str
 
     class Config:
         """
@@ -332,6 +334,7 @@ class OrderCustomerView(BaseModel):
     id: int
     customer_id: int
     status: str
+    payment_status: str
 
     class Config:
         """
@@ -392,3 +395,13 @@ class OrderStatus(str, Enum):
     EM_PREP = "Em preparação"
     RECEBIDO = "Recebido"
     FINALIZADO = "Finalizado"
+
+class UpdateOrderPaymentStatus(BaseModel):
+    """
+    Modelo para Atualização do Status de um Pedido.
+
+    Attributes:
+        status (str): Novo status do pedido.
+    """
+
+    payment_status: str
