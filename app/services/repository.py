@@ -498,6 +498,27 @@ def update_order_payment_status(db: Session, order_id: int, payment_status: str)
         logger.error(f'Error updating order payment status: {e}', exc_info=True)
         raise
 
+def create_webhook(db: Session, webhook: schemas.WebhookCreate):
+
+    logger.debug(f'Creating a webhook entry for order ID: {webhook.order_id}')
+    try:
+        order_search = db.query(models.Order).filter(models.Order.id == webhook.order_id).first()
+        db_webhook = models.Webhook(
+            order_id=order_search.id,
+            received_at=webhook.received_at,
+            status=order_search.status,
+            payment_status=order_search.payment_status,
+            customer_id=webhook.customer_id
+        )
+        db.query(models.Order).filter(models.Order.id == webhook.order_id).first()
+        db.add(db_webhook)
+        db.commit()
+        db.refresh(db_webhook)
+        logger.info(f'Webhook entry created with ID: {db_webhook.id}')
+        return db_webhook
+    except Exception as e:
+        logger.error(f'Error creating tracking entry: {e}', exc_info=True)
+        raise
 
 def create_tracking(db: Session, order_id: int, status: str) -> models.Tracking:
     """Cria uma nova entrada de rastreamento para um pedido.
