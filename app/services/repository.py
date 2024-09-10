@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 from dotenv import load_dotenv
 from jose import jwt
 from sqlalchemy import text
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..model import models, schemas
 from ..tools.logging import logger
@@ -586,9 +586,15 @@ def get_order(db: Session, order_id: int) -> Optional[models.Order]:
     Returns:
         Optional[models.Order]: O pedido correspondente, ou None se não encontrado.
     """
+
     logger.debug(f'Fetching order with ID: {order_id}')
     try:
-        order = db.query(models.Order).filter(models.Order.id == order_id).first()
+        order = db.query(models.Order).options(
+            joinedload(models.Order.order_products)
+            .joinedload(models.OrderProduct.product)
+            .joinedload(models.Product.category)  # Carregando a categoria associada ao produto
+        ).filter(models.Order.id == order_id).first()
+
         logger.info('Order fetched successfully')
         return order
     except Exception as e:

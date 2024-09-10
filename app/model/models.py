@@ -50,7 +50,9 @@ class Product(Base):
     description = Column(String)
     price = Column(Float)
     category_id = Column(Integer, ForeignKey('categories.id'))
+
     category = relationship('Category', back_populates='products')
+    order_products = relationship('OrderProduct', back_populates='product')
 
 
 class Order(Base):
@@ -143,7 +145,7 @@ class OrderProduct(Base):
     comment = Column(Text)
 
     order = relationship('Order', back_populates='order_products')
-    product = relationship('Product')
+    product = relationship('Product', back_populates='order_products')
 
 
 class Tracking(Base):

@@ -221,6 +221,13 @@ class OrderBase(BaseModel):
     comments: Optional[str] = None
 
 
+class ProductView(BaseModel):
+    name: str
+    description: str
+    price: float
+    category: Optional[CategoryBase] = None
+
+
 class OrderProductBase(BaseModel):
     """
     Modelo Base para Dados de Produtos em um Pedido.
@@ -232,6 +239,7 @@ class OrderProductBase(BaseModel):
 
     product_id: int
     comment: Optional[str] = None
+    product: Optional[ProductView] = None
 
 
 class OrderProductCreate(OrderProductBase):
@@ -336,6 +344,7 @@ class OrderCustomerView(BaseModel):
     customer_id: int
     status: str
     payment_status: str
+    order_products: List[OrderProductCreate] = []
 
     class Config:
         """
