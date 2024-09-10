@@ -473,7 +473,7 @@ def update_order_status(db: Session, order_id: int, status: str) -> Optional[mod
         raise
 
 def update_order_payment_status(db: Session, order_id: int, payment_status: str) -> Optional[models.Order]:
-    """Atualiza o status de um pedido existente.
+    """Atualiza o status de pagamento de um pedido existente e cria um webhook se o status for 'Pago'.
 
     Args:
         db (Session): Sessão do banco de dados.
@@ -493,7 +493,18 @@ def update_order_payment_status(db: Session, order_id: int, payment_status: str)
             db.refresh(db_order)
             logger.info(f'Order ID {db_order.id} payment status updated to {payment_status}')
             create_tracking(db, db_order.id, payment_status)
+
+            if payment_status.lower() == "pago":
+                # Criando um schema do tipo WebhookCreate para passar para a função create_webhook
+                webhook_data = schemas.WebhookCreate(
+                    order_id=order_id,
+                    received_at=datetime.now(timezone.utc),
+                    customer_id=db_order.customer_id
+                )
+                create_webhook(db, webhook_data)
+
         return db_order
+
     except Exception as e:
         logger.error(f'Error updating order payment status: {e}', exc_info=True)
         raise
