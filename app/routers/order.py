@@ -220,7 +220,7 @@ def update_order_payment_status(
         if db_order is None:
             logger.warning(f'Pedido não encontrado: {order_id}')
             raise HTTPException(status_code=404, detail='Pedido não encontrado')
-        logger.info(f'Status de pagamento do ID do pedido {order_id} atualizado para {update_data.payment_status}')
+        logger.info(f'Status de pagamento do pedido de ID {order_id} atualizado para {update_data.payment_status}')
         return db_order
     except Exception as e:
         logger.error(f'Erro ao atualizar o status de pagamento do pedido: {e}', exc_info=True)

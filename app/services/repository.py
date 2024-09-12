@@ -502,6 +502,7 @@ def update_order_payment_status(db: Session, order_id: int, payment_status: str)
                     customer_id=db_order.customer_id
                 )
                 create_webhook(db, webhook_data)
+                logger.info(f'Creating a webhook entry for order ID: {db_order.id} at {webhook_data.received_at}')
 
         return db_order
 
@@ -568,7 +569,13 @@ def get_orders(db: Session, skip: int = 0, limit: int = 10) -> List[models.Order
     """
     logger.debug(f'Fetching orders with skip: {skip}, limit: {limit}')
     try:
-        orders = db.query(models.Order).offset(skip).limit(limit).all()
+        orders = (
+            db.query(models.Order)
+            .order_by(models.Order.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
         logger.info('Orders fetched successfully')
         return orders
     except Exception as e:
