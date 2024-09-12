@@ -242,12 +242,13 @@ class OrderProductBase(BaseModel):
     product: Optional[ProductView] = None
 
 
-class OrderProductCreate(OrderProductBase):
+class OrderProductCreate(BaseModel):
     """
     Modelo para Criação de um Produto em um Pedido.
     """
 
-    pass
+    product_id: int
+    comment: Optional[str] = None
 
 
 class OrderProduct(OrderProductBase):
@@ -344,7 +345,7 @@ class OrderCustomerView(BaseModel):
     customer_id: int
     status: str
     payment_status: str
-    order_products: List[OrderProductCreate] = []
+    order_products: List[OrderProductBase] = []
 
     class Config:
         """
