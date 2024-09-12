@@ -569,7 +569,7 @@ def get_orders(db: Session, skip: int = 0, limit: int = 10) -> List[models.Order
     try:
         orders = (
             db.query(models.Order)
-            .order_by(models.Order.created_at.desc())
+            .order_by(models.Order.created_at.asc())
             .offset(skip)
             .limit(limit)
             .all()
