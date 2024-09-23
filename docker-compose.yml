@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:latest
@@ -33,7 +31,6 @@ services:
     volumes:
       - logs:/app/logs
     command: poetry run pytest -vv
-    # Remove "command" if you don't want the service to start automatically
 
 volumes:
   db-data:
