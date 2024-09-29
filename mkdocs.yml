@@ -94,9 +94,17 @@ extra:
 nav:
   - Home: "index.md"
   - Docs:
-    - DDD: "ddd.md"
-    - Event Storming: "event-storming.md"
+    - Fase 1:
+      - DDD: "fase_1/ddd.md"
+      - Event Storming: "fase_1/event_storming.md"
+      - Entrega: "fase_1/entrega.md"
+      - Passo a Passo: "fase_1/steps.md"
+    - Fase 2:
+        - Kubernetes: "fase_2/kubernetes.md"
+        - Clean Code: "fase_2/clean_code.md"
+        - API Mercado Pago: "fase_2/api_mercado_pago.md"
+        - Novas Rotas: "fase_2/novas_rotas.md"
+        - Entrega: "fase_2/entrega.md"
+        - Passo a Passo: "fase_2/steps.md"
   - Guia:
     - Ambiente: "environment.md"
-    - Entrega: "entrega.md"
-    - Passo a Passo: "steps.md"

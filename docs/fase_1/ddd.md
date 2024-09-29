@@ -58,4 +58,4 @@ O sistema deverá exibir na área administrativa (interface de atendimento) todo
 
  Cadastro, Pedido e Pagamento
 
-![image](assets/ddd.png)
+![image](../assets/ddd.png)
