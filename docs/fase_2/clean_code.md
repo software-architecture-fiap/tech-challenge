@@ -97,3 +97,13 @@ Pytest Coverage é uma extensão do framework de testes pytest que mede a cobert
 Ele gera relatórios detalhados sobre quais partes do código foram executadas durante a execução dos testes e quais
 não foram, ajudando a identificar áreas não testadas. A cobertura é importante para garantir que os testes validem
 o máximo possível do comportamento do código, aumentando sua confiabilidade.
+
+## :simple-sonarlint: Sonar Lint
+
+Além das configurações e bibliotecas automatizadas, usamos o plugin do Sonar Lint para fazer checagens e dicas
+em nosso código. Isso nos ajuda a refletir sobre nosso projeto em tempo de desenvolvimento.
+
+## :material-source-repository-multiple: Sourcery
+
+Assim como o Sonar Lint, o Sourcery para verificar nosso código em nível de repositório. Então ele funciona como
+uma ultrassonografia do projeto.
