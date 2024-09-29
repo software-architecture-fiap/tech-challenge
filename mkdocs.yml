@@ -100,11 +100,11 @@ nav:
       - Entrega: "fase_1/entrega.md"
       - Passo a Passo: "fase_1/steps.md"
     - Fase 2:
-        - Kubernetes: "fase_2/kubernetes.md"
-        - Clean Code: "fase_2/clean_code.md"
-        - API Mercado Pago: "fase_2/api_mercado_pago.md"
-        - Novas Rotas: "fase_2/novas_rotas.md"
-        - Entrega: "fase_2/entrega.md"
-        - Passo a Passo: "fase_2/steps.md"
+      - Clean Code: "fase_2/clean_code.md"
+      - Kubernetes: "fase_2/kubernetes.md"
+      - Novas Rotas: "fase_2/novas_rotas.md"
+      - API Mercado Pago: "fase_2/api_mercado_pago.md"
+      - Entrega: "fase_2/entrega.md"
+      - Passo a Passo: "fase_2/steps.md"
   - Guia:
     - Ambiente: "environment.md"
