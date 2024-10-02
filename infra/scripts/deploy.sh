@@ -31,7 +31,6 @@ echo "Updating Kustomize with the image version $IMAGE_VERSION..."
 
 # Navigate to the Kustomize directory
 KUSTOMIZE_DIR="$(pwd)/infra/kubernetes/$ENVIRONMENT"
-echo "Navigating to $KUSTOMIZE_DIR"
 cd $KUSTOMIZE_DIR
 
 if [ ! -f kustomization.yaml ]; then
