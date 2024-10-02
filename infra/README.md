@@ -151,6 +151,7 @@ Updating Kustomize with the image version v1.0.1...
 NAME          STATUS   AGE
 development   Active   24m
 Applying Kubernetes manifests for development environment...
+secret/db-url-secret created
 service/db created
 service/web created
 persistentvolumeclaim/db-pvc created
