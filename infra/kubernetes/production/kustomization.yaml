@@ -3,5 +3,17 @@ kind: Kustomization
 
 # Prod criado para reutizar os recursos da base com alterações para produção 
 # incluindo variaveis de ambiente ou config de escalabilidade
-bases:
-  - ../../base
+
+patches:
+- path: deployment-patch.yaml
+  target:
+    kind: Deployment
+    name: web
+
+resources:
+- ../base
+
+images:
+- name: web
+  newName: web
+  newTag: v1.0.0

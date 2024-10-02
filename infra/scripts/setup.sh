@@ -1,9 +1,8 @@
 #!/bin/bash
-
 set -euo pipefail
 
-# Create a Kind cluster
-kind create cluster --name lanchonete-k8s --config infra/config/kind-config.yaml
+CLUSTER_NAME="lanchonete-k8s"
+kind create cluster --name ${CLUSTER_NAME} --config infra/config/kind-config.yaml
 
 # Set KUBECONFIG environment variable
-export KUBECONFIG="$(kind get kubeconfig-path --name=lanchonete-k8s)"
+export KUBECONFIG="$(kind get kubeconfig --name=${CLUSTER_NAME})"

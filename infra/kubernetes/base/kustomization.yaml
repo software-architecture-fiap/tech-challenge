@@ -9,4 +9,6 @@ resources:
   - service-web.yaml
   - pvc-logs.yaml
 
-namePrefix: base-
+images:
+  - name: web
+    newTag: latest

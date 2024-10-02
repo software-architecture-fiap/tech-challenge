@@ -16,7 +16,16 @@ spec:
     spec:
       containers:
       - name: web
-        image: web:1.0
+        image: web:1.0.1
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "1"
+            ephemeral-storage: "1Gi"
+          limits:
+            memory: "128Mi"
+            cpu: "2"
+            ephemeral-storage: "2Gi"
         ports:
         - containerPort: 2000
         env:
