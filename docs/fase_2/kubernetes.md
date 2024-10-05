@@ -1,6 +1,6 @@
-## Infra Kubernetes
+## Kubernetes
 
-### Arquitetura
+### :simple-kubernetes: Arquitetura
 
 ```mermaid
 flowchart TD
@@ -35,7 +35,7 @@ flowchart TD
     Client[Client Access] --> K
 ```
 
-### Pré-requisitos
+### :simple-pkgsrc: Pré-requisitos
 - [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 - [Kubectl](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 - [Docker](https://docs.docker.com/engine/install/)
@@ -56,7 +56,7 @@ Kustomize Version: v5.0.4-0.20230601165947-6ce0bf390ce3
 Server Version: v1.31.0
 ```
 
-### Configurando os clusters usando o Kind
+### :simple-boat: Configurando os clusters usando o Kind
 
 - Execute o script dentro de `./infra/scripts/setup.sh`
 - Aguarde alguns minutos até os cluster serem criados, como no exemplo abaixo:
@@ -108,7 +108,7 @@ local-path-storage   local-path-provisioner-57c5987fd4-r4tw4                1/1 
 ```
 
 
-### Build do container e publicação no cluster Kind
+### :octicons-container-16: Build do container e publicação no cluster Kind
 
 Agora que o cluster está ativo é necessário fazer o build da imagem container da aplicação. Use o script como no exemplo abaixo, informando a versão da imagem baseada em [semantic version](https://semver.org/)
 
@@ -134,7 +134,7 @@ Image: "web:v1.0.1" with ID "sha256:0efb63782ce6fd65e45ee7dce3a5c8e1e336bfb66b0e
 Build and publish of web:v1.0.1 completed!
 ```
 
-### Deploy do serviços no cluster Kind
+### :octicons-server-16: Deploy do serviços no cluster Kind
 
 Utilizaremos o [Kustomize](https://kustomize.io/) para facilitar a reutilização e o gerenciamento dos manifestos K8S em mais de um ambiente, aqui há a segmentação entre namespaces nomeados como `development` e `production`.
 
@@ -190,6 +190,5 @@ kubectl -n development port-forward svc/web 2000
 Forwarding from 127.0.0.1:2000 -> 2000
 Forwarding from [::1]:2000 -> 2000
 ```
-
 
 ![image](../docs/assets/redoc-init.png)
