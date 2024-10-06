@@ -36,11 +36,11 @@ flowchart TD
 ```
 
 ### :simple-pkgsrc: Pré-requisitos
+
 - [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 - [Kubectl](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 - [Docker](https://docs.docker.com/engine/install/)
 - [Kustomize](https://kustomize.io/)
-
 
 Nessa primeira versão nossa aplicação ficará disponível em cluster Kubernetes local usando o Kind. Por favor, certifique-se de que as ferramentas de pré-requisitos estão instaladas, como nos exemplos:
 
@@ -60,6 +60,7 @@ Server Version: v1.31.0
 
 - Execute o script dentro de `./infra/scripts/setup.sh`
 - Aguarde alguns minutos até os cluster serem criados, como no exemplo abaixo:
+
 ```bash
 ❯ ./infra/scripts/setup.sh
 Creating cluster "lanchonete-k8s" ...
@@ -80,9 +81,10 @@ Not sure what to do next? 😅  Check out https://kind.sigs.k8s.io/docs/user/qui
 
 - Ao final execute `kind get clusters` que deverá exibir o resultado abaixo:
 
-``` bash
+```bash
 lanchonete-k8s
 ```
+
 - Com `kubectl get nodes` você visualizará um node control plane e um worker:
 
 ```bash
@@ -90,6 +92,7 @@ NAME                           STATUS   ROLES           AGE   VERSION
 lanchonete-k8s-control-plane   Ready    control-plane   32m   v1.31.0
 lanchonete-k8s-worker          Ready    <none>          32m   v1.31.0
 ```
+
 - Após isso, execute `kubectl get pods -A` para listar todos os pods de todos os namespaces existentes no cluster.
 
 ```bash
@@ -106,7 +109,6 @@ kube-system          kube-proxy-6bhr6                                       1/1 
 kube-system          kube-scheduler-lanchonete-k8s-control-plane            1/1     Running   0          88s
 local-path-storage   local-path-provisioner-57c5987fd4-r4tw4                1/1     Running   0          83s
 ```
-
 
 ### :octicons-container-16: Build do container e publicação no cluster Kind
 
@@ -144,7 +146,7 @@ Para fazer o deploy use o script informando os parametros de ambiente e a versã
 ./infra/scripts/deploy.sh production v1.0.1
 ```
 
-```
+```bash
 Updating Kustomize with the image version v1.0.1...
 NAME          STATUS   AGE
 development   Active   24m
@@ -191,4 +193,4 @@ Forwarding from 127.0.0.1:2000 -> 2000
 Forwarding from [::1]:2000 -> 2000
 ```
 
-![image](../docs/assets/redoc-init.png)
+![image](/docs/assets/redoc-init.png)
