@@ -69,6 +69,8 @@ mkdocs-material = "^9.5.33"
 mkdocstrings = "^0.25.2"
 mkdocstrings-python = "^1.10.8"
 mkdocs-glightbox = "^0.4.0"
+pytest = "^8.3.3"
+pytest-cov = "^5.0.0"
 
 [tool.poetry.group.doc.dependencies]
 mkdocs-material = "^9.5.33"
@@ -88,6 +90,8 @@ ruff = "^0.6.2"
 taskipy = "^1.13.0"
 interrogate = "^1.7.0"
 pre-commit = "^3.8.0"
+pytest = "^8.3.3"
+pytest-cov = "^5.0.0"
 
 [tool.interrogate]
 ignore-init-method = false

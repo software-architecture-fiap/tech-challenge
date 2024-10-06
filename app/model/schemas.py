@@ -2,8 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict
-
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class CustomerBase(BaseModel):
@@ -17,7 +16,10 @@ class CustomerBase(BaseModel):
     """
 
     name: Optional[str] = None
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
+    
+    # Refact Add CPF validation and change the cpf type with regex
+    # example: cpf: Optional[constr(regex=r"^\d{3}\.\d{3}\.\d{3}-\d{2}$")] = None
     cpf: Optional[str] = None
 
 
@@ -136,7 +138,7 @@ class ProductCreate(BaseModel):
 
     name: str
     description: str
-    price: float
+    price: float = Field(..., gt=0) # price is a positive float
     category_id: int
 
     model_config = ConfigDict(from_attributes=True)
