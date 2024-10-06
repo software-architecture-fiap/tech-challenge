@@ -1,4 +1,5 @@
-FROM python:3.10-slim
+# Stage 1: Build
+FROM python:3.10-slim AS builder
 
 WORKDIR /app
 
@@ -13,8 +14,15 @@ ENV PATH="${PATH}:/root/.local/bin"
 
 COPY pyproject.toml poetry.lock* ./
 
-RUN poetry install --no-root
+RUN poetry config virtualenvs.create false && \
+    poetry install --no-dev --no-root
 
+# Stage 2: Final
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY --from=builder /app /app
 COPY . .
 
 EXPOSE 2000
