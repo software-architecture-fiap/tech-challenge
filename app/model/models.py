@@ -50,7 +50,9 @@ class Product(Base):
     description = Column(String)
     price = Column(Float)
     category_id = Column(Integer, ForeignKey('categories.id'))
+
     category = relationship('Category', back_populates='products')
+    order_products = relationship('OrderProduct', back_populates='product')
 
 
 class Order(Base):
@@ -79,6 +81,7 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     status = Column(String, index=True, default='created')
+    payment_status=Column(String, default='pendente')
     user_agent = Column(String)
     ip_address = Column(String)
     os = Column(String)
@@ -95,7 +98,7 @@ class Order(Base):
     order_items = relationship('OrderItem', back_populates='order')
     order_products = relationship('OrderProduct', back_populates='order')
     tracking = relationship('Tracking', back_populates='order')
-
+    webhook = relationship('Webhook', back_populates='order')
 
 class OrderItem(Base):
     """
@@ -142,7 +145,7 @@ class OrderProduct(Base):
     comment = Column(Text)
 
     order = relationship('Order', back_populates='order_products')
-    product = relationship('Product')
+    product = relationship('Product', back_populates='order_products')
 
 
 class Tracking(Base):
@@ -203,3 +206,17 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
     products = relationship('Product', back_populates='category')
+
+
+class Webhook(Base):
+
+    __tablename__ = 'webhook'
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey('orders.id'))
+    status = Column(String)
+    payment_status=Column(String)
+    received_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    customer_id = Column(Integer)
+    order = relationship('Order', back_populates='webhook')

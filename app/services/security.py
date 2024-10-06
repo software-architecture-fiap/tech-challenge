@@ -19,7 +19,7 @@ load_dotenv()
 # Configurações do JWT
 SECRET_KEY = env.get('SECRET_KEY')
 ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 1
+ACCESS_TOKEN_EXPIRE_MINUTES = 5
 
 # Contexto para hash de senha e Token
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
