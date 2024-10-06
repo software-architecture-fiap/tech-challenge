@@ -71,6 +71,7 @@ mkdocstrings-python = "^1.10.8"
 mkdocs-glightbox = "^0.4.0"
 pytest = "^8.3.3"
 pytest-cov = "^5.0.0"
+pytest-mock = "^3.14.0"
 
 [tool.poetry.group.doc.dependencies]
 mkdocs-material = "^9.5.33"
@@ -99,6 +100,7 @@ generate-badge = "docs/assets/"
 ignore-module = true
 badge-format = "svg"
 --badge-style = "flat-square-modified"
+exclude = ["setup.py", "docs", "build", "app/tests"]
 
 [tool.pytest.ini_options]
 pythonpath = "."
@@ -114,12 +116,12 @@ quote-style = 'single'
 
 [tool.taskipy.tasks]
 run = 'fastapi dev fastapi_template/app.py'
-test = 'pytest -vv'
+test = 'docker compose run tests'
 lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
 pre-commit = 'pre-commit run --all-files'
 docs = 'mkdocs serve'
-compose = 'docker compose up --build'
+compose = 'docker compose up web'
 interrogate = 'interrogate -vv'
 
 [tool.ruff.lint]
