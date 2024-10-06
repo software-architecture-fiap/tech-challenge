@@ -192,5 +192,6 @@ kubectl -n development port-forward svc/web 2000
 Forwarding from 127.0.0.1:2000 -> 2000
 Forwarding from [::1]:2000 -> 2000
 ```
+### :material-webpack: FastAPI screen (localhost)
 
-![image](/docs/assets/redoc-init.png)
+![image](../assets/redoc-init.png)
