@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 from dotenv import load_dotenv
 from jose import jwt
 from sqlalchemy import text
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..model import models, schemas
 from ..tools.logging import logger
@@ -419,6 +419,7 @@ def create_order(db: Session, order: schemas.OrderCreate) -> models.Order:
             device=order.device,
             comments=order.comments,
             customer_id=customer_id_int,
+            payment_status=order.payment_status,
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc),
         )
@@ -471,6 +472,63 @@ def update_order_status(db: Session, order_id: int, status: str) -> Optional[mod
         logger.error(f'Error updating order status: {e}', exc_info=True)
         raise
 
+def update_order_payment_status(db: Session, order_id: int, payment_status: str) -> Optional[models.Order]:
+    """Atualiza o status de pagamento de um pedido existente e cria um webhook se o status for 'Pago'.
+    Args:
+        db (Session): Sessão do banco de dados.
+        order_id (int): ID do pedido a ser atualizado.
+        status (str): Novo status do pedido.
+    Returns:
+        Optional[models.Order]: O pedido atualizado, ou None se não encontrado.
+    """
+    logger.debug(f'Updating order payment status for order ID: {order_id} to {payment_status}')
+    try:
+        db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
+        if db_order:
+            db_order.payment_status = payment_status
+            db_order.updated_at = datetime.now(timezone.utc)
+            db.commit()
+            db.refresh(db_order)
+            logger.info(f'Order ID {db_order.id} payment status updated to {payment_status}')
+            create_tracking(db, db_order.id, payment_status)
+
+            if payment_status.lower() == "pago" or payment_status.lower() == "recusado":
+                # Criando um schema do tipo WebhookCreate para passar para a função create_webhook
+                webhook_data = schemas.WebhookCreate(
+                    order_id=order_id,
+                    received_at=datetime.now(timezone.utc),
+                    customer_id=db_order.customer_id
+                )
+                create_webhook(db, webhook_data)
+                logger.info(f'Creating a webhook entry for order ID: {db_order.id} at {webhook_data.received_at}')
+
+        return db_order
+
+    except Exception as e:
+        logger.error(f'Error updating order payment status: {e}', exc_info=True)
+        raise
+
+def create_webhook(db: Session, webhook: schemas.WebhookCreate):
+
+    logger.debug(f'Creating a webhook entry for order ID: {webhook.order_id}')
+    try:
+        order_search = db.query(models.Order).filter(models.Order.id == webhook.order_id).first()
+        db_webhook = models.Webhook(
+            order_id=order_search.id,
+            received_at=webhook.received_at,
+            status=order_search.status,
+            payment_status=order_search.payment_status,
+            customer_id=webhook.customer_id
+        )
+        db.query(models.Order).filter(models.Order.id == webhook.order_id).first()
+        db.add(db_webhook)
+        db.commit()
+        db.refresh(db_webhook)
+        logger.info(f'Webhook entry created with ID: {db_webhook.id}')
+        return db_webhook
+    except Exception as e:
+        logger.error(f'Error creating tracking entry: {e}', exc_info=True)
+        raise
 
 def create_tracking(db: Session, order_id: int, status: str) -> models.Tracking:
     """Cria uma nova entrada de rastreamento para um pedido.
@@ -509,7 +567,13 @@ def get_orders(db: Session, skip: int = 0, limit: int = 10) -> List[models.Order
     """
     logger.debug(f'Fetching orders with skip: {skip}, limit: {limit}')
     try:
-        orders = db.query(models.Order).offset(skip).limit(limit).all()
+        orders = (
+            db.query(models.Order)
+            .order_by(models.Order.created_at.asc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
         logger.info('Orders fetched successfully')
         return orders
     except Exception as e:
@@ -527,9 +591,15 @@ def get_order(db: Session, order_id: int) -> Optional[models.Order]:
     Returns:
         Optional[models.Order]: O pedido correspondente, ou None se não encontrado.
     """
+
     logger.debug(f'Fetching order with ID: {order_id}')
     try:
-        order = db.query(models.Order).filter(models.Order.id == order_id).first()
+        order = db.query(models.Order).options(
+            joinedload(models.Order.order_products)
+            .joinedload(models.OrderProduct.product)
+            .joinedload(models.Product.category)  # Carregando a categoria associada ao produto
+        ).filter(models.Order.id == order_id).first()
+
         logger.info('Order fetched successfully')
         return order
     except Exception as e:

@@ -42,4 +42,4 @@ def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2Passw
     access_token = security.create_access_token(data={'sub': str(user.id)}, expires_delta=access_token_expires)
 
     logger.info(f'Token criado para o ID do usuário: {user.id}')
-    return {'access_token': f'bearer {access_token}', 'customer_id': str(user.id)}
+    return {'access_token': f'{access_token}', 'customer_id': str(user.id)}
