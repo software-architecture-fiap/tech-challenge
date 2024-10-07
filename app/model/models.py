@@ -81,7 +81,7 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     status = Column(String, index=True, default='created')
-    payment_status=Column(String, default='pendente')
+    payment_status = Column(String, default='pendente')
     user_agent = Column(String)
     ip_address = Column(String)
     os = Column(String)
@@ -99,6 +99,7 @@ class Order(Base):
     order_products = relationship('OrderProduct', back_populates='order')
     tracking = relationship('Tracking', back_populates='order')
     webhook = relationship('Webhook', back_populates='order')
+
 
 class OrderItem(Base):
     """
@@ -215,8 +216,9 @@ class Webhook(Base):
     id = Column(Integer, primary_key=True, index=True)
     order_id = Column(Integer, ForeignKey('orders.id'))
     status = Column(String)
-    payment_status=Column(String)
+    payment_status = Column(String)
     received_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     customer_id = Column(Integer)
     order = relationship('Order', back_populates='webhook')
+    
