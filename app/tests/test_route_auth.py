@@ -13,7 +13,7 @@ def test_auth_success(mocker):
 
     mocker.patch('app.services.repository.get_user_by_email', return_value=mock_user)
     mocker.patch('app.services.security.verify_password', return_value=True)
-    mocker.patch('app.services.security.create_access_token', return_value='mock_access_token')
+    mocker.patch('app.services.security.create_access_token', return_value='bearer mock_access_token')
 
     form_data = {'username': 'user@example.com', 'password': 'valid_password'}
 

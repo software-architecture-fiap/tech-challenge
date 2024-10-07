@@ -1,3 +1,5 @@
+########## This is used only for test purposes ##########
+########## Important: To validate the application, use Kubernetes with Kind as described in infra/README.md
 services:
   db:
     image: postgres:latest

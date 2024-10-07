@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict
@@ -210,12 +211,20 @@ class OrderBase(BaseModel):
     """
 
     status: str
+    payment_status: str
     user_agent: str
     ip_address: str
     os: str
     browser: str
     device: str
     comments: Optional[str] = None
+
+
+class ProductView(BaseModel):
+    name: str
+    description: str
+    price: float
+    category: Optional[CategoryBase] = None
 
 
 class OrderProductBase(BaseModel):
@@ -229,14 +238,16 @@ class OrderProductBase(BaseModel):
 
     product_id: int
     comment: Optional[str] = None
+    product: Optional[ProductView] = None
 
 
-class OrderProductCreate(OrderProductBase):
+class OrderProductCreate(BaseModel):
     """
     Modelo para Criação de um Produto em um Pedido.
     """
 
-    pass
+    product_id: int
+    comment: Optional[str] = None
 
 
 class OrderProduct(OrderProductBase):
@@ -307,6 +318,9 @@ class OrderResponse(BaseModel):
 
     id: int
     customer_id: int
+    status: str
+    created_at: datetime
+    payment_status: str
 
     class Config:
         """
@@ -329,6 +343,8 @@ class OrderCustomerView(BaseModel):
     id: int
     customer_id: int
     status: str
+    payment_status: str
+    order_products: List[OrderProductBase] = []
 
     class Config:
         """
@@ -384,3 +400,44 @@ class UpdateOrderStatus(BaseModel):
     """
 
     status: str
+
+
+class OrderStatus(str, Enum):
+    PRONTO = "Pronto"
+    EM_PREP = "Em preparação"
+    RECEBIDO = "Recebido"
+    FINALIZADO = "Finalizado"
+
+
+class UpdateOrderPaymentStatus(BaseModel):
+    """
+    Modelo para Atualização do Status de um Pedido.
+
+    Attributes:
+        status (str): Novo status do pedido.
+    """
+
+    payment_status: str
+
+
+class WebhookBase(BaseModel):
+    id: int
+    order_id: int
+    status: str
+    customer_id: int
+    payment_status: str
+    received_at: datetime
+
+
+class WebhookCreate(BaseModel):
+    order_id: int
+    customer_id: int
+    received_at: datetime
+
+
+class WebhookResponse(BaseModel):
+    order_id: int
+    status: str
+    customer_id: int
+    payment_status: str
+    received_at: datetime

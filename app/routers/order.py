@@ -5,10 +5,15 @@ from sqlalchemy.orm import Session
 
 from ..db.database import get_db
 from ..model import schemas
+from ..model.schemas import OrderStatus
 from ..services import repository, security
 from ..tools.logging import logger
 
 router = APIRouter()
+
+INTERNAL_SERVER_ERROR_MSG = "Erro Interno do Servidor"
+INVALID_ORDER_ID_MSG = "Formato de ID do pedido inválido"
+REQUEST_NOT_FOUND_MSG = "Pedido não encontrado"
 
 
 @router.post('/', response_model=schemas.OrderResponse)
@@ -37,7 +42,7 @@ def create_order(
         return db_order
     except Exception as e:
         logger.error(f'Erro ao criar o pedido: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
 
 @router.put('/{order_id}/status', response_model=schemas.OrderResponse)
@@ -66,21 +71,26 @@ def update_order_status(
         f'{update_data.status}'
     )
     try:
+        update_data.status = OrderStatus(update_data.status)
+    except (ValueError, IndexError):
+        logger.warning(f'Status {update_data.status} não é permitido')
+        raise HTTPException(status_code=422, detail='Status não permitido')
+
+    try:
         order_id_int = order_id
     except (ValueError, IndexError):
-        logger.warning(f'Formato de ID do pedido inválido: {order_id}')
-        raise HTTPException(status_code=400, detail='Formato de ID do pedido inválido')
+        raise HTTPException(status_code=400, detail=INVALID_ORDER_ID_MSG)
 
     try:
         db_order = repository.update_order_status(db, order_id=order_id_int, status=update_data.status)
         if db_order is None:
             logger.warning(f'Pedido não encontrado: {order_id}')
-            raise HTTPException(status_code=404, detail='Pedido não encontrado')
+            raise HTTPException(status_code=404, detail=REQUEST_NOT_FOUND_MSG)
         logger.info(f'Status do ID do pedido {order_id} atualizado para {update_data.status}')
         return db_order
     except Exception as e:
         logger.error(f'Erro ao atualizar o status do pedido: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
 
 @router.get('/', response_model=Dict[str, List[schemas.OrderResponse]])
@@ -104,11 +114,12 @@ def read_orders(
     logger.info('Endpoint de leitura de pedidos chamado')
     try:
         orders = repository.get_orders(db, skip=skip, limit=limit)
+        filtered_orders = [order for order in orders if order.status != 'Finalizado']
         logger.info('Pedidos recuperados com sucesso')
-        return {'orders': orders}
+        return {'orders': filtered_orders}
     except Exception as e:
         logger.error(f'Erro ao recuperar os pedidos: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
 
 @router.get('/{order_id}', response_model=schemas.OrderCustomerView)
@@ -144,7 +155,7 @@ def read_order(
         return db_order
     except Exception as e:
         logger.error(f'Erro ao recuperar o pedido: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
 
 @router.post('/checkout', response_model=schemas.OrderResponse)
@@ -173,4 +184,68 @@ def fake_checkout(
         return db_order
     except Exception as e:
         logger.error(f'Erro durante o checkout fictício: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
+
+
+@router.patch('/{order_id}/payment', response_model=schemas.OrderResponse)
+def update_order_payment_status(
+    order_id: str,
+    update_data: schemas.UpdateOrderPaymentStatus,
+    db: Session = Depends(get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user),
+) -> schemas.OrderResponse:
+    """Atualiza o status de pagamento um pedido criado.
+
+    Args:
+        order_id (str): O ID do pedido a ser atualizado.
+        update_data (schemas.UpdateOrderPaymentStatus): Os dados de atualização de status de pagamento.
+        db (Session): A sessão do banco de dados.
+        current_user (schemas.Customer): O usuário autenticado atualmente.
+
+    Raises:
+        HTTPException: Se o formato do ID do pedido for inválido, o pedido não for encontrado, ou ocorrer um erro.
+
+    Returns:
+        schemas.OrderResponse: O pedido atualizado.
+    """
+    logger.info(
+        f'Endpoint de atualização de status do pedido chamado para o ID do pedido: {order_id} com status: '
+        f'{update_data.payment_status}'
+    )
+    try:
+        order_id_int = order_id
+    except (ValueError, IndexError):
+        logger.warning(f'Formato de ID do pedido inválido: {order_id}')
+        raise HTTPException(status_code=400, detail='Formato de ID do pedido inválido')
+
+    try:
+        db_order = repository.update_order_payment_status(
+            db, order_id=order_id_int, payment_status=update_data.payment_status
+        )
+        if db_order is None:
+            logger.warning(f'Pedido não encontrado: {order_id}')
+            raise HTTPException(status_code=404, detail='Pedido não encontrado')
+        logger.info(f'Status de pagamento do pedido de ID {order_id} atualizado para {update_data.payment_status}')
+        return db_order
+    except Exception as e:
+        logger.error(f'Erro ao atualizar o status de pagamento do pedido: {e}', exc_info=True)
+        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+
+
+@router.post('/webhook', response_model=schemas.WebhookResponse)
+def create_webhook(
+    webhook: schemas.WebhookCreate,
+    db: Session = Depends(get_db),
+    current_user: schemas.Customer = Depends(security.get_current_user),
+) -> schemas.WebhookResponse:
+
+    logger.info('Endpoint de criação de webhook chamado')
+    try:
+        db_webhook = repository.create_webhook(db=db, webhook=webhook)
+        logger.info(
+            f'Endpoint de atualização de status do pedido chamado para o ID de pedido: {webhook.order_id}'
+        )
+        return db_webhook
+    except Exception as e:
+        logger.error(f'Erro ao criar o pedido: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
