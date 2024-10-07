@@ -11,6 +11,10 @@ from ..tools.logging import logger
 
 router = APIRouter()
 
+INTERNAL_SERVER_ERROR_MSG = "Erro Interno do Servidor"
+INVALID_ORDER_ID_MSG = "Formato de ID do pedido inválido"
+REQUEST_NOT_FOUND_MSG = "Pedido não encontrado"
+
 
 @router.post('/', response_model=schemas.OrderResponse)
 def create_order(
@@ -38,7 +42,7 @@ def create_order(
         return db_order
     except Exception as e:
         logger.error(f'Erro ao criar o pedido: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
 
 @router.put('/{order_id}/status', response_model=schemas.OrderResponse)
@@ -75,19 +79,18 @@ def update_order_status(
     try:
         order_id_int = order_id
     except (ValueError, IndexError):
-        logger.warning(f'Formato de ID do pedido inválido: {order_id}')
-        raise HTTPException(status_code=400, detail='Formato de ID do pedido inválido')
+        raise HTTPException(status_code=400, detail=INVALID_ORDER_ID_MSG)
 
     try:
         db_order = repository.update_order_status(db, order_id=order_id_int, status=update_data.status)
         if db_order is None:
             logger.warning(f'Pedido não encontrado: {order_id}')
-            raise HTTPException(status_code=404, detail='Pedido não encontrado')
+            raise HTTPException(status_code=404, detail=REQUEST_NOT_FOUND_MSG)
         logger.info(f'Status do ID do pedido {order_id} atualizado para {update_data.status}')
         return db_order
     except Exception as e:
         logger.error(f'Erro ao atualizar o status do pedido: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
 
 @router.get('/', response_model=Dict[str, List[schemas.OrderResponse]])
@@ -116,7 +119,7 @@ def read_orders(
         return {'orders': filtered_orders}
     except Exception as e:
         logger.error(f'Erro ao recuperar os pedidos: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
 
 @router.get('/{order_id}', response_model=schemas.OrderCustomerView)
@@ -152,7 +155,7 @@ def read_order(
         return db_order
     except Exception as e:
         logger.error(f'Erro ao recuperar o pedido: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
 
 @router.post('/checkout', response_model=schemas.OrderResponse)
@@ -181,7 +184,7 @@ def fake_checkout(
         return db_order
     except Exception as e:
         logger.error(f'Erro durante o checkout fictício: {e}', exc_info=True)
-        raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
 
 @router.patch('/{order_id}/payment', response_model=schemas.OrderResponse)
@@ -216,7 +219,9 @@ def update_order_payment_status(
         raise HTTPException(status_code=400, detail='Formato de ID do pedido inválido')
 
     try:
-        db_order = repository.update_order_payment_status(db, order_id=order_id_int, payment_status=update_data.payment_status)
+        db_order = repository.update_order_payment_status(
+            db, order_id=order_id_int, payment_status=update_data.payment_status
+        )
         if db_order is None:
             logger.warning(f'Pedido não encontrado: {order_id}')
             raise HTTPException(status_code=404, detail='Pedido não encontrado')

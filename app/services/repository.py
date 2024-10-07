@@ -472,6 +472,7 @@ def update_order_status(db: Session, order_id: int, status: str) -> Optional[mod
         logger.error(f'Error updating order status: {e}', exc_info=True)
         raise
 
+
 def update_order_payment_status(db: Session, order_id: int, payment_status: str) -> Optional[models.Order]:
     """Atualiza o status de pagamento de um pedido existente e cria um webhook se o status for 'Pago'.
     Args:
@@ -508,6 +509,7 @@ def update_order_payment_status(db: Session, order_id: int, payment_status: str)
         logger.error(f'Error updating order payment status: {e}', exc_info=True)
         raise
 
+
 def create_webhook(db: Session, webhook: schemas.WebhookCreate):
 
     logger.debug(f'Creating a webhook entry for order ID: {webhook.order_id}')
@@ -529,6 +531,7 @@ def create_webhook(db: Session, webhook: schemas.WebhookCreate):
     except Exception as e:
         logger.error(f'Error creating tracking entry: {e}', exc_info=True)
         raise
+
 
 def create_tracking(db: Session, order_id: int, status: str) -> models.Tracking:
     """Cria uma nova entrada de rastreamento para um pedido.

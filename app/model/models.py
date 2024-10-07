@@ -221,4 +221,3 @@ class Webhook(Base):
 
     customer_id = Column(Integer)
     order = relationship('Order', back_populates='webhook')
-    
