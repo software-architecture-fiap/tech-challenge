@@ -8,9 +8,9 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python3 -
 
-ENV PATH="${PATH}:/root/.local/bin"
+ENV PATH=/opt/poetry/bin:${PATH}
 
 COPY pyproject.toml poetry.lock* ./
 
@@ -22,8 +22,11 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+COPY --from=builder /opt/poetry /opt/poetry
 COPY --from=builder /app /app
 COPY . .
+
+ENV PATH=/opt/poetry/bin:${PATH}
 
 EXPOSE 2000
 

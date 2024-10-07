@@ -14,11 +14,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      - name: Construindo e Subindo os Containers
+      - name: Construindo e ativando os containers
         run: docker-compose up -d --build
 
-      - name: Executando os Testes
+      - name: Executando testes integrados
         run: docker-compose run tests
 
-      - name: Derrubando os Containers
+      - name: Removendo containers
         run: docker-compose down
