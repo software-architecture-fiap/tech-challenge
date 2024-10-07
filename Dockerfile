@@ -3,12 +3,8 @@ FROM python:3.10-slim AS builder
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y curl build-essential && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python3 -
+RUN apt-get update && apt-get install -y curl build-essential && apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python3 -
 
 ENV PATH=/opt/poetry/bin:${PATH}
 
