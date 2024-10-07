@@ -4,7 +4,7 @@
 
 ```mermaid
 flowchart TD
-    subgraph Control_Plane["Control Plane"]
+    subgraph Control_Plane["lanchonete-k8s-control-plane"]
         A[etcd]
         B[CoreDNS]
         C[Kindnet]
