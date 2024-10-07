@@ -24,6 +24,8 @@ COPY . .
 
 ENV PATH=/opt/poetry/bin:${PATH}
 
+RUN poetry install --no-dev --no-root
+
 EXPOSE 2000
 
 CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "2000", "--reload"]

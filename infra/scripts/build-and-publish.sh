@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 IMAGE_BASE_NAME="web"
 CLUSTER_NAME="lanchonete-k8s"
