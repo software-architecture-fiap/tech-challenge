@@ -1,24 +1,47 @@
 name: Pytest
-on: [push]
+on: [push, pull_request]
 
 jobs:
   Testing:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
 
     steps:
-      - name: Copiando os Arquivos do Repositório
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Instalando o Docker Compose
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache Poetry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Install Deps
+        run: poetry install
+
+      - name: Install Docker Compose
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      - name: Construindo e ativando os containers
+      - name: Build and run containers
         run: docker-compose up -d --build
 
-      - name: Executando testes integrados
+      - name: Run integration tests
         run: docker-compose run tests
 
-      - name: Removendo containers
+      - name: Remove containers
         run: docker-compose down

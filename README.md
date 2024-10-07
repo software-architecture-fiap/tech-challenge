@@ -1,10 +1,8 @@
-# Tech Challenge - Fase 2
+# Tech Challenge - SOAT 2024 - #25
 
-## Detalhes
-Este projeto é um Sistema de Pedidos para uma Lanchonete adaptável para web e mobile, focado no backend.
+Este projeto é um sistema de gerenciamento de pedidos desenvolvido para uma lanchonete em expansão. A solução de software é projetada para ser responsiva tanto em plataformas Web quanto Mobile. O backend, documentado e acessível via Swagger, permite uma administração eficiente e integrada dos pedidos, garantindo escalabilidade e facilidade de manutenção.
 
-
-Você irá encontrar todos os Passos do Nosso Projeto através desse link na nossa
+Você encontrará todos os passos do nosso projeto através deste link na nossa
 [Plataforma de Documentação](https://software-architecture-fiap.github.io/tech-challenge/).
 
 ![Interrogate](docs/assets/interrogate_badge.svg)
@@ -18,7 +16,6 @@ Você irá encontrar todos os Passos do Nosso Projeto através desse link na nos
 * [![Typed with: pydantic](https://img.shields.io/badge/typed%20with-pydantic-BA600F.svg?style=for-the-badge)](https://docs.pydantic.dev/)
 
 ---
-
 
 ### Contribuição
 [![Open Issues](https://img.shields.io/github/issues-raw/software-architecture-fiap/tech-challenge?style=for-the-badge)](https://github.com/software-architecture-fiap/tech-challenge/issues)
