@@ -16,7 +16,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
         - **client_id**: "1"
     
     Isso gerará o Token de Acesso necessário para prosseguir com as etapas que exigem autenticação via token.
-    ![image](assets/token-token.png)
+    ![image](../assets/token-token.png)
 
     Ao tentar acessar endpoints que requerem autorização, como **category**, **orders**, e **products**, siga estas etapas adicionais:
 
@@ -40,8 +40,8 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ```
     Verifique se o Token de Acesso foi gerado corretamente e se as credenciais estão corretas ao tentar autorizar o acesso. 
 
-    ![image](assets/security.png)
-    ![image](assets/access-token.png)    
+    ![image](../assets/security.png)
+    ![image](../assets/access-token.png)    
     
     Para garantir a segurança, o token expira a cada operação (GET, PUT ou POST). Para ajustar o tempo de expiração do token, você deve definir a variável de ambiente TIMETOKEN no arquivo .env com o valor desejado para o tempo de expiração personalizado.
 
@@ -54,7 +54,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     2. Clique em **Try it out**.
     3. Em seguida, clique em **Execute**.
     Após seguir esses passos, um cliente anônimo será gerado, permitindo que o pedido seja realizado sem identificação.
-    ![image](assets/customer-anon.png)
+    ![image](../assets/customer-anon.png)
 
 
 ### Onboarding: Cliente identificado
@@ -72,7 +72,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     ```
 
     Para certificar que o cliente foi registrado utilize o endpoint [customers/read_customers](http://localhost:2000/docs#/customers/read_customers_customers__get) e liste todos os clientes cadastrados.
-    ![image](assets/customer-list.png) 
+    ![image](../assets/customer-list.png) 
 
 
 ### Pedido: Seleção do pedido
@@ -99,7 +99,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     }
     ```    
     Resultado da operação de seleção do pedido:
-    ![image](assets/response_order.png)
+    ![image](../assets/response_order.png)
 
 
 ### Pagamento: Processando o pagamento do pedido
@@ -139,7 +139,7 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
     }
     ```
     - Depois de atualizar o status, você pode confirmar a atualização acessando novamente o endpoint [orders/read_order](http://localhost:2000/docs#/orders/read_order_orders__order_id__get). O estado do pedido será exibido como **pronto para retirada**.
-    ![image](assets/ready_status.png)
+    ![image](../assets/ready_status.png)
 
 
 ???- note "Listando todos os pedidos registrados"
