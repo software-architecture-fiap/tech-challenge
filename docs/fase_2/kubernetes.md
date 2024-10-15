@@ -178,7 +178,7 @@ kubectl get pod -n development web-68f45d8994-xwlhz -o jsonpath="{..image}"
 web:v1.0.1 docker.io/library/web:v1.0.1%
 ```
 
-Usando o service do Kubernetes faça port-foward para a porta 2000 e acesse normalmente [http://localhost:2000/redoc](http://localhost:2000/redoc)
+Usando o service do Kubernetes faça port-foward para a porta 2000 e acesse normalmente [http://localhost:2000/redoc](http://localhost:2000/redoc) para visualizar a documentação ou o [http://localhost:2000/docs#/](http://localhost:2000/docs#) para acesso ao Swagger.
 
 ```bash
 kubectl get service -n development
