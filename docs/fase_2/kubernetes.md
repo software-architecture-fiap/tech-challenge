@@ -140,10 +140,10 @@ Build and publish of web:v1.0.1 completed!
 
 Utilizaremos o [Kustomize](https://kustomize.io/) para facilitar a reutilização e o gerenciamento dos manifestos K8S em mais de um ambiente, aqui há a segmentação entre namespaces nomeados como `development` e `production`.
 
-Para fazer o deploy use o script informando os parametros de ambiente e a versão da imagem construída no passo anterior.
+Para fazer o deploy use o script informando os parametros de ambiente (`development` ou `production`) e a versão da imagem construída no passo anterior.
 
 ```bash
-./infra/scripts/deploy.sh production v1.0.1
+./infra/scripts/deploy.sh development v1.0.1
 ```
 
 ```bash
@@ -161,7 +161,7 @@ deployment.apps/web created
 Deployment complete!
 ```
 
-Verifique o status dos pods infromando o namespaces do ambiente.
+Verifique o status dos pods informando o namespaces do ambiente (`development` ou `production`).
 
 ```bash
 kubectl get pod -n development
@@ -178,7 +178,7 @@ kubectl get pod -n development web-68f45d8994-xwlhz -o jsonpath="{..image}"
 web:v1.0.1 docker.io/library/web:v1.0.1%
 ```
 
-Usando o service do Kubernetes faça port-foward para a porta 2000 e acesse normalmente [http://localhost:2000/redoc](http://localhost:2000/redoc)
+Usando o service do Kubernetes faça port-foward para a porta 2000 e acesse normalmente [http://localhost:2000/redoc](http://localhost:2000/redoc) para visualizar a documentação ou o [http://localhost:2000/docs#/](http://localhost:2000/docs#) para acesso ao Swagger.
 
 ```bash
 kubectl get service -n development
