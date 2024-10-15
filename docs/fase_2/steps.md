@@ -104,7 +104,11 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 
 ### Pagamento: Processando o pagamento do pedido
 
-???- note "Passo 04: Realizando pagamento do pedido (fake checkout)"
+???- note "Passo 04: Realizando pagamento do pedido chamando a rota "
+    Após executar o [orders/fake_checkout](http://localhost:2000/docs#/orders/fake_checkout_orders_checkout_post) siga para o fluxo de atualização de status do pedido.
+
+
+???- note "Passo 04.1: Realizando pagamento do pedido com fake checkout"
     Após executar o [orders/fake_checkout](http://localhost:2000/docs#/orders/fake_checkout_orders_checkout_post) siga para o fluxo de atualização de status do pedido.
 
 
