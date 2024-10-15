@@ -104,9 +104,35 @@ Essa documentação fornece um passo a passo detalhado para realizar testes no b
 
 ### Pagamento: Processando o pagamento do pedido
 
-???- note "Passo 04: Realizando pagamento do pedido chamando a rota "
-    Após executar o [orders/fake_checkout](http://localhost:2000/docs#/orders/fake_checkout_orders_checkout_post) siga para o fluxo de atualização de status do pedido.
+???- note "Passo 04: Realizando pagamento do pedido chamando a rota /payments"
+    Com o endpoint [orders/{order_id}/payment](http://localhost:2000/docs#/orders/update_order_payment_status_orders__order_id__payment_patch) defina no parâmetro "order_id" o id do pedido em questão para alterar seu status de pagamento, exemplo:
+    
+    ```json
+    {
+      "payment_status": "pago"
+    }
+    ```   
+    Resultado da operação de realização de chamada no endpoint de pagamento com um status code 200:
+    ```json
+    {
+      "id": 1,
+      "customer_id": 1,
+      "status": "Recebido",
+      "created_at": "2024-10-15T12:40:45.696390",
+      "payment_status": "pago"
+    }
+    ```
 
+    Obs.: Uma vez em que o status do pedido é alterado, é disparado um Webhook para a plataforma, com a data/hora do momento em que está sendo feita a alteração, o novo status do pagamento do pedido e o id do mesmo, conforme:
+    ```json
+    {
+      "order_id": 1,
+      "status": "Finalizado",
+      "customer_id": 1,
+      "payment_status": "pago",
+      "received_at": "2024-10-15T22:21:35.479Z"
+    }
+    ```
 
 ???- note "Passo 04.1: Realizando pagamento do pedido com fake checkout"
     Após executar o [orders/fake_checkout](http://localhost:2000/docs#/orders/fake_checkout_orders_checkout_post) siga para o fluxo de atualização de status do pedido.
