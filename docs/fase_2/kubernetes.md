@@ -1,5 +1,28 @@
 # Kubernetes
 
+### :simple-youtube: Vídeo no Youtube
+
+<div style="text-align: center;">
+    <iframe 
+        width="745" 
+        height="400" 
+        src="https://www.youtube.com/embed/cVIkB0YKows" 
+        title="Arquitetura do K8S" 
+        allow="accelerometer; 
+        autoplay; 
+        clipboard-write; 
+        encrypted-media; 
+        gyroscope; 
+        picture-in-picture; 
+        web-share" 
+        referrerpolicy="strict-origin-when-cross-origin" 
+        allowfullscreen
+    >
+    </iframe>
+</div>
+
+<a href="https://www.youtube.com/watch?v=cVIkB0YKows" target="_blank">Link para Arquitetura do K8S no YouTube</a>
+
 ### :simple-kubernetes: Arquitetura
 
 ```mermaid
