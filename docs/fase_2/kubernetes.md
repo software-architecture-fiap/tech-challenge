@@ -1,5 +1,64 @@
 # Kubernetes
 
+### :simple-youtube: Vídeo no Youtube
+
+<div style="text-align: center;">
+    <iframe 
+        width="745" 
+        height="400" 
+        src="https://www.youtube.com/embed/cVIkB0YKows" 
+        title="Arquitetura do K8S - Introdução" 
+        allow="accelerometer; 
+        autoplay; 
+        clipboard-write; 
+        encrypted-media; 
+        gyroscope;
+        picture-in-picture; 
+        web-share" 
+        referrerpolicy="strict-origin-when-cross-origin" 
+        allowfullscreen
+    >
+    </iframe>
+</div>
+
+<div style="text-align: center;">
+    <iframe 
+        width="745" 
+        height="400" 
+        src="https://www.youtube.com/embed/XHB44TdbPSk?si=w60F34ls0egLdxZL"
+        title="Arquitetura do K8S - Parte 01" 
+        allow="accelerometer; 
+        autoplay; 
+        clipboard-write; 
+        encrypted-media; 
+        gyroscope;
+        picture-in-picture; 
+        web-share" 
+        referrerpolicy="strict-origin-when-cross-origin" 
+        allowfullscreen
+    >
+    </iframe>
+</div>
+
+<div style="text-align: center;">
+    <iframe 
+        width="745" 
+        height="400" 
+        src="https://www.youtube.com/embed/aFCAw43Fhsg?si=lXffFtO40OYeGgop" 
+        title="Arquitetura do K8S - Parte 02" 
+        allow="accelerometer; 
+        autoplay; 
+        clipboard-write; 
+        encrypted-media; 
+        gyroscope;
+        picture-in-picture; 
+        web-share" 
+        referrerpolicy="strict-origin-when-cross-origin" 
+        allowfullscreen
+    >
+    </iframe>
+</div>
+
 ### :simple-kubernetes: Arquitetura
 
 ```mermaid

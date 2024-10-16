@@ -1,5 +1,30 @@
 # Novas Rotas
 
+### :simple-youtube: Vídeo no Youtube
+
+### :simple-youtube: Vídeo no Youtube
+
+<div style="text-align: center;">
+    <iframe 
+      width="745" 
+      height="400" 
+      src="https://youtu.be/-pcrvoztUX0?si=Ul73qEGE2T_kNAnk" 
+      title="Arquitetura do K8S" 
+      allow="accelerometer; 
+      autoplay; 
+      clipboard-write; 
+      encrypted-media; 
+      gyroscope; 
+      picture-in-picture; 
+      web-share" 
+      referrerpolicy="strict-origin-when-cross-origin" 
+      allowfullscreen
+    >
+    </iframe>
+</div>
+
+<a href="https://youtu.be/-pcrvoztUX0?si=Ul73qEGE2T_kNAnk" target="_blank">Link para Arquitetura do K8S no YouTube</a>
+
 ### :material-tag-check-outline: Checkout Pedido
 
 Este endpoint é utilizado para realizar o checkout de um pedido, recebendo os produtos solicitados e retornando a identificação do pedido gerado.
@@ -204,4 +229,3 @@ Este endpoint permite a atualização do status de pagamento de um pedido.
     "payment_status": "string"
   }
   ```
-
