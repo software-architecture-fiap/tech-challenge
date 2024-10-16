@@ -6,7 +6,7 @@
     <iframe 
         width="745" 
         height="400" 
-        src="https://www.youtube.com/embed/cVIkB0YKows" 
+        src="https://www.youtube.com/embed/yudSWBTdwEc?si=kGxRAHpqQR0sXDjY"
         title="Arquitetura do K8S - Introdução" 
         allow="accelerometer; 
         autoplay; 
