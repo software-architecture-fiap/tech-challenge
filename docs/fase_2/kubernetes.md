@@ -79,6 +79,7 @@ flowchart TD
         E --> F
         E --> G
     end
+    
     subgraph Worker_Node["lanchonete-k8s-worker"]
         H[Pod: Postgres_DB]
         I[Pod: Web_APP]
@@ -91,7 +92,14 @@ flowchart TD
         K --> H
         J --> I
     end
+
+    subgraph Autoscaler["Horizontal Pod Autoscaler (HPA)"]
+        N[HPA: Web_APP Autoscaler]
+        N --> I
+    end
+    
     Client[Client Access] --> K
+
 ```
 
 ### :simple-pkgsrc: Pré-requisitos
@@ -254,3 +262,70 @@ Forwarding from [::1]:2000 -> 2000
 ### :material-webpack: FastAPI screen (localhost)
 
 ![image](../assets/redoc-init.png)
+
+### :material-content-duplicate: Horizontal Auto Scaling
+
+Horizontal Pod Autoscaler (HPA) é um recurso do Kubernetes que ajusta automaticamente o número de pods do deployment com base em métricas, neste caso, adicionamos no HPA do pod da API parametrizado a utilização de CPU e de memória. Isso ajuda a garantir que a aplicação possa escalar horizontalmente para atender à demanda nos casos onde o limite do targed é alcançado.
+
+Para configurar o HPA criamos o manifesto no diretório `./infra/k8s/base/hpa-we.yaml`:
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web-autoscaler
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70  # Scales based on CPU usage
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 70  # Scales based on memory usage
+```
+
+    Neste caso, o autoscaling dos pods será ativado com base na utilização média de CPU e memória quando esse valor atingir 70%. A quantidade de réplicas variará de um mínimo de 1 a um máximo de 4 pods. Como estamos usando o Kustomize para fazer os deploys da API e do banco de dados, o HPA será criado automaticamente na próxima execução do processo de deploy, conforme o exemplo abaixo:
+
+```bash
+
+❯ ./infra/scripts/deploy.sh development v1.0.1
+Updating Kustomize with the image version v1.0.1...
+Error from server (NotFound): namespaces "development" not found
+namespace/development created
+Applying Kubernetes manifests for development environment...
+service/db created
+service/web created
+persistentvolumeclaim/db-pvc created
+persistentvolumeclaim/logs-pvc created
+deployment.apps/db created
+deployment.apps/web created
+horizontalpodautoscaler.autoscaling/web-autoscaler created
+Deployment complete!
+```
+
+Para verificar o status do HPA, use o comando abaixo para verificar o status do HPA e garantir que ele está funcionando corretamente:
+
+```bash
+kubectl get hpa -n development
+```
+
+O output será semelhante ao exemplo abaixo:
+
+```bash
+NAME             REFERENCE        TARGETS                                     MINPODS   MAXPODS   REPLICAS   AGE
+web-autoscaler   Deployment/web   cpu: 10%/70%, memory:22%/70%                1         4         1          53m
+```
+
+Assim, nossa API ajusta automaticamente o número de réplicas do deployment `web` com base na utilização de memória e CPU, garantindo a escalabilidade horizontal conforme necessário.

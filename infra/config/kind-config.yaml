@@ -12,3 +12,4 @@ nodes:
   - containerPort: 31300
     hostPort: 31300
 - role: worker
+- role: worker
