@@ -8,6 +8,7 @@ resources:
   - deployment-web.yaml
   - service-web.yaml
   - pvc-logs.yaml
+  - hpa-web.yaml
   #TODO
   # - secrets.yaml Add it on the service web and db deployments
 

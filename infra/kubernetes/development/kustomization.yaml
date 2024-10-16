@@ -13,4 +13,4 @@ resources:
 images:
 - name: web
   newName: web
-  newTag: v1.0.3-test
+  newTag: v1.0.1

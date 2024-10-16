@@ -4,7 +4,8 @@ metadata:
   name: web
 spec:
   ports:
-    - port: 2000
+    - protocol: TCP
+      port: 2000
       targetPort: 2000
   selector:
     app: web
