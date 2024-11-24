@@ -13,5 +13,5 @@ resources:
   # - secrets.yaml Add it on the service web and db deployments
 
 images:
-  - name: web
+  - name: /app/web
     newTag: latest

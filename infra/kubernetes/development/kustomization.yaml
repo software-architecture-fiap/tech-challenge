@@ -12,5 +12,5 @@ resources:
 
 images:
 - name: web
-  newName: web
-  newTag: v1.0.1
+  newName: 830714066230.dkr.ecr.us-east-1.amazonaws.com/app/web
+  newTag: latest
