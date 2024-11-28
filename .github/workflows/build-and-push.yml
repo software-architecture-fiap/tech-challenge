@@ -7,6 +7,7 @@ on:
 env:
   AWS_REGION: us-east-1                 
   ECR_REPOSITORY: app/web
+  EKS_CLUSTER_NAME: EKS-lanchonete-cluster
 
 permissions:
   contents: read
@@ -14,6 +15,9 @@ permissions:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
+    outputs:
+      image: ${{ steps.build.outputs.image }}
 
     steps:
       - name: Checkout repository
@@ -32,10 +36,31 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build the container image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+        id: build
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "Image $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG pushed to ECR" >> $GITHUB_OUTPUT
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Setup Kubeconfig
+        run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+
+      - name: Deploy app in Kubernetes
+        env:
+          IMAGE: ${{ steps.build.outputs.image }}
+        run: |
+          echo "image=$IMAGE" >> $GITHUB_ENV
+          echo "ENVIRONMENT=development" >> $GITHUB_ENV
+          KUSTOMIZE_DIR="$(pwd)/infra/kubernetes/$ENVIRONMENT"
+          cd $KUSTOMIZE_DIR
+
+          if [ ! -f kustomization.yaml ]; then
+              echo "Error: Missing kustomization file 'kustomization.yaml' in $KUSTOMIZE_DIR."
+              exit 1
+          fi
+          kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
+
+          kustomize edit set image web=$IMAGE
+          
+          echo "Deploying resources in $ENVIRONMENT environment..."
+          kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT
