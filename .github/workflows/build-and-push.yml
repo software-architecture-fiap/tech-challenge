@@ -34,6 +34,9 @@ jobs:
       - name: Login to ECR registry
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: private
+          mask-password: true
 
       - name: Build the container image
         id: build
@@ -61,6 +64,7 @@ jobs:
           
           source $GITHUB_ENV
 
+          cd $KUSTOMIZE_DIR
           pwd && ls -la
 
           kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
@@ -69,3 +73,10 @@ jobs:
           
           echo "Deploying resources in $ENVIRONMENT environment..."
           kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT
+
+          if [ $? -eq 0 ]; then
+            echo "Resources deployed successfully!"
+          else
+            echo "Failed to deploy resources!"
+            exit 1
+          fi
