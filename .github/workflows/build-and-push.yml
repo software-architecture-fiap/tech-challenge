@@ -8,6 +8,8 @@ env:
   AWS_REGION: us-east-1                 
   ECR_REPOSITORY: app/web
 
+permissions:
+  contents: read
 
 jobs:
   build-and-push:
