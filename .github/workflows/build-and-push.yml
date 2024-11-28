@@ -55,15 +55,14 @@ jobs:
         run: |
           echo "image=$IMAGE" >> $GITHUB_ENV
           echo "ENVIRONMENT=development" >> $GITHUB_ENV
-          echo "Image tag: $IMAGE"
-          ENVIRONMENT=development
-          KUSTOMIZE_DIR="$(pwd)/infra/kubernetes/$ENVIRONMENT"
-          cd $KUSTOMIZE_DIR
+          echo "KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/development" >> $GITHUB_ENV
 
-          if [ ! -f kustomization.yaml ]; then
-              echo "Error: Missing kustomization file 'kustomization.yaml' in $KUSTOMIZE_DIR."
-              exit 1
-          fi
+          echo "Image tag: $IMAGE"
+          
+          source $GITHUB_ENV
+
+          pwd && ls -la
+
           kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
 
           kustomize edit set image web=$IMAGE
