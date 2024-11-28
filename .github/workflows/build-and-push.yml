@@ -55,6 +55,8 @@ jobs:
         run: |
           echo "image=$IMAGE" >> $GITHUB_ENV
           echo "ENVIRONMENT=development" >> $GITHUB_ENV
+          echo "Image tag: $IMAGE"
+          ENVIRONMENT=development
           KUSTOMIZE_DIR="$(pwd)/infra/kubernetes/$ENVIRONMENT"
           cd $KUSTOMIZE_DIR
 
