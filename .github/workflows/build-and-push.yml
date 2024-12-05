@@ -1,7 +1,7 @@
 name: build-and-push
 on:
   issue_comment:
-    types: [created]
+    types: [created, edited, deleted]
 
   push:
     branches:
@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build-and-push:
-    if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '/deploy-dev') || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    if: contains(github.event.comment.body, '/deploy-dev') || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
 
     outputs:
