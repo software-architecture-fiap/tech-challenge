@@ -20,81 +20,27 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      image: ${{ steps.build.outputs.image }}
+      semver_tag: ${{ steps.semver-tag.outputs.semver_tag }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Get version from CHANGELOG.md
-        id: get-version
-        run: |
-            if [[ ! -f CHANGELOG.md ]]; then
-              echo "CHANGELOG.md file not found!"
-              exit 1
-            fi
-
-            # Extract the latest version from the CHANGELOG.md
-            VERSION=$(grep -oP '^## \[\K[0-9]+\.[0-9]+\.[0-9]+' CHANGELOG.md | head -n 1)
-            if [[ -z $VERSION ]]; then
-              echo "Version not found in CHANGELOG.md!"
-              exit 1
-            fi
-
-            echo "Current version is: $VERSION"
-            echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Check PR labels
-        id: check-labels
-        run: |
-            PR_LABELS=$(gh pr view ${{ github.event.pull_request.number }} --json labels --jq '.labels[].name')
-            echo "PR labels: $PR_LABELS"
-  
-            # Set version increment type based on label
-            if [[ "$PR_LABELS" == *"major"* ]]; then
-              echo "Incrementing major version."
-              VERSION_TYPE="major"
-            elif [[ "$PR_LABELS" == *"minor"* ]]; then
-              echo "Incrementing minor version."
-              VERSION_TYPE="minor"
-            elif [[ "$PR_LABELS" == *"patch"* ]]; then
-              echo "Incrementing patch version."
-              VERSION_TYPE="patch"
-            else
-              echo "No version label found. Defaulting to patch."
-              VERSION_TYPE="patch"
-            fi
-            echo "VERSION_TYPE=$VERSION_TYPE" >> $GITHUB_ENV
-      
-      - name: Add version for production
-        run: |
-            # Get the current version
-            VERSION=${{ env.VERSION }}
-            VERSION_TYPE=${{ env.VERSION_TYPE }}
-
-            # Split parts
-            IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
-            MAJOR=${VERSION_PARTS[0]}
-            MINOR=${VERSION_PARTS[1]}
-            PATCH=${VERSION_PARTS[2]}
-
-            if [[ "$VERSION_TYPE" == "major" ]]; then
-              MAJOR=$((MAJOR + 1))
-              MINOR=0
-              PATCH=0
-            elif [[ "$VERSION_TYPE" == "minor" ]]; then
-              MINOR=$((MINOR + 1))
-              PATCH=0
-            else
-              PATCH=$((PATCH + 1))
-            fi
-
-            NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-            echo "New version is: $NEW_VERSION"
-            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-            
-      - name: Set image tag for production
-        run: echo "tag=${{ env.NEW_VERSION }}" >> $GITHUB_ENV
+    
+      - name: Calculate SemVer tag
+        id: semver-tag
+        uses: gandarez/semver-action@v2.0.0
+        with:
+          branching_model: "trunk-based"
+          main_branch_name: "main"
+          major_regex: "(?i)^(.+:)?(release/.+)"
+          minor_regex: "(?i)^(.+:)?(feature/.+)"
+          patch_regex: "(?i)^(.+:)?(hotfix/.+)"
+          debug: "true"
+     
+      - name: Create git tag
+        uses: rickstaa/action-create-tag@v1.7.2
+        with:
+          tag: ${{ steps.semver-tag.outputs.semver_tag }} 
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -115,17 +61,22 @@ jobs:
         id: build
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }} .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
 
       - name: update CHANGELOG.md
+        env:
+          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
         run: |
           sed -i "1i ## [${{ env.NEW_VERSION }}] - $(date +'%d-%m-%Y')\n\n### Added\n" CHANGELOG.md
           echo $NEW_VERSION > VERSION
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Commit and push updated version in CHANGELOG.md
+        env:
+          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -137,6 +88,8 @@ jobs:
         run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
       - name: Deploy app in Kubernetes cluster
+        env:
+          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
         run: |
           source $GITHUB_ENV
 
@@ -147,7 +100,7 @@ jobs:
           kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
 
           IMAGE_TAG=${{ env.NEW_VERSION }}
-          kustomize edit set image web=${{ steps.build.outputs.image }}
+          kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
 
           echo "Deploying resources in $ENVIRONMENT environment"
           cd $KUSTOMIZE_DIR
