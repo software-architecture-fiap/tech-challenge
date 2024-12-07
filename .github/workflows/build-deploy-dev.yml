@@ -4,7 +4,7 @@ on:
         types: [created, edited]
     push:
         branches:
-            - main
+            - "**"
 env:
     AWS_REGION: us-east-1
     ECR_REPOSITORY: app/web
@@ -15,6 +15,7 @@ permissions:
 
 jobs:
   build-deploy-dev:
+    #if: ${{ github.event.issue.pull_request && github.event.comment.body == '/deploy-dev' }}
     if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '/deploy-dev')
     runs-on: ubuntu-latest
 
