@@ -8,12 +8,14 @@ env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: app/web
   EKS_CLUSTER_NAME: EKS-lanchonete-cluster
+  GH_TOKEN: ${{ github.token }}
+  GITHUB_OUTPUT: $GITHUB_ENV
 
 permissions:
   contents: read
 
 jobs:
-  build-and-deploy:
+  release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
@@ -113,7 +115,6 @@ jobs:
         id: build
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          GITHUB_OUTPUT: $GITHUB_ENV
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }} .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
