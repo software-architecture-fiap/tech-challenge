@@ -1,4 +1,4 @@
-# Tech Challenge - SOAT 2024 - #25
+# Tech Challenge - SOAT 2024 - Grupo #25
 
 Este projeto é um sistema de gerenciamento de pedidos desenvolvido para uma lanchonete em expansão. A solução de software é projetada para ser responsiva tanto em plataformas Web quanto Mobile. O backend, documentado e acessível via Swagger, permite uma administração eficiente e integrada dos pedidos, garantindo escalabilidade e facilidade de manutenção.
 
