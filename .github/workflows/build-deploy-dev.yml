@@ -15,13 +15,17 @@ permissions:
 
 jobs:
   build-deploy-dev:
-    if: github.event_name == 'issue_comment'
+    if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '/deploy-dev')
     runs-on: ubuntu-latest
 
     outputs:
         image: ${{ steps.build.outputs.image }}
     
     steps:
+      - name: Debug GitHub Event
+        run: |
+            echo "Event: ${{ toJson(github.event) }}"
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
