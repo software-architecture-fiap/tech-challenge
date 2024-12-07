@@ -32,9 +32,6 @@ jobs:
         with:
           branching_model: "trunk-based"
           main_branch_name: "main"
-          major_regex: "(?i)^(.+:)?(release/.+)"
-          minor_regex: "(?i)^(.+:)?(feature/.+)"
-          patch_regex: "(?i)^(.+:)?(hotfix/.+)"
           debug: "true"
      
       - name: Debug SemVer
@@ -42,11 +39,13 @@ jobs:
           echo "New version: ${{ steps.semver-tag.outputs.semver_tag }}"
           echo "Git SHA: ${{ github.sha }}"
 
-      - name: Create git tag
+      - name: Create Git tag
         uses: rickstaa/action-create-tag@v1.7.2
+        id: tag-create
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.semver-tag.outputs.semver_tag }} 
+          tag: ${{ steps.semver-tag.outputs.semver_tag }}
+          message: "ci: release ${{ steps.semver-tag.outputs.semver_tag }}"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
