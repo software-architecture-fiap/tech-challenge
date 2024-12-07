@@ -102,3 +102,5 @@ The deployment process includes:
    - Checking and creating the namespace if it doesn't exist.
    - Updating the image in the kustomize configuration.
    - Applying the Kubernetes resources using `kubectl`.
+
+
