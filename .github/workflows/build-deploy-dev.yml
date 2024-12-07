@@ -1,41 +1,39 @@
 name: build-deploy-dev
 on:
-    issue_comment:
-        types: [created, edited]
-    push:
-        branches:
-            - "**"
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [opened, synchronize]
+
 env:
-    AWS_REGION: us-east-1
-    ECR_REPOSITORY: app/web
-    EKS_CLUSTER_NAME: EKS-lanchonete-cluster
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: app/web
+  EKS_CLUSTER_NAME: EKS-lanchonete-cluster
 
 permissions:
-    contents: read
+  contents: read
 
 jobs:
   build-deploy-dev:
-    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/deploy-dev'}}
-    #if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '/deploy-dev')
+    if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && github.event.comment.body == '/deploy-dev' }}
     runs-on: ubuntu-latest
 
     outputs:
-        image: ${{ steps.build.outputs.image }}
-    
+      image: ${{ steps.build.outputs.image }}
+
     steps:
       - name: Debug GitHub Event
         run: |
-            echo "Event: ${{ toJson(github.event) }}"
+          echo "Event: ${{ toJson(github.event) }}"
 
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Check deploy-dev comment trigger and version image tag
-        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '/deploy-dev')
         run: |
-            echo "Development deploy detected. I will be trigger a build using commit SHA and a deployment in development environment."
-            echo "tag=${{ github.sha }}-dev" >> $GITHUB_ENV
-            echo "The dev version is: ${{ github.sha }}-dev"
+          echo "Development deploy detected. I will be trigger a build using commit SHA and a deployment in development environment."
+          echo "tag=${{ github.sha }}-dev" >> $GITHUB_ENV
+          echo "The dev version is: ${{ github.sha }}-dev"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -51,7 +49,7 @@ jobs:
         with:
           registry-type: private
           mask-password: true
-      
+
       - name: Build and push the container image
         id: build-dev
         env:
@@ -65,20 +63,18 @@ jobs:
         run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
       - name: Deploy to development environment
-        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '/deploy-dev')
         run: |
-            echo "Deploying to development environment..."
-            # Use the image tag from the previous step
-            echo "Image tag: ${{ steps.build-dev.outputs.image }}"
-            # Deploy the image to the development environment
+          echo "Deploying to development environment..."
+          # Use the image tag from the previous step
+          echo "Image tag: ${{ steps.build-dev.outputs.image }}"
+          # Deploy the image to the development environment
 
-            ENVIRONMENT=development
-            KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/development
-            
-            kubectl get namespaces $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
+          ENVIRONMENT=development
+          KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/development
 
-            IMAGE_TAG=${{ steps.build-dev.outputs.image }}
-            kustomize edit set image web=${{ steps.build-dev.outputs.image }}
-            kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT
-            echo "Deploymento to $ENVIRONMENT environment completed!"
+          kubectl get namespaces $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
 
+          IMAGE_TAG=${{ steps.build-dev.outputs.image }}
+          kustomize edit set image web=${{ steps.build-dev.outputs.image }}
+          kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT
+          echo "Deployment to $ENVIRONMENT environment completed!"
