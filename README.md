@@ -36,22 +36,22 @@ The pipeline [build-and-deploy](.github/workflows/build-and-deploy.yml) is desig
 > **Note:** This step is crucial to ensure a secure connection with AWS resources. Credentials are necessary for the pipeline to authenticate and interact with AWS ECR and EKS.
 
 Update the repository settings under `Secrets and variables` > `Actions` with the following values:
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_SESSION_TOKEN`
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY`
+   - `AWS_SESSION_TOKEN`
 
 ## Workflow Triggers
 
 The pipeline is triggered by the following events:
-- **Issue Comment**: When a comment is created, edited, or deleted on an issue that contains `/deploy-dev`
-- **Push**: When code is pushed to the `main` branch.
+   - **Issue Comment**: When a comment is created, edited, or deleted on an issue that contains `/deploy-dev`
+   - **Push**: When code is pushed to the `main` branch.
 
 ### Environment Variables
 
 The following environment variables are defined for use throughout the pipeline:
-- `AWS_REGION`: The AWS region where resources are located (`us-east-1`).
-- `ECR_REPOSITORY`: The ECR repository name (`app/web`).
-- `EKS_CLUSTER_NAME`: The EKS cluster name (`EKS-lanchonete-cluster`).
+   - `AWS_REGION`: The AWS region where resources are located (`us-east-1`).
+   - `ECR_REPOSITORY`: The ECR repository name (`app/web`).
+   - `EKS_CLUSTER_NAME`: The EKS cluster name (`EKS-lanchonete-cluster`).
 
 ## Tasks
 
@@ -94,11 +94,11 @@ This job runs on `ubuntu-latest` and is executed if the event is an issue commen
 ## Deployment Logic
 
 The deployment logic varies based on the environment:
-- **Development Environment**: Triggered by issue comments containing `/deploy-dev`.
-- **Production Environment**: Triggered by pushes to the `main` branch.
+   - **Development Environment**: Triggered by issue comments containing `/deploy-dev`.
+   - **Production Environment**: Triggered by pushes to the `main` branch.
 
 The deployment process includes:
-- Setting the environment and kustomize directory.
-- Checking and creating the namespace if it doesn't exist.
-- Updating the image in the kustomize configuration.
-- Applying the Kubernetes resources using `kubectl`.
+   - Setting the environment and kustomize directory.
+   - Checking and creating the namespace if it doesn't exist.
+   - Updating the image in the kustomize configuration.
+   - Applying the Kubernetes resources using `kubectl`.
