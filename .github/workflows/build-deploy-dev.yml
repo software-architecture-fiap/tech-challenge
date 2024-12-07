@@ -1,0 +1,79 @@
+name: build-deploy-dev
+on:
+    issue_comment:
+        types: [created, edited]
+    push:
+        branches:
+            - main
+env:
+    AWS_REGION: us-east-1
+    ECR_REPOSITORY: app/web
+    EKS_CLUSTER_NAME: EKS-lanchonete-cluster
+
+permissions:
+    contents: read
+
+jobs:
+  build-deploy-dev:
+    if: github.event_name == 'issue_comment'
+    runs-on: ubuntu-latest
+
+    outputs:
+        image: ${{ steps.build.outputs.image }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check deploy-dev comment trigger and version image tag
+        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '/deploy-dev')
+        run: |
+            echo "Development deploy detected. I will be trigger a build using commit SHA and a deployment in development environment."
+            echo "tag=${{ github.sha }}-dev" >> $GITHUB_ENV
+            echo "The dev version is: ${{ github.sha }}-dev"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR registry
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: private
+          mask-password: true
+      
+      - name: Build and push the container image
+        id: build-dev
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          GITHUB_OUTPUT: $GITHUB_ENV
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.tag }} .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.tag }}
+
+      - name: Setup Kubeconfig
+        run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+
+      - name: Deploy to development environment
+        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '/deploy-dev')
+        run: |
+            echo "Deploying to development environment..."
+            # Use the image tag from the previous step
+            echo "Image tag: ${{ steps.build-dev.outputs.image }}"
+            # Deploy the image to the development environment
+
+            ENVIRONMENT=development
+            KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/development
+            
+            kubectl get namespaces $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
+
+            IMAGE_TAG=${{ steps.build-dev.outputs.image }}
+            kustomize edit set image web=${{ steps.build-dev.outputs.image }}
+            kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT
+            echo "Deploymento to $ENVIRONMENT environment completed!"
+
