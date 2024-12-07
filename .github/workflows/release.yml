@@ -12,7 +12,7 @@ env:
   GITHUB_OUTPUT: $GITHUB_ENV
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   release:
@@ -37,9 +37,15 @@ jobs:
           patch_regex: "(?i)^(.+:)?(hotfix/.+)"
           debug: "true"
      
+      - name: Debug SemVer
+        run: |
+          echo "New version: ${{ steps.semver-tag.outputs.semver_tag }}"
+          echo "Git SHA: ${{ github.sha }}"
+
       - name: Create git tag
         uses: rickstaa/action-create-tag@v1.7.2
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.semver-tag.outputs.semver_tag }} 
 
       - name: Configure AWS credentials
@@ -70,9 +76,13 @@ jobs:
         env:
           NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
         run: |
-          sed -i "1i ## [${{ env.NEW_VERSION }}] - $(date +'%d-%m-%Y')\n\n### Added\n" CHANGELOG.md
-          echo $NEW_VERSION > VERSION
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          if ! grep -q "\[${{ env.NEW_VERSION }}\]" CHANGELOG.md; then
+            sed -i "1i ## [${{ env.NEW_VERSION }}] - $(date +'%d-%m-%Y')\n\n### Added\n" CHANGELOG.md
+            echo $NEW_VERSION > VERSION
+            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          else
+            echo "Version $NEW_VERSION already exists in CHANGELOG.md. Skipping update."
+          fi
 
       - name: Commit and push updated version in CHANGELOG.md
         env:
@@ -106,4 +116,4 @@ jobs:
           cd $KUSTOMIZE_DIR
 
           echo "Using image version: ${{ env.NEW_VERSION }}"
-          kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || (echo "Failed to deploy resources!" && exit 1)
+          kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || {echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }
