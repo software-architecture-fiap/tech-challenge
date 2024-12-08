@@ -20,7 +20,7 @@ jobs:
 
     outputs:
       ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-
+      
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -42,6 +42,8 @@ jobs:
 
       - name: Build container image for development
         id: build-image-dev
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
             # Build image container using commit SHA with dev suffix
             VERSION=${{ github.sha }}-dev
@@ -55,6 +57,8 @@ jobs:
         run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
       - name: Deploy to EKS cluster in development namespace
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
             source $GITHUB_ENV
 
