@@ -7,7 +7,6 @@ env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: app/web
   EKS_CLUSTER_NAME: EKS-lanchonete-cluster
-  GITHUB_OUTPUT: $GITHUB_ENV
 
 permissions:
   contents: write
@@ -28,8 +27,9 @@ jobs:
       - name: Check deploy-dev comment trigger and version image tag
         run: |
           echo "Development deploy detected. I will be triggering a build using commit SHA and a deployment in development environment."
-          echo "tag=${{ github.sha }}-dev" >> $GITHUB_ENV
+          echo "TAG=${{ github.sha }}-dev" >> $GITHUB_ENV
           echo "The dev version is: ${{ github.sha }}-dev"
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -50,24 +50,22 @@ jobs:
         id: build-dev
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          TAG: ${{ github.sha }}-dev
+          TAG: ${{ env.TAG }}
 
         run: |
-          source $GITHUB_ENV
-
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.TAG }} .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.TAG }}
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.TAG }}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.TAG }}" >> $GITHUB_ENV
 
       - name: Setup Kubeconfig
         run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
       - name: Deploy to development environment
         env:
-          IMAGE: ${{ steps.build-dev.outputs.image }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
           echo "Deploying to development environment..."
-          IMAGE_TAG=${{ env.IMAGE }}
+          IMAGE_TAG=${{ env.IMAGE_TAG }}
           echo "Image tag: $IMAGE_TAG"
           ENVIRONMENT=development
           KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/development
