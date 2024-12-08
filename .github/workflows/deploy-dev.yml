@@ -1,0 +1,78 @@
+name: Deploy to development
+
+on:
+  issue_comment:
+    types: [created]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: app/web
+  EKS_CLUSTER_NAME: EKS-lanchonete-cluster
+  GH_TOKEN: ${{ github.token }}
+
+permissions:
+  contents: read
+
+jobs:
+  build-deploy-dev:
+    if: github.event.comment.body == '/deploy'
+    runs-on: ubuntu-latest
+
+    outputs:
+      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR registry
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: private
+          mask-password: true
+
+      - name: Build container image for development
+        id: build-image-dev
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+            # Build image container using commit SHA with dev suffix
+            VERSION=${{ github.sha }}-dev
+            echo "Building image using commit SHA: $VERSION"
+
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION .
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION
+            echo "image-version=$VERSION" >> $GITHUB_ENV
+        
+      - name: Setup Kubeconfig
+        run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+
+      - name: Deploy to EKS cluster in development namespace
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+            source $GITHUB_ENV
+
+            ENVIRONMENT=development
+            KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/$ENVIRONMENT
+            cd $KUSTOMIZE_DIR
+            
+            # Check if namespace exists, if not create it
+            kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
+            
+            kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.image-version }}
+
+            echo "Deploying resource in $ENVIRONMENT namespace."
+
+            echo "Using image version: ${{ env.image-version }}"
+            echo "Fully qualified image name: $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.image-version }}"
+            kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || { echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }

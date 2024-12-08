@@ -21,31 +21,31 @@ jobs:
 
     outputs:
       semver_tag: ${{ steps.semver-tag.outputs.semver_tag }}
+      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
     
-      - name: Calculate SemVer tag
-        id: semver-tag
+      - id: semver-tag
         uses: gandarez/semver-action@v2.0.0
         with:
           branching_model: "trunk-based"
           main_branch_name: "main"
           debug: "true"
-     
-      - name: Debug SemVer
-        run: |
-          echo "New version: ${{ steps.semver-tag.outputs.semver_tag }}"
-          echo "Git SHA: ${{ github.sha }}"
 
-      - name: Create Git tag
-        uses: rickstaa/action-create-tag@v1.7.2
-        id: tag-create
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.semver-tag.outputs.semver_tag }}
-          message: "ci: release ${{ steps.semver-tag.outputs.semver_tag }}"
+      - name: Create tag
+        run: |
+          echo "tag ${{ steps.semver-tag.outputs.semver_tag }}"
+
+
+      # - name: Create Git tag
+      #   uses: rickstaa/action-create-tag@v1.7.2
+      #   id: tag-create
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     tag: ${{ steps.semver-tag.outputs.semver_tag }}
+      #     message: "ci: release ${{ steps.semver-tag.outputs.semver_tag }}"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -83,15 +83,15 @@ jobs:
             echo "Version $NEW_VERSION already exists in CHANGELOG.md. Skipping update."
           fi
 
-      # - name: Commit and push updated version in CHANGELOG.md
-      #   env:
-      #     NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
-      #   run: |
-      #     git config user.name "github-actions[bot]"
-      #     git config user.email "github-actions[bot]@users.noreply.github.com"
-      #     git add CHANGELOG.md VERSION
-      #     git commit -m "ci: bump version to ${{ env.NEW_VERSION }}"
-      #     git push origin ${{ github.ref }}
+      - name: Commit and push updated version in CHANGELOG.md
+        env:
+          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md VERSION
+          git commit -m "ci: bump version to ${{ env.NEW_VERSION }}"
+          git push origin ${{ github.ref }}
 
       - name: Setup Kubeconfig
         run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
@@ -104,6 +104,7 @@ jobs:
 
           ENVIRONMENT=production
           KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/production
+          cd $KUSTOMIZE_DIR
 
           # Check if namespace exists, if not create it
           kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
@@ -112,7 +113,6 @@ jobs:
           kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
 
           echo "Deploying resources in $ENVIRONMENT environment"
-          cd $KUSTOMIZE_DIR
 
           echo "Using image version: ${{ env.NEW_VERSION }}"
           kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || {echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }
