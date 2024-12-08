@@ -45,6 +45,6 @@ jobs:
             VERSION=${{ github.sha }}-dev
             echo "Building image using commit SHA: $VERSION"
 
-            docker build -t $ECR_REGISTRY:$ECR_REPOSITORY:$VERSION .
-            docker push $ECR_REGISTRY:$ECR_REPOSITORY:$VERSION
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION .
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION
             echo "image-version=$VERSION" >> $GITHUB_ENV
