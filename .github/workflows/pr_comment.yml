@@ -1,0 +1,33 @@
+name: Comment on Pull Request
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  post-comment:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+     
+      - name: Comment on Pull Request
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: |
+            Rules for deployment and branch naming conventions:
+
+            **Development Deployment:**
+            - To deploy to the development environment, please comment `/deploy-dev`.
+
+            **Production Deployment:**
+            - To deploy to the production environment, please comment `/deploy-prod`.
+            - To deploy to production with a specific version, please comment `/deploy-prod vX.Y.Z`.
+            - To deploy to production with a specific version and environment, please comment `/deploy-prod vX.Y.Z environment`.
+
+            **Branch Naming Conventions:**
+            - **Patch Version:** Use the `bugfix/` pattern.
+            - **Minor Version:** Use the `feature/` pattern.
+            - **Major Version:** Use the `release/` pattern.
+            - **Documentation or Miscellaneous:** Use the `doc/` or `misc/` pattern to increment the build version (e.g., `v0.0.0+1`).
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
