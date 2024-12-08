@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from os import environ as env
-from typing import Union
+from typing import Union, Optional
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -9,9 +9,9 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from ..db import database
-from ..model import schemas
+from ..model import schemas, models
 from ..tools.logging import logger
-from . import repository
+from ..db.database import get_db
 
 load_dotenv()
 
@@ -60,7 +60,8 @@ def authenticate_user(db: Session, username: str, password: str) -> Union[schema
     Returns:
         Union[schemas.User, bool]: O usuário autenticado ou False se a autenticação falhar.
     """
-    user = repository.get_user_by_email(db, email=username)
+    from .repository import get_user_by_email 
+    user = get_user_by_email(db, email=username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -124,19 +125,36 @@ def get_current_user(db: Session = Depends(database.get_db), token: str = Depend
         raise credentials_exception
 
     # Verifica se o token foi usado
-    if repository.is_token_used(db, token):
+    from .repository import is_token_used
+    if is_token_used(db, token):
         logger.warning('Token has already been used')
         raise HTTPException(status_code=401, detail='Token has already been used')
 
     # Busca o usuário pelo ID
-    user = repository.get_customer(db, customer_id=user_id)
+    from .repository import get_customer
+    user = get_customer(db, customer_id=user_id)
     if user is None:
         logger.warning(f'User not found with ID: {user_id}')
         raise credentials_exception
 
     # Marca o token como usado
-    repository.mark_token_as_used(db, token)
+    from .repository import mark_token_as_used
+    mark_token_as_used(db, token)
     logger.info(f'User authenticated: {user.email}')
 
     # Retorna os dados do usuário
     return schemas.Customer(id=user_id, name=user.name, email=user.email, cpf=user.cpf)
+
+def get_optional_user(db: Session = Depends(get_db), user_id: Optional[int] = None) -> Optional[models.Customer]:
+    """
+    Retorna o cliente autenticado com base no token, ou None se o token for inválido ou ausente.
+    """
+    try:
+        if not user_id:
+            return None
+
+        customer = db.query(models.Customer).filter(models.Customer.id == user_id).first()
+        return customer
+    except Exception as e:
+        logger.error(f"Erro ao obter cliente opcional: {e}", exc_info=True)
+        return None

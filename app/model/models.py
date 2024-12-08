@@ -47,6 +47,7 @@ class Product(Base):
     description = Column(String)
     price = Column(Float)
     category_id = Column(Integer, ForeignKey('categories.id'))
+    enabled = Column(Boolean, default=True)
 
     category = relationship('Category', back_populates='products')
     order_products = relationship('OrderProduct', back_populates='product')
@@ -71,6 +72,7 @@ class Order(Base):
         order_items (relationship): Relacionamento com os itens do pedido.
         order_products (relationship): Relacionamento com os produtos do pedido.
         tracking (relationship): Relacionamento com o rastreamento do pedido.
+        payments (relationship): Relacionamento com os pagamentos do pedido.
     """
 
     __tablename__ = 'orders'
@@ -89,12 +91,13 @@ class Order(Base):
         DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
     )
 
-    customer_id = Column(Integer, ForeignKey('customers.id'))
+    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=True)
     customer = relationship('Customer', back_populates='orders')
     order_items = relationship('OrderItem', back_populates='order')
     order_products = relationship('OrderProduct', back_populates='order')
     tracking = relationship('Tracking', back_populates='order')
     webhook = relationship('Webhook', back_populates='order')
+    payments = relationship('OrderPayment', back_populates='order')
 
 class OrderItem(Base):
     """
@@ -141,6 +144,38 @@ class OrderProduct(Base):
 
     order = relationship('Order', back_populates='order_products')
     product = relationship('Product', back_populates='order_products')
+
+class OrderPayment(Base):
+    """
+    Representa um Pagamento associado a um Pedido.
+
+    Attributes:
+        id (int): Identificador único do pagamento.
+        order_id (int): Identificador do pedido associado ao pagamento.
+        status (str): Status do pagamento (e.g., 'approved', 'pending', 'failed').
+        payment_method (str): Método de pagamento utilizado (e.g., 'credit_card', 'pix').
+        transaction_id (str): Identificador da transação gerado pelo provedor de pagamento.
+        payment_provider (str): Nome do provedor de pagamento (e.g., 'Mercado Pago').
+        amount (float): Valor do pagamento.
+        created_at (datetime): Data e hora em que o pagamento foi criado.
+        updated_at (datetime): Data e hora em que o pagamento foi atualizado pela última vez.
+    """
+
+    __tablename__ = 'order_payments'
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)
+    status = Column(String, nullable=False, index=True)
+    payment_method = Column(String, nullable=False)
+    transaction_id = Column(String, unique=True, nullable=False)
+    payment_provider = Column(String, nullable=False)
+    amount = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
+    )
+
+    order = relationship('Order', back_populates='payments')
 
 class Tracking(Base):
     """
@@ -197,6 +232,7 @@ class Category(Base):
     __tablename__ = 'categories'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
+    enabled = Column(Boolean, default=True)
     products = relationship('Product', back_populates='category')
 
 class Webhook(Base):

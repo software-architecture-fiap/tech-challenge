@@ -2,17 +2,17 @@ from __future__ import with_statement
 
 import os
 import sys
+from pathlib import Path
 from logging.config import fileConfig
 from typing import Optional
-
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 from sqlalchemy.engine import Engine
-
 from alembic import context
-from app.db.database import Base
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+from app.db.database import Base
 
 load_dotenv()
 config = context.config

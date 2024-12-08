@@ -3,6 +3,9 @@ from typing import Optional
 from aioredis import Redis, from_url
 from fastapi import HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
 
 from ..tools.logging import logger
 
@@ -103,23 +106,19 @@ class ExceptionLoggingMiddleware(BaseHTTPMiddleware):
         Nenhum.
     """
 
-    async def dispatch(self, request: Request, call_next):  # noqa PLR6301
-        """
-        Manipula cada requisição, capturando e registrando exceções não tratadas.
-
-        Args:
-            request: A requisição atual.
-            call_next: Função que chama o próximo middleware ou endpoint.
-
-        Returns:
-            A resposta da aplicação, caso nenhuma exceção ocorra.
-
-        Raises:
-            HTTPException: Se ocorrer uma exceção não tratada, uma exceção 500 é lançada.
-        """
+    async def dispatch(self, request: Request, call_next):
         try:
             response = await call_next(request)
             return response
+        except StarletteHTTPException as exc:
+            logger.error(f"Erro HTTP: {exc.detail} | Status: {exc.status_code}")
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={"detail": exc.detail},
+            )
         except Exception as e:
-            logger.error(f'Erro Não Tratado: {e}', exc_info=True)
-            raise HTTPException(status_code=500, detail='Erro Interno do Servidor!!!')
+            logger.exception(f"Erro interno: {e}")
+            return JSONResponse(
+                status_code=500,
+                content={"detail": "Erro Interno do Servidor"},
+            )

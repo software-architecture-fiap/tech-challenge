@@ -1,11 +1,12 @@
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from dotenv import load_dotenv
 from jose import jwt
 from sqlalchemy import text
 from sqlalchemy.orm import Session, joinedload
 
+from .mercadopago import MercadoPagoService
 from ..model import models, schemas
 from ..tools.logging import logger
 from . import security
@@ -43,13 +44,13 @@ def mark_token_as_used(db: Session, token: str) -> models.Token:
     """
     logger.info(f'Marking token as used: {token}')
     db_token = db.query(models.Token).filter(models.Token.token == token).first()
-    if db_token:
-        db_token.is_used = True
-        db.commit()
-        db.refresh(db_token)
-        logger.debug(f'Token marked as used: {token}')
-    else:
-        logger.warning(f'Token not found: {token}')
+    if not db_token:
+        logger.warning(f'Token not found in database: {token}')
+        return None
+    db_token.is_used = True
+    db.commit()
+    db.refresh(db_token)
+    logger.info(f'Token marked as used: {token}')
     return db_token
 
 def is_token_used(db: Session, token: str) -> bool:
@@ -288,7 +289,7 @@ def get_product(db: Session, product_id: int) -> Optional[models.Product]:
     """
     logger.debug(f'Fetching product with ID: {product_id}')
     try:
-        return db.query(models.Product).filter(models.Product.id == product_id).first()
+        return db.query(models.Product).filter(models.Product.id == product_id, models.Product.enabled == True).first()
     except Exception as e:
         logger.error(f'Error fetching product: {e}')
         return None
@@ -305,7 +306,13 @@ def get_products(db: Session, skip: int = 0, limit: int = 10) -> List[models.Pro
         List[models.Product]: Lista de produtos.
     """
     logger.debug(f'Fetching products with skip: {skip}, limit: {limit}')
-    return db.query(models.Product).offset(skip).limit(limit).all()
+    return (
+        db.query(models.Product)
+        .filter(models.Product.enabled == True)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
 
 def create_product(db: Session, product: schemas.ProductCreate) -> models.Product:
     """Cria um novo produto.
@@ -364,9 +371,14 @@ def delete_product(db: Session, product_id: int) -> Optional[models.Product]:
     """
     logger.debug(f'Deleting product with ID: {product_id}')
     try:
-        db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+        db_product = db.query(
+            models.Product
+            ).filter(
+                models.Product.id == product_id, 
+                models.Product.enabled == True
+                ).first()
         if db_product:
-            db.delete(db_product)
+            db_product.enabled = False
             db.commit()
             logger.info(f'Product deleted: {db_product.name} - Category: {db_product.category}')
         else:
@@ -595,14 +607,14 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10) -> List[schemas.
     """
     logger.debug(f'Fetching categories with skip: {skip}, limit: {limit}')
     categories = db.execute(
-        text('SELECT id, name FROM categories LIMIT :limit OFFSET :skip'), {'limit': limit, 'skip': skip}
+        text('SELECT id, name FROM categories LIMIT :limit OFFSET :skip WHERE enabled = true'), {'limit': limit, 'skip': skip}
     ).fetchall()
 
     category_list = []
     for category in categories:
         category_id = category.id
         products = db.execute(
-            text('SELECT id, name, description, price FROM products WHERE category_id = :category_id'),
+            text('SELECT id, name, description, price FROM products WHERE category_id = :category_id AND enabled = true'),
             {'category_id': category_id},
         ).fetchall()
 
@@ -634,11 +646,11 @@ def get_category_with_products(db: Session, category_id: int) -> Optional[schema
     logger.debug(f'Fetching category with ID: {category_id}')
     try:
         result = db.execute(
-            text('SELECT * FROM categories WHERE id = :category_id'), {'category_id': category_id}
+            text('SELECT * FROM categories WHERE id = :category_id AND enabled = true'), {'category_id': category_id}
         ).fetchone()
         if result:
             products = db.execute(
-                text('SELECT * FROM products WHERE category_id = :category_id'), {'category_id': category_id}
+                text('SELECT * FROM products WHERE category_id = :category_id AND enabled = true'), {'category_id': category_id}
             ).fetchall()
 
             product_list = [schemas.Product(**dict(product)) for product in products]
@@ -700,9 +712,41 @@ def delete_category(db: Session, db_category: models.Category) -> Optional[model
     """
     logger.debug(f'Deleting category with ID: {db_category.id}')
     try:
-        db.delete(db_category)
+        db_category.enabled = False
         db.commit()
         return db_category
     except Exception as e:
         logger.error(f'Error deleting category: {e}')
         return None
+
+def create_payment_preference(
+    db: Session, order_id: int, payment_payload: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    Cria uma preferência de pagamento no Mercado Pago.
+
+    Args:
+        db (Session): Sessão do banco de dados.
+        order_id (int): ID do pedido.
+        payment_payload (Dict[str, Any]): Dados da preferência de pagamento.
+
+    Returns:
+        Dict[str, Any]: Resposta da API Mercado Pago contendo a URL de pagamento.
+    """
+    try:
+        logger.info(f"Criando preferência de pagamento para o pedido ID {order_id}")
+        preference_response = MercadoPagoService.create_preference(payment_payload)
+        
+        # Valida a resposta
+        if not preference_response or "init_point" not in preference_response:
+            logger.error(f"Erro na criação da preferência de pagamento: {preference_response}")
+            return None
+
+        # Retorna dados necessários para o frontend
+        return {
+            "payment_url": preference_response["init_point"],
+            "preference_id": preference_response["id"],
+        }
+    except Exception as e:
+        logger.error(f"Erro ao criar preferência de pagamento para o pedido ID {order_id}: {e}", exc_info=True)
+        raise

@@ -81,8 +81,8 @@ async def global_exception_handler(request, exc):
         },
     )
 
-@app.get('/')
-def read_root() -> dict:
+@app.get('/', tags=['server-status'])
+def server_status() -> dict:
     """Retorna o status operacional da aplicação.
 
     Returns:
@@ -91,7 +91,7 @@ def read_root() -> dict:
     logger.debug('Status endpoint accessed')
     return {'status': 'Operational'}
 
-@app.get('/users/me', response_model=schemas.Customer)
+@app.get('/check-user', tags=[ 'customers'], response_model=schemas.Customer)
 def read_users_me(current_user: schemas.Customer = Depends(get_current_user)) -> schemas.Customer:
     """Retorna as informações do usuário atual.
 
@@ -104,8 +104,7 @@ def read_users_me(current_user: schemas.Customer = Depends(get_current_user)) ->
     logger.debug(f'User endpoint accessed by {current_user.id}')
     return current_user
 
-# Adiciona a rota para a documentação do ReDoc
-@app.get('/redoc', include_in_schema=False)
+@app.get('/redoc', include_in_schema=False, tags=['documentation'])
 async def redoc() -> str:
     """Retorna o HTML para a documentação do ReDoc.
 

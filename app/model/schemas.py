@@ -109,6 +109,7 @@ class Product(BaseModel):
     description: str
     price: float
     category: str
+    enabled: Optional[bool] = True
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -173,6 +174,7 @@ class Category(CategoryBase):
 
     id: int
     products: List[Product] = []
+    enabled: bool
 
     class Config:
         """
@@ -259,6 +261,8 @@ class OrderCreate(OrderBase):
 
     customer_id: int
     products: List[OrderProductCreate]
+    email: Optional[str] = None
+    total_price: float
 
 class Order(OrderBase):
     """
@@ -410,3 +414,92 @@ class WebhookResponse(BaseModel):
     customer_id: int
     payment_status: str
     received_at: datetime
+
+class PaymentMethod(str, Enum):
+    """Enumeração para Métodos de Pagamento."""
+    CREDIT_CARD = "credit_card"
+    PIX = "pix"
+    BOLETO = "boleto"
+
+class OrderPaymentBase(BaseModel):
+    """
+    Modelo Base para Dados de Pagamento de Pedido.
+
+    Attributes:
+        order_id (int): Identificador do pedido associado ao pagamento.
+        status (str): Status do pagamento.
+        payment_method (PaymentMethod): Método de pagamento utilizado.
+        transaction_id (str): Identificador da transação.
+        payment_provider (str): Nome do provedor de pagamento.
+        amount (float): Valor do pagamento.
+    """
+    order_id: int
+    status: str
+    payment_method: PaymentMethod
+    transaction_id: str
+    payment_provider: str
+    amount: float
+
+class OrderPaymentCreate(BaseModel):
+    """
+    Modelo para Criação de um Pagamento de Pedido.
+
+    Attributes:
+        payment_method (PaymentMethod): Método de pagamento.
+        amount (float): Valor do pagamento.
+    """
+    payment_method: PaymentMethod
+    amount: float
+
+class OrderPayment(OrderPaymentBase):
+    """
+    Modelo para Dados Completos de Pagamento de Pedido.
+
+    Attributes:
+        id (int): Identificador único do pagamento.
+        created_at (datetime): Data e hora da criação do pagamento.
+        updated_at (datetime): Data e hora da última atualização do pagamento.
+    """
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        """
+        Configurações específicas para o modelo Pydantic.
+        """
+        from_attributes = True
+
+class MercadoPagoPaymentRequest(BaseModel):
+    """
+    Modelo para Requisição de Pagamento na API Mercado Pago.
+
+    Attributes:
+        transaction_amount (float): Valor total da transação.
+        description (str): Descrição da transação.
+        payment_method_id (str): Identificador do método de pagamento.
+        payer_email (str): Email do pagador.
+    """
+    transaction_amount: float
+    description: str
+    payment_method_id: str
+    payer_email: str
+
+class MercadoPagoPaymentResponse(BaseModel):
+    """
+    Modelo para Resposta da API Mercado Pago.
+
+    Attributes:
+        id (str): Identificador único do pagamento.
+        status (str): Status do pagamento.
+        status_detail (str): Detalhes do status do pagamento.
+        transaction_amount (float): Valor da transação.
+        payment_method_id (str): Método de pagamento utilizado.
+        payer_email (str): Email do pagador.
+    """
+    id: str
+    status: str
+    status_detail: str
+    transaction_amount: float
+    payment_method_id: str
+    payer_email: str
