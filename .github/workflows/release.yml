@@ -91,16 +91,13 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
         run: |
-          # Check the current directory is:
-          ls -la && pwd
+          echo "Debug: check directory structure"
+          ls -R /home/runner/work/tech-challenge
+          
+          echo "Debug: check path to Dockerfile"
+          ls -R /home/runner/work/tech-challenge/tech-challenge
 
-          # Change to the directory where the Dockerfile is located
-          cd /home/runner/work/tech-challenge
-
-          # List the files in the current directory
-          ls -la && pwd
-
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }} ./tech-challenge
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }} .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
 
       - name: update CHANGELOG.md
