@@ -60,7 +60,7 @@ The following environment variables are defined for use throughout the pipeline:
 
 ## Tasks
 
-### Build and deploy
+### Build and Deploy
 
 This job runs on `ubuntu-latest` and is executed if the event is an issue comment or a push to the `main` branch.
 
@@ -68,7 +68,7 @@ This job runs on `ubuntu-latest` and is executed if the event is an issue commen
 
 1. **Checkout Repository**
 
-   - Uses the `actions/checkout@v4` action to checkout the repository.
+   - Uses the `actions/checkout@v4` action to check out the repository.
 
 2. **Check for Deploy-Dev Comment**
 
@@ -78,7 +78,7 @@ This job runs on `ubuntu-latest` and is executed if the event is an issue commen
 
    - Determines the image tag based on the event type:
      - Production: using `push` events to the `main` branch, increments the semantic version, considering the main branch as production.
-     - Development: it is trigger using the commit SHA with a `-dev` suffix.
+     - Development: it is triggered using the commit SHA with a `-dev` suffix.
 
 4. **Configure AWS Credentials**
 
@@ -90,7 +90,7 @@ This job runs on `ubuntu-latest` and is executed if the event is an issue commen
 
 6. **Build and Push the Container Image**
 
-   - Builds and pushes the container image to the ECR repository using tag.
+   - Builds and pushes the container image to the ECR repository using the tag.
 
 7. **Commit and Push Updated Version**
 
