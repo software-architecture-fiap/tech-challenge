@@ -1,5 +1,4 @@
 from typing import Dict, List
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
@@ -10,7 +9,6 @@ from ..services import repository
 from ..tools.logging import logger
 
 router = APIRouter()
-
 
 @router.get('/', response_model=Dict[str, List[schemas.Category]])
 def list_categories(
@@ -33,7 +31,6 @@ def list_categories(
     """
     categories = repository.get_categories(db, skip=skip, limit=limit)
     return {'categories': categories}
-
 
 @router.get('/{category_id}', response_model=schemas.Category)
 def get_category(
@@ -81,7 +78,6 @@ def get_category(
     logger.info(f'Retorno da categoria: {category_response}')
     return category_response
 
-
 @router.post('/', response_model=schemas.Category)
 def create_category(
     category: schemas.CategoryCreate,
@@ -121,7 +117,6 @@ def create_category(
     except Exception as e:
         logger.error(f'Erro ao criar categoria: {e}')
         raise HTTPException(status_code=500, detail='Erro interno do servidor')
-
 
 @router.put('/{category_id}', response_model=schemas.Category)
 def update_category(
@@ -169,7 +164,6 @@ def update_category(
     )
 
     return category_response
-
 
 @router.delete('/{category_id}', response_model=schemas.Category)
 def delete_category(

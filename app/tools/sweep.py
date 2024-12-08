@@ -4,7 +4,6 @@ from typing import List, Optional
 
 IGNORED_DIRS = ['node_modules', 'build', 'public', '.venv', '__pycache__', '.git', 'log', 'install']
 
-
 def generate_directory_tree(root_dir: str, output_file: str, ignore_patterns: Optional[List[str]] = None) -> None:
     """Gera um arquivo com a árvore de diretórios a partir do diretório raiz especificado.
 
@@ -35,7 +34,6 @@ def generate_directory_tree(root_dir: str, output_file: str, ignore_patterns: Op
             output.write(f'{indent}- {os.path.basename(dirpath)}/\n')
             for filename in sorted(filtered_filenames):
                 output.write(f'{indent}  - {filename}\n')
-
 
 if __name__ == '__main__':
     root_directory = './'

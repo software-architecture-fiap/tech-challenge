@@ -1,5 +1,4 @@
 from typing import Dict, List
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -14,7 +13,6 @@ router = APIRouter()
 INTERNAL_SERVER_ERROR_MSG = "Erro Interno do Servidor"
 INVALID_ORDER_ID_MSG = "Formato de ID do pedido inválido"
 REQUEST_NOT_FOUND_MSG = "Pedido não encontrado"
-
 
 @router.post('/', response_model=schemas.OrderResponse)
 def create_order(
@@ -43,7 +41,6 @@ def create_order(
     except Exception as e:
         logger.error(f'Erro ao criar o pedido: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
-
 
 @router.put('/{order_id}/status', response_model=schemas.OrderResponse)
 def update_order_status(
@@ -92,7 +89,6 @@ def update_order_status(
         logger.error(f'Erro ao atualizar o status do pedido: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
-
 @router.get('/', response_model=Dict[str, List[schemas.OrderResponse]])
 def read_orders(
     skip: int = 0,
@@ -120,7 +116,6 @@ def read_orders(
     except Exception as e:
         logger.error(f'Erro ao recuperar os pedidos: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
-
 
 @router.get('/{order_id}', response_model=schemas.OrderCustomerView)
 def read_order(
@@ -157,7 +152,6 @@ def read_order(
         logger.error(f'Erro ao recuperar o pedido: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
 
-
 @router.post('/checkout', response_model=schemas.OrderResponse)
 def fake_checkout(
     order: schemas.OrderCreate,
@@ -185,7 +179,6 @@ def fake_checkout(
     except Exception as e:
         logger.error(f'Erro durante o checkout fictício: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_MSG)
-
 
 @router.patch('/{order_id}/payment', response_model=schemas.OrderResponse)
 def update_order_payment_status(
@@ -230,7 +223,6 @@ def update_order_payment_status(
     except Exception as e:
         logger.error(f'Erro ao atualizar o status de pagamento do pedido: {e}', exc_info=True)
         raise HTTPException(status_code=500, detail='Erro Interno do Servidor')
-
 
 @router.post('/webhook', response_model=schemas.WebhookResponse)
 def create_webhook(

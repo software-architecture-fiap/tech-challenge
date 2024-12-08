@@ -1,0 +1,128 @@
+service: tech-challenge
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  region: us-east-1
+  ecr:
+    images:
+      tech-challenge:
+        path: .
+  deploymentBucket:
+    name: tech-challenge-deployment-bucket
+  environment:
+    STAGE: ${sls:stage}
+    DATABASE_URL: ${ssm:/tech-challenge/${sls:stage}/DATABASE_URL}
+    JWT_SECRET: ${ssm:/tech-challenge/${sls:stage}/JWT_SECRET, "local-jwt-secret"}
+
+functions:
+  api:
+    image:
+      name: tech-challenge
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+
+plugins:
+  - serverless-dotenv-plugin
+
+custom:
+  dotenv:
+    path: .env
+
+resources:
+  Resources:
+    ApiGatewayHttpApi:
+      Type: AWS::ApiGatewayV2::Api
+      Properties:
+        Name: TechChallengeHttpApi
+        ProtocolType: HTTP
+
+    ApiGatewayHttpApiIntegration:
+      Type: AWS::ApiGatewayV2::Integration
+      Properties:
+        ApiId: !Ref ApiGatewayHttpApi
+        IntegrationType: AWS_PROXY
+        IntegrationUri: !GetAtt ApiLambdaFunction.Arn
+        PayloadFormatVersion: "2.0"
+
+    ApiGatewayHttpApiRoute:
+      Type: AWS::ApiGatewayV2::Route
+      Properties:
+        ApiId: !Ref ApiGatewayHttpApi
+        RouteKey: "ANY /{proxy+}"
+        Target: !Sub "integrations/${ApiGatewayHttpApiIntegration}"
+
+    ApiGatewayHttpApiStage:
+      Type: AWS::ApiGatewayV2::Stage
+      Properties:
+        ApiId: !Ref ApiGatewayHttpApi
+        StageName: $default
+        AutoDeploy: true
+
+    ApiLambdaPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !Ref ApiLambdaFunction
+        Action: "lambda:InvokeFunction"
+        Principal: "apigateway.amazonaws.com"
+        SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayHttpApi.ApiId}/*/*"
+
+    ApiGatewayLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: "/aws/http-api/tech_challenge"
+        RetentionInDays: 14
+
+    TechChallengeDatabase:
+      Type: AWS::RDS::DBInstance
+      Properties:
+        DBInstanceClass: db.t3.micro
+        AllocatedStorage: 20
+        Engine: postgres
+        EngineVersion: 15.9
+        DBName: tech_challenge
+        MasterUsername: postgres
+        MasterUserPassword: localhost%401988
+        PubliclyAccessible: true
+        MultiAZ: false
+        StorageType: gp2
+        BackupRetentionPeriod: 7
+        VPCSecurityGroups:
+          - !GetAtt RDSInstanceSecurityGroup.GroupId
+
+    RDSInstanceSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Enable PostgreSQL access
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 5432
+            ToPort: 5432
+            CidrIp: 0.0.0.0/0
+
+    DatabaseURLParameter:
+      Type: AWS::SSM::Parameter
+      Properties:
+        Name: !Sub /tech-challenge/${sls:stage}/DATABASE_URL
+        Type: String
+        Value: !Sub "postgres://postgres:localhost%401988@${TechChallengeDatabase.Endpoint.Address}:5432/tech_challenge"
+
+package:
+  individually: true
+  patterns:
+    - "**/__pycache__/**"
+    - "**/*.pyc"
+    - "**/tests/**"
+    - "**/test_*.py"
+    - "**/*.md"
+    - "**/*.log"
+    - "**/*.dist-info/**"
+    - "**/*.egg-info/**"
+    - ".git/**"
+    - ".vscode/**"
+    - ".serverless/**"
+    - "node_modules/**"
+    - "requirements/**"

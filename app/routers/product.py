@@ -1,5 +1,4 @@
 from typing import Dict, List
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -8,7 +7,6 @@ from ..model import models, schemas
 from ..services import repository, security
 
 router = APIRouter()
-
 
 @router.post('/', response_model=schemas.Product)
 def create_product(
@@ -49,7 +47,6 @@ def create_product(
     )
     return product_response
 
-
 @router.get('/', response_model=Dict[str, List[schemas.Product]])
 def read_products(
     skip: int = 0,
@@ -71,7 +68,6 @@ def read_products(
     products = repository.get_products(db, skip=skip, limit=limit)
     categorized_products = repository.categorize_products(products)
     return categorized_products
-
 
 @router.get('/{product_id}', response_model=schemas.Product)
 def read_product(
@@ -104,7 +100,6 @@ def read_product(
         category=db_product.category.name,
     )
     return product_response
-
 
 @router.put('/{product_id}', response_model=schemas.Product)
 def update_product(
@@ -151,7 +146,6 @@ def update_product(
         category=db_category.name,
     )
     return product_response
-
 
 @router.delete('/{product_id}', response_model=schemas.Product)
 def delete_product(

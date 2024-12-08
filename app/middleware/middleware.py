@@ -1,12 +1,10 @@
 import time
 from typing import Optional
-
 from aioredis import Redis, from_url
 from fastapi import HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from ..tools.logging import logger
-
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """
@@ -93,7 +91,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             logger.error(f'Erro no RateLimitMiddleware: {e}')
             raise HTTPException(status_code=500, detail='Erro Interno do Servidor!!!')
-
 
 class ExceptionLoggingMiddleware(BaseHTTPMiddleware):
     """

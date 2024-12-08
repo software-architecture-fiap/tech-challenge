@@ -1,31 +1,37 @@
 # Stage 1: Build
 FROM python:3.10-slim AS builder
 
+# Instalar dependências de sistema
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    build-essential \
+    curl && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Instalar Poetry
+RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python3 -
+ENV PATH="/opt/poetry/bin:$PATH"
+
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y curl build-essential && apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python3 -
-
-ENV PATH=/opt/poetry/bin:${PATH}
-
-COPY pyproject.toml poetry.lock* ./
-
-RUN poetry config virtualenvs.create false && \
-    poetry install --no-dev --no-root
+# Copiar apenas os arquivos necessários
+COPY pyproject.toml poetry.lock ./
+RUN poetry config virtualenvs.create false && poetry install --no-root
 
 # Stage 2: Final
-FROM python:3.10-slim
+FROM public.ecr.aws/lambda/python:3.10
 
-WORKDIR /app
+WORKDIR /var/task
 
-COPY --from=builder /opt/poetry /opt/poetry
-COPY --from=builder /app /app
+# Copiar dependências do estágio de build
+COPY --from=builder /usr/local/lib/python3.10/site-packages /var/task/
+COPY --from=builder /app /var/task/
+
+# Copiar o código fonte
 COPY . .
 
-ENV PATH=/opt/poetry/bin:${PATH}
+# Testa o carregamento do driver
+RUN python -c "from sqlalchemy.dialects.postgresql import dialect; print('PostgreSQL dialect loaded:', dialect)"
 
-RUN poetry install --no-dev --no-root
-
-EXPOSE 2000
-
-CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "2000", "--reload"]
+# Configuração do ponto de entrada
+CMD ["handler.handler"]
