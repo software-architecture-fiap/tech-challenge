@@ -63,9 +63,10 @@ jobs:
             # Check if namespace exists, if not create it
             kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
             
-            kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_VERSION
+            kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.image-version }}
 
             echo "Deploying resource in $ENVIRONMENT namespace."
 
-            echo "Using image version: $IMAGE_VERSION"
+            echo "Using image version: ${{ env.image-version }}"
+            echo "Fully qualified image name: $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.image-version }}"
             kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || { echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }
