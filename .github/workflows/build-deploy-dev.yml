@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build-deploy-dev:
-    if: github.event.issue.pull_request && github.event.comment.body == '/deploy-dev'
+    if: github.event.comment.body == '/deploy-dev'
     runs-on: ubuntu-latest
 
     steps:
