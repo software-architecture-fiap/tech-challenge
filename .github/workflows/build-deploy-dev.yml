@@ -55,9 +55,9 @@ jobs:
         run: |
           source $GITHUB_ENV
 
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.tag }} .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.tag }}
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.tag }}" >> $GITHUB_ENV
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.TAG }} .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.TAG }}
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.TAG }}" >> $GITHUB_ENV
 
       - name: Setup Kubeconfig
         run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
@@ -67,7 +67,7 @@ jobs:
           IMAGE: ${{ steps.build-dev.outputs.image }}
         run: |
           echo "Deploying to development environment..."
-          IMAGE_TAG=${{ env.image }}
+          IMAGE_TAG=${{ env.IMAGE }}
           echo "Image tag: $IMAGE_TAG"
           ENVIRONMENT=development
           KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/development
