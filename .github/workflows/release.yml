@@ -91,16 +91,9 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
         run: |
-          # Check the Dockerfile exists
-          if [ ! -f Dockerfile ]; then
-            echo "Dockerfile not found in the root of the repository"
-            exit 1
-          else
-            echo "List the current directory"
-            ls -la
-          fi
-
+          # Check the current directory
           ls -la && pwd
+          cd tech-challenge
 
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }} ./tech-challenge
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
