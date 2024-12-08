@@ -4,6 +4,15 @@ on:
   issue_comment:
     types: [created]
 
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: app/web
+  EKS_CLUSTER_NAME: EKS-lanchonete-cluster
+  GH_TOKEN: ${{ github.token }}
+
+permissions:
+  contents: read
+
 jobs:
   hello-world:
     if: github.event.comment.body == '/deploy'
@@ -11,6 +20,31 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-    
-      - name: Hello world
-        run: echo "Hello world"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR registry
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: private
+          mask-password: true
+
+      - name: Build container image for development
+        id: build-image-dev
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+            # Build image container using commit SHA with dev suffix
+            VERSION=${{ github.sha }}-dev
+            echo "Building image using commit SHA: $VERSION"
+
+            docker build -t $ECR_REGISTRY:$ECR_REPOSITORY:$VERSION .
+            docker push $ECR_REGISTRY:$ECR_REPOSITORY:$VERSION
+            echo "image-version=$VERSION" >> $GITHUB_ENV
