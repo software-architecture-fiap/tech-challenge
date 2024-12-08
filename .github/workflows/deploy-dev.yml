@@ -17,6 +17,10 @@ jobs:
   build-deploy-dev:
     if: github.event.comment.body == '/deploy'
     runs-on: ubuntu-latest
+
+    outputs:
+      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -38,8 +42,6 @@ jobs:
 
       - name: Build container image for development
         id: build-image-dev
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
             # Build image container using commit SHA with dev suffix
             VERSION=${{ github.sha }}-dev

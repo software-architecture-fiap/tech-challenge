@@ -21,6 +21,7 @@ jobs:
 
     outputs:
       semver_tag: ${{ steps.semver-tag.outputs.semver_tag }}
+      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
 
     steps:
       - name: Checkout repository
