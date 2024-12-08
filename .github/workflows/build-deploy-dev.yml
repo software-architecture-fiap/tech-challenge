@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build-deploy-dev:
-    if: github.event.comment.body == '/deploy-dev'
+    if: github.event.comment.body == '/deploy'
     runs-on: ubuntu-latest
 
     steps:
