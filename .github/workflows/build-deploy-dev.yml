@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build-deploy-dev:
-    if: github.event.comment.body == '/deploy-dev'
+    if: github.event.comment.body == '/deploy'
     runs-on: ubuntu-latest
 
     steps:
@@ -32,40 +32,40 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: ${{ env.AWS_REGION }}
 
-    - name: Login to ECR registry
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-      with:
-        registry-type: private
-        mask-password: true
+    # - name: Login to ECR registry
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v1
+    #   with:
+    #     registry-type: private
+    #     mask-password: true
 
-    - name: Build, tag, and push continer image
-      id: build-image-dev
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      run: |
-          echo "Building image using commit SHA: $GITHUB_SHA with dev suffix"
-          echo "TAG=$GITHUB_SHA-dev" >> $GITHUB_ENV
-          docker build -t $ECR_REGISTRY:$ECR_REPOSITORY:$TAG .
-          docker push $ECR_REGISTRY:$ECR_REPOSITORY:$TAG
-          echo "IMAGE_FULL_NAME_TAG=$ECR_REGISTRY:$ECR_REPOSITORY:$TAG" >> $GITHUB_ENV
+    # - name: Build, tag, and push continer image
+    #   id: build-image-dev
+    #   env:
+    #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+    #   run: |
+    #       echo "Building image using commit SHA: $GITHUB_SHA with dev suffix"
+    #       echo "TAG=$GITHUB_SHA-dev" >> $GITHUB_ENV
+    #       docker build -t $ECR_REGISTRY:$ECR_REPOSITORY:$TAG .
+    #       docker push $ECR_REGISTRY:$ECR_REPOSITORY:$TAG
+    #       echo "IMAGE_FULL_NAME_TAG=$ECR_REGISTRY:$ECR_REPOSITORY:$TAG" >> $GITHUB_ENV
 
-    - name: Setup Kubeconfig
-      run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+    # - name: Setup Kubeconfig
+    #   run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
-    - name: Deploy to EKS cluster in development namespace
-      env: 
-        IMAGE_FULL_NAME_TAG: ${{ env.IMAGE_FULL_NAME_TAG }}
-        TAG: ${{ env.TAG }}
-      run: |
-          echo "Deploying to development environment..."
-          IMAGE_TAG=${{ env.TAG }}
-          echo "Image tag version: $IMAGE_TAG"
-          ENVIRONMENT=development
-          KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/development
+    # - name: Deploy to EKS cluster in development namespace
+    #   env: 
+    #     IMAGE_FULL_NAME_TAG: ${{ env.IMAGE_FULL_NAME_TAG }}
+    #     TAG: ${{ env.TAG }}
+    #   run: |
+    #       echo "Deploying to development environment..."
+    #       IMAGE_TAG=${{ env.TAG }}
+    #       echo "Image tag version: $IMAGE_TAG"
+    #       ENVIRONMENT=development
+    #       KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/development
 
-          kubectl get namespaces $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
+    #       kubectl get namespaces $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
 
-          kustomize edit set image web=$IMAGE_TAG
-          kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT
-          echo "Deployment to $ENVIRONMENT environment completed!"
+    #       kustomize edit set image web=$IMAGE_TAG
+    #       kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT
+    #       echo "Deployment to $ENVIRONMENT environment completed!"
