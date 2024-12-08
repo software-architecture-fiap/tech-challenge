@@ -1,7 +1,10 @@
 import uvicorn
-from fastapi import Depends, FastAPI
+from mangum import Mangum
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html
+from fastapi.responses import JSONResponse
+from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from .db.database import Base, SessionLocal, engine
 from .middleware import ExceptionLoggingMiddleware
@@ -14,7 +17,6 @@ from .tools.logging import logger
 
 # Criando todas as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
-
 
 def init_admin_user() -> None:
     """Inicializa o usuário admin e configura o banco de dados.
@@ -30,7 +32,6 @@ def init_admin_user() -> None:
         initialize_db(db)
     finally:
         db.close()
-
 
 app = FastAPI(on_startup=[init_admin_user])
 
@@ -50,9 +51,6 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-# Adicionar RateLimitMiddleware para proteger a rota de token
-# app.add_middleware(RateLimitMiddleware, redis_url="/token", rate_limit=10, rate_limit_period=60)
-
 # Incluindo os roteadores
 app.add_middleware(ExceptionLoggingMiddleware)
 app.include_router(auth.router)
@@ -61,6 +59,27 @@ app.include_router(product.router, prefix='/products', tags=['products'])
 app.include_router(order.router, prefix='/orders', tags=['orders'])
 app.include_router(category.router, prefix='/category', tags=['category'])
 
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    logger.error(f"HTTP error: {exc.detail}")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "status code": exc.status_code,
+            "msg": exc.detail,
+        },
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    logger.error(f"Unexpected server error: {str(exc)}", exc_info=True)
+    return JSONResponse(
+        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "status code": 500,
+            "msg": "An unexpected error occurred. Please try again later or contact your Support Team."
+        },
+    )
 
 @app.get('/')
 def read_root() -> dict:
@@ -71,7 +90,6 @@ def read_root() -> dict:
     """
     logger.debug('Status endpoint accessed')
     return {'status': 'Operational'}
-
 
 @app.get('/users/me', response_model=schemas.Customer)
 def read_users_me(current_user: schemas.Customer = Depends(get_current_user)) -> schemas.Customer:
@@ -85,7 +103,6 @@ def read_users_me(current_user: schemas.Customer = Depends(get_current_user)) ->
     """
     logger.debug(f'User endpoint accessed by {current_user.id}')
     return current_user
-
 
 # Adiciona a rota para a documentação do ReDoc
 @app.get('/redoc', include_in_schema=False)
@@ -101,6 +118,11 @@ async def redoc() -> str:
         redoc_js_url='https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js',
     )
 
+@app.get("/docs", tags=['documentation'])
+def get_docs():
+    return app.openapi()
 
 if __name__ == '__main__':
     uvicorn.run('app.main:app', host='127.0.0.1', port=2000, reload=True)
+
+Mangum(app)

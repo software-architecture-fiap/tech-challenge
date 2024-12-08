@@ -1,5 +1,4 @@
 from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -9,7 +8,6 @@ from ..services import repository
 from ..tools.logging import logger
 
 router = APIRouter()
-
 
 @router.post('/admin', response_model=schemas.Customer)
 def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_db)) -> schemas.Customer:
@@ -33,7 +31,6 @@ def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_
     created_customer = repository.create_user(db=db, user=customer)
     logger.info(f'Cliente criado com ID: {created_customer.id}')
     return created_customer
-
 
 @router.get('/{customer_id}', response_model=schemas.Customer)
 def read_customer(customer_id: str, db: Session = Depends(get_db)) -> schemas.Customer:
@@ -62,7 +59,6 @@ def read_customer(customer_id: str, db: Session = Depends(get_db)) -> schemas.Cu
         raise HTTPException(status_code=404, detail='Cliente não encontrado')
     return db_customer
 
-
 @router.get('/', response_model=List[schemas.Customer])
 def read_customers(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)) -> List[schemas.Customer]:
     """Recupera uma lista de clientes com paginação.
@@ -78,7 +74,6 @@ def read_customers(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)
     logger.info(f'Buscando clientes com skip: {skip}, limit: {limit}')
     customers = repository.get_customers(db, skip=skip, limit=limit)
     return customers
-
 
 @router.post('/identify', response_model=schemas.Customer)
 def identify_customer(cpf: schemas.CPFIdentify, db: Session = Depends(get_db)) -> schemas.Customer:
@@ -100,7 +95,6 @@ def identify_customer(cpf: schemas.CPFIdentify, db: Session = Depends(get_db)) -
         logger.warning(f'Cliente com CPF {cpf.cpf} não encontrado')
         raise HTTPException(status_code=404, detail='Cliente não encontrado')
     return db_customer
-
 
 @router.post('/register', response_model=schemas.Customer)
 def register_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_db)) -> schemas.Customer:
@@ -124,7 +118,6 @@ def register_customer(customer: schemas.CustomerCreate, db: Session = Depends(ge
     created_customer = repository.create_user(db=db, user=customer)
     logger.info(f'Cliente registrado com ID: {created_customer.id}')
     return created_customer
-
 
 @router.post('/anonymous', response_model=schemas.Customer)
 def create_anonymous_customer(db: Session = Depends(get_db)) -> schemas.Customer:

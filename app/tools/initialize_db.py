@@ -1,11 +1,8 @@
 import logging
-
 from sqlalchemy.orm import Session
-
 from ..model.models import Category, Product
 
 logger = logging.getLogger('Application')
-
 
 def initialize_db(db: Session) -> None:
     """Inicializa o banco de dados com dados padrão para produtos e categorias.

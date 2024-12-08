@@ -1,0 +1,21 @@
+{
+  "version": "2.0",
+  "routeKey": "GET /",
+  "rawPath": "/",
+  "rawQueryString": "",
+  "headers": {
+    "host": "localhost:3000",
+    "user-agent": "curl/7.64.1",
+    "accept": "*/*"
+  },
+  "requestContext": {
+    "http": {
+      "method": "GET",
+      "path": "/",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "127.0.0.1",
+      "userAgent": "curl/7.64.1"
+    }
+  },
+  "isBase64Encoded": false
+}

@@ -15,7 +15,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-
 def get_db() -> Generator[Session, None, None]:
     """Cria uma sessão de banco de dados e garante que ela seja fechada ao final.
 

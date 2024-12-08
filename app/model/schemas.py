@@ -1,9 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
-
 from pydantic import BaseModel, ConfigDict
-
 
 class CustomerBase(BaseModel):
     """
@@ -19,7 +17,6 @@ class CustomerBase(BaseModel):
     email: Optional[str] = None
     cpf: Optional[str] = None
 
-
 class CustomerCreate(CustomerBase):
     """
     Modelo para Criação de um Novo Cliente.
@@ -29,7 +26,6 @@ class CustomerCreate(CustomerBase):
     """
 
     password: Optional[str] = None
-
 
 class Customer(CustomerBase):
     """
@@ -48,7 +44,6 @@ class Customer(CustomerBase):
 
         from_attributes = True
 
-
 class CPFIdentify(BaseModel):
     """
     Modelo para Identificação por CPF.
@@ -58,7 +53,6 @@ class CPFIdentify(BaseModel):
     """
 
     cpf: str
-
 
 class Token(BaseModel):
     """
@@ -72,7 +66,6 @@ class Token(BaseModel):
     access_token: str
     customer_id: int
 
-
 class TokenData(BaseModel):
     """
     Modelo para Dados do Token.
@@ -82,7 +75,6 @@ class TokenData(BaseModel):
     """
 
     username: Optional[str] = None
-
 
 class ProductBase(BaseModel):
     """
@@ -102,7 +94,6 @@ class ProductBase(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-
 class Product(BaseModel):
     """
     Modelo para Dados Completos do Produto.
@@ -120,7 +111,6 @@ class Product(BaseModel):
     category: str
 
     model_config = ConfigDict(from_attributes=True)
-
 
 class ProductCreate(BaseModel):
     """
@@ -140,7 +130,6 @@ class ProductCreate(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-
 class CategoryBase(BaseModel):
     """
     Modelo Base para Dados de Categorias.
@@ -151,7 +140,6 @@ class CategoryBase(BaseModel):
 
     name: str
 
-
 class CategoryCreate(CategoryBase):
     """
     Modelo para Criação de uma Nova Categoria.
@@ -161,7 +149,6 @@ class CategoryCreate(CategoryBase):
     """
 
     description: Optional[str] = None
-
 
 class CategoryUpdate(BaseModel):
     """
@@ -174,7 +161,6 @@ class CategoryUpdate(BaseModel):
 
     name: Optional[str] = None
     description: Optional[str] = None
-
 
 class Category(CategoryBase):
     """
@@ -194,7 +180,6 @@ class Category(CategoryBase):
         """
 
         from_attributes = True
-
 
 class OrderBase(BaseModel):
     """
@@ -219,13 +204,11 @@ class OrderBase(BaseModel):
     device: str
     comments: Optional[str] = None
 
-
 class ProductView(BaseModel):
     name: str
     description: str
     price: float
     category: Optional[CategoryBase] = None
-
 
 class OrderProductBase(BaseModel):
     """
@@ -240,7 +223,6 @@ class OrderProductBase(BaseModel):
     comment: Optional[str] = None
     product: Optional[ProductView] = None
 
-
 class OrderProductCreate(BaseModel):
     """
     Modelo para Criação de um Produto em um Pedido.
@@ -248,7 +230,6 @@ class OrderProductCreate(BaseModel):
 
     product_id: int
     comment: Optional[str] = None
-
 
 class OrderProduct(OrderProductBase):
     """
@@ -267,7 +248,6 @@ class OrderProduct(OrderProductBase):
 
         from_attributes = True
 
-
 class OrderCreate(OrderBase):
     """
     Modelo para Criação de um Novo Pedido.
@@ -279,7 +259,6 @@ class OrderCreate(OrderBase):
 
     customer_id: int
     products: List[OrderProductCreate]
-
 
 class Order(OrderBase):
     """
@@ -306,7 +285,6 @@ class Order(OrderBase):
 
         from_attributes = True
 
-
 class OrderResponse(BaseModel):
     """
     Modelo para Resposta de um Pedido.
@@ -328,7 +306,6 @@ class OrderResponse(BaseModel):
         """
 
         from_attributes = True
-
 
 class OrderCustomerView(BaseModel):
     """
@@ -353,7 +330,6 @@ class OrderCustomerView(BaseModel):
 
         from_attributes = True
 
-
 class TrackingCreate(BaseModel):
     """
     Modelo para Criação de um Rastreamento de Pedido.
@@ -365,7 +341,6 @@ class TrackingCreate(BaseModel):
 
     status: str
     order_id: int
-
 
 class Tracking(BaseModel):
     """
@@ -390,7 +365,6 @@ class Tracking(BaseModel):
 
         from_attributes = True
 
-
 class UpdateOrderStatus(BaseModel):
     """
     Modelo para Atualização do Status de um Pedido.
@@ -401,13 +375,11 @@ class UpdateOrderStatus(BaseModel):
 
     status: str
 
-
 class OrderStatus(str, Enum):
     PRONTO = "Pronto"
     EM_PREP = "Em preparação"
     RECEBIDO = "Recebido"
     FINALIZADO = "Finalizado"
-
 
 class UpdateOrderPaymentStatus(BaseModel):
     """
@@ -419,7 +391,6 @@ class UpdateOrderPaymentStatus(BaseModel):
 
     payment_status: str
 
-
 class WebhookBase(BaseModel):
     id: int
     order_id: int
@@ -428,12 +399,10 @@ class WebhookBase(BaseModel):
     payment_status: str
     received_at: datetime
 
-
 class WebhookCreate(BaseModel):
     order_id: int
     customer_id: int
     received_at: datetime
-
 
 class WebhookResponse(BaseModel):
     order_id: int

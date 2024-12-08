@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from os import environ as env
 from typing import Union
-
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -25,7 +24,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 5
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
-
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verifica se a senha fornecida corresponde à senha criptografada.
 
@@ -39,7 +37,6 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     logger.debug('Verifying password for user')
     return pwd_context.verify(plain_password, hashed_password)
 
-
 def get_password_hash(password: str) -> str:
     """Gera um hash para a senha fornecida.
 
@@ -51,7 +48,6 @@ def get_password_hash(password: str) -> str:
     """
     logger.debug('Hashing password')
     return pwd_context.hash(password)
-
 
 def authenticate_user(db: Session, username: str, password: str) -> Union[schemas.Customer, bool]:
     """Autentica um usuário com base no nome de usuário e senha fornecidos.
@@ -70,7 +66,6 @@ def authenticate_user(db: Session, username: str, password: str) -> Union[schema
     if not verify_password(password, user.hashed_password):
         return False
     return user
-
 
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None) -> str:
     """Cria um token JWT com base nos dados fornecidos e tempo de expiração.
@@ -92,7 +87,6 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     logger.info(f'JWT created: {encoded_jwt}')
     return encoded_jwt
-
 
 def get_current_user(db: Session = Depends(database.get_db), token: str = Depends(oauth2_scheme)) -> schemas.Customer:
     """Obtém o usuário atual com base no token JWT fornecido.

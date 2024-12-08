@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # Criação do diretório de logs se não existir
-log_directory = 'logs'
+log_directory = '/tmp/logs'
 if not os.path.exists(log_directory):
     os.makedirs(log_directory)
 

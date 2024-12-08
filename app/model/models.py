@@ -1,10 +1,8 @@
 from datetime import datetime, timezone
-
 from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from ..db.database import Base
-
 
 class Customer(Base):
     """
@@ -29,7 +27,6 @@ class Customer(Base):
 
     orders = relationship('Order', back_populates='customer')
 
-
 class Product(Base):
     """
     Representa um Produto na Base de Dados.
@@ -53,7 +50,6 @@ class Product(Base):
 
     category = relationship('Category', back_populates='products')
     order_products = relationship('OrderProduct', back_populates='product')
-
 
 class Order(Base):
     """
@@ -100,7 +96,6 @@ class Order(Base):
     tracking = relationship('Tracking', back_populates='order')
     webhook = relationship('Webhook', back_populates='order')
 
-
 class OrderItem(Base):
     """
     Representa um Item em um Pedido.
@@ -123,7 +118,6 @@ class OrderItem(Base):
 
     order = relationship('Order', back_populates='order_items')
     product = relationship('Product')
-
 
 class OrderProduct(Base):
     """
@@ -148,7 +142,6 @@ class OrderProduct(Base):
     order = relationship('Order', back_populates='order_products')
     product = relationship('Product', back_populates='order_products')
 
-
 class Tracking(Base):
     """
     Representa o Rastreamento de um Pedido.
@@ -169,7 +162,6 @@ class Tracking(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     order = relationship('Order', back_populates='tracking')
-
 
 class Token(Base):
     """
@@ -192,7 +184,6 @@ class Token(Base):
 
     user = relationship('Customer')
 
-
 class Category(Base):
     """
     Representa uma Categoria de Produtos.
@@ -208,9 +199,7 @@ class Category(Base):
     name = Column(String, unique=True, index=True)
     products = relationship('Product', back_populates='category')
 
-
 class Webhook(Base):
-
     __tablename__ = 'webhook'
 
     id = Column(Integer, primary_key=True, index=True)

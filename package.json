@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "serverless": "^3.39.0"
+  },
+  "name": "tech-challenge",
+  "devDependencies": {
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-python-requirements": "^6.1.1"
+  }
+}
