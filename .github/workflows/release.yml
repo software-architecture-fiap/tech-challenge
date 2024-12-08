@@ -15,38 +15,57 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  version:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     outputs:
       semver_tag: ${{ steps.semver-tag.outputs.semver_tag }}
-      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-    
-      - id: semver-tag
+
+      - name: Calculate new version
+        id: semver-tag
         uses: gandarez/semver-action@v2.0.0
         with:
           branching_model: "trunk-based"
           main_branch_name: "main"
+          prefix: ""
           debug: "true"
 
       - name: Create tag
-        run: |
-          echo "tag ${{ steps.semver-tag.outputs.semver_tag }}"
+        # run: |
+        #   echo "tag ${{ steps.semver-tag.outputs.semver_tag }}"
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${{ steps.semver-tag.outputs.semver_tag }}`,
+              sha: context.sha
+            })
 
+    # - name: Create Git tag
+    #   uses: rickstaa/action-create-tag@v1.7.2
+    #   id: tag-create
+    #   with:
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    #     tag: ${{ steps.semver-tag.outputs.semver_tag }}
+    #     message: "ci: release ${{ steps.semver-tag.outputs.semver_tag }}"
 
-      # - name: Create Git tag
-      #   uses: rickstaa/action-create-tag@v1.7.2
-      #   id: tag-create
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     tag: ${{ steps.semver-tag.outputs.semver_tag }}
-      #     message: "ci: release ${{ steps.semver-tag.outputs.semver_tag }}"
+  build:
+    runs-on: ubuntu-latest
+    needs: version
+    name: Build and push container image
 
+    outputs:
+      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+
+    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -66,14 +85,14 @@ jobs:
         id: build
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
+          NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }} .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
 
       - name: update CHANGELOG.md
         env:
-          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
+          NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
         run: |
           if ! grep -q "\[${{ env.NEW_VERSION }}\]" CHANGELOG.md; then
             sed -i "1i ## [${{ env.NEW_VERSION }}] - $(date +'%d-%m-%Y')\n\n### Added\n" CHANGELOG.md
@@ -85,7 +104,7 @@ jobs:
 
       - name: Commit and push updated version in CHANGELOG.md
         env:
-          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
+          NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -93,26 +112,32 @@ jobs:
           git commit -m "ci: bump version to ${{ env.NEW_VERSION }}"
           git push origin ${{ github.ref }}
 
-      - name: Setup Kubeconfig
-        run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: [build, version]
+  #   name: Deploy to Kubernetes
 
-      - name: Deploy app in Kubernetes cluster
-        env:
-          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
-        run: |
-          source $GITHUB_ENV
+  #   steps:
+  #     - name: Setup Kubeconfig
+  #       run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
-          ENVIRONMENT=production
-          KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/production
-          cd $KUSTOMIZE_DIR
+  #     - name: Deploy app in Kubernetes cluster
+  #       env:
+  #         NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
+  #       run: |
+  #         source $GITHUB_ENV
 
-          # Check if namespace exists, if not create it
-          kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
+  #         ENVIRONMENT=production
+  #         KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/production
+  #         cd $KUSTOMIZE_DIR
 
-          IMAGE_TAG=${{ env.NEW_VERSION }}
-          kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
+  #         # Check if namespace exists, if not create it
+  #         kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
 
-          echo "Deploying resources in $ENVIRONMENT environment"
+  #         IMAGE_TAG=${{ env.NEW_VERSION }}
+  #         kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
 
-          echo "Using image version: ${{ env.NEW_VERSION }}"
-          kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || {echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }
+  #         echo "Deploying resources in $ENVIRONMENT environment"
+
+  #         echo "Using image version: ${{ env.NEW_VERSION }}"
+  #         kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || {echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }
