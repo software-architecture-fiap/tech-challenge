@@ -1,0 +1,118 @@
+name: release
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: app/web
+  EKS_CLUSTER_NAME: EKS-lanchonete-cluster
+  GH_TOKEN: ${{ github.token }}
+  GITHUB_OUTPUT: $GITHUB_ENV
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    outputs:
+      semver_tag: ${{ steps.semver-tag.outputs.semver_tag }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+    
+      - name: Calculate SemVer tag
+        id: semver-tag
+        uses: gandarez/semver-action@v2.0.0
+        with:
+          branching_model: "trunk-based"
+          main_branch_name: "main"
+          debug: "true"
+     
+      - name: Debug SemVer
+        run: |
+          echo "New version: ${{ steps.semver-tag.outputs.semver_tag }}"
+          echo "Git SHA: ${{ github.sha }}"
+
+      - name: Create Git tag
+        uses: rickstaa/action-create-tag@v1.7.2
+        id: tag-create
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.semver-tag.outputs.semver_tag }}
+          message: "ci: release ${{ steps.semver-tag.outputs.semver_tag }}"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR registry
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: private
+          mask-password: true
+
+      - name: Build and push the container image
+        id: build
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }} .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
+
+      - name: update CHANGELOG.md
+        env:
+          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
+        run: |
+          if ! grep -q "\[${{ env.NEW_VERSION }}\]" CHANGELOG.md; then
+            sed -i "1i ## [${{ env.NEW_VERSION }}] - $(date +'%d-%m-%Y')\n\n### Added\n" CHANGELOG.md
+            echo $NEW_VERSION > VERSION
+            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          else
+            echo "Version $NEW_VERSION already exists in CHANGELOG.md. Skipping update."
+          fi
+
+      # - name: Commit and push updated version in CHANGELOG.md
+      #   env:
+      #     NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
+      #   run: |
+      #     git config user.name "github-actions[bot]"
+      #     git config user.email "github-actions[bot]@users.noreply.github.com"
+      #     git add CHANGELOG.md VERSION
+      #     git commit -m "ci: bump version to ${{ env.NEW_VERSION }}"
+      #     git push origin ${{ github.ref }}
+
+      - name: Setup Kubeconfig
+        run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+
+      - name: Deploy app in Kubernetes cluster
+        env:
+          NEW_VERSION: ${{ steps.semver-tag.outputs.semver_tag }}
+        run: |
+          source $GITHUB_ENV
+
+          ENVIRONMENT=production
+          KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/production
+
+          # Check if namespace exists, if not create it
+          kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
+
+          IMAGE_TAG=${{ env.NEW_VERSION }}
+          kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
+
+          echo "Deploying resources in $ENVIRONMENT environment"
+          cd $KUSTOMIZE_DIR
+
+          echo "Using image version: ${{ env.NEW_VERSION }}"
+          kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || {echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }
