@@ -53,21 +53,19 @@ jobs:
         run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
       - name: Deploy to EKS cluster in development namespace
-        env: 
-          IMAGE_VERSION: ${{ env.image-version }}
         run: |
             source $GITHUB_ENV
 
             ENVIRONMENT=development
             KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/$ENVIRONMENT
-
+            cd $KUSTOMIZE_DIR
+            
             # Check if namespace exists, if not create it
             kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
             
-            kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.IMAGE_VERSION }}
+            kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.image-version }}
 
             echo "Deploying resource in $ENVIRONMENT namespace."
-            cd $KUSTOMIZE_DIR
 
-            echo "Using image version: $IMAGE_VERSION"
+            echo "Using image version: ${{ env.image-version }}"
             kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || {echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }
