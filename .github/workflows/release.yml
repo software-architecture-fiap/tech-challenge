@@ -93,7 +93,7 @@ jobs:
         run: |
           echo "Debug: check directory structure"
           ls -R /home/runner/work/tech-challenge
-
+          
           echo "Debug: check path to Dockerfile"
           ls -R /home/runner/work/tech-challenge/tech-challenge
 
