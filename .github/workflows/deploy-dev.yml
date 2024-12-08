@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  hello-world:
+  build-deploy-dev:
     if: github.event.comment.body == '/deploy'
     runs-on: ubuntu-latest
     steps:
@@ -48,3 +48,26 @@ jobs:
             docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION .
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION
             echo "image-version=$VERSION" >> $GITHUB_ENV
+        
+      - name: Setup Kubeconfig
+        run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+
+      - name: Deploy to EKS cluster in development namespace
+        env: 
+          IMAGE_VERSION: ${{ env.image-version }}
+        run: |
+            source $GITHUB_ENV
+
+            ENVIRONMENT=development
+            KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/$ENVIRONMENT
+
+            # Check if namespace exists, if not create it
+            kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
+            
+            kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.IMAGE_VERSION }}
+
+            echo "Deploying resource in $ENVIRONMENT namespace."
+            cd $KUSTOMIZE_DIR
+
+            echo "Using image version: $IMAGE_VERSION"
+            kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || {echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }
