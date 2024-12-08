@@ -25,6 +25,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: List Git tags
+        run: git fetch --tags && git tag --list
 
       - name: Calculate new version
         id: semver-tag
