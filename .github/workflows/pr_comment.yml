@@ -15,19 +15,20 @@ jobs:
         uses: thollander/actions-comment-pull-request@v1
         with:
           message: |
-            Rules for deployment and branch naming conventions:
+            Regras para deploy e convenção de nomenclatura da branch.
 
-            **Development Deployment:**
-            - To deploy to the development environment, please comment `/deploy-dev`.
+            **Deploy para o ambiente de desenvolvimento:**
+            - Para realizar o deploy no ambiente de desenvolvimento, comente: `/deploy-dev`
 
-            **Production Deployment:**
-            - To deploy to the production environment, please comment `/deploy-prod`.
-            - To deploy to production with a specific version, please comment `/deploy-prod vX.Y.Z`.
-            - To deploy to production with a specific version and environment, please comment `/deploy-prod vX.Y.Z environment`.
+            **Deploy para o ambiente produtivo:**
+            Este projeto utiliza o SemVer (Versionamento Semântico) para controlar as versões de imagens e tags do repositório. 
+            Para realizar o deploy no ambiente de produção, siga as regras abaixo:
 
-            **Branch Naming Conventions:**
-            - **Patch Version:** Use the `bugfix/` pattern.
-            - **Minor Version:** Use the `feature/` pattern.
-            - **Major Version:** Use the `release/` pattern.
-            - **Documentation or Miscellaneous:** Use the `doc/` or `misc/` pattern to increment the build version (e.g., `v0.0.0+1`).
+            Nomenclatura de Branch por tipo de versão:
+            - Patch Version (Correção de bugs): Use o prefixo `bugfix/`.
+            - Minor Version (Novas funcionalidades sem mudanças incompatíveis): Use o prefixo `feature/`.
+            - Major Version (Mudanças incompatíveis ou significativas): Use o prefixo `release/`.
+            - Documentação ou Ajustes Diversos: Use os padrões `doc/` ou `misc/` para incrementar apenas a versão de build (exemplo: v0.0.0+1).
+
+            Certifique-se de seguir essas convenções para garantir um processo de deploy funcione!
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
