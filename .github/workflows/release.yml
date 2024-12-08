@@ -41,8 +41,6 @@ jobs:
           debug: "true"
 
       - name: Create tag
-        # run: |
-        #   echo "tag ${{ steps.semver-tag.outputs.semver_tag }}"
         uses: actions/github-script@v7
         with:
           debug: true
@@ -93,7 +91,18 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }} .
+          # Check the Dockerfile exists
+          if [ ! -f Dockerfile ]; then
+            echo "Dockerfile not found in the root of the repository"
+            exit 1
+          else
+            echo "List the current directory"
+            ls -la
+          fi
+
+          ls -la && pwd
+
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }} ./tech-challenge
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
 
       - name: update CHANGELOG.md
