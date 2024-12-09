@@ -23,11 +23,11 @@ Benefícios do Workflow
 
 Este workflow do GitHub Actions automatiza o processo de deploy para o ambiente de desenvolvimento ao detectar um comentário específico (/deploy) em uma issue. Essa funcionalidade atende aos requisitos de integração e entrega de código no workload, promovendo a adoção de práticas de integração e deploy contínuos.
 
-# :material-foot-print: Flowchart Development Workflow
+# :material-foot-print: Fluxograma do Workflow Não-Produtivo
 
 ```mermaid
 
-flowchart TD
+flowchart LR
   A[[Issue Comment Triggered]]
     style A fill:#f9f,stroke:#333,stroke-width:2
   B[[Start Job: build-deploy-dev]]
@@ -51,8 +51,7 @@ flowchart TD
 
 ### Detalhes
 
-Etapas:
-
+    Etapas:
     - Condição: Executa apenas se o corpo do comentário contiver /deploy.
     - Checkout do código: Faz o checkout do repositório usando actions/checkout@v2.
     - Configuração das credenciais AWS: Configura as credenciais da AWS utilizando aws-actions/configure-aws-credentials@v1.
@@ -71,3 +70,69 @@ Observações:
 
     O workflow utiliza o kustomize para personalização dos recursos Kubernetes.
     O processo de deploy inclui tratamento de erros para relatar detalhes dos pods em caso de falha.
+
+# :material-foot-print: Workflow de Deploy para o Ambiente de Produção
+
+Este workflow automatiza o processo de versionamento, build, publicação de imagem Docker no Amazon ECR e deploy no ambiente de produção no cluster Kubernetes gerenciado pelo EKS. Ele é acionado automaticamente ao realizar um push na branch main.
+
+# :material-foot-print: Fluxograma do Workflow de Produção
+
+```mermaid
+flowchart LR
+    A[Push na branch main] -->|Trigger| B[Job: Version]
+    B -->|Calcula nova versão semântica| C[Cria tag Git]
+    C --> D[Job: Build]
+    D -->|Faz login no ECR e publica imagem| E[Publica imagem com nova versão]
+    E --> F[Job: Deploy]
+    F -->|Configura o Kubeconfig| G[Verifica namespace e ajusta manifests]
+    G -->|Aplica recursos no Kubernetes| H[Deploy concluído]
+    H -->|Erro?| I{Erro no Deploy?}
+    I -->|Sim| J[Exibe logs de pods e detalhes]
+    I -->|Não| K[Deploy bem-sucedido]
+```
+
+### Detalhes
+
+1. Gerenciamento de Versão
+
+Este job calcula e cria uma nova versão semântica baseada no histórico de commits.
+Este job é executado apenas quando há um push para a branch main e não é acionado pelo bot do GitHub Actions. A saída deste job é uma nova versão semântica, armazenada na variável `semver_tag`.
+
+    Etapas:
+    - Checkout do repositório: Garante acesso ao histórico completo dos commits.
+    - Listagem de tags Git: Identifica a versão mais recente.
+    - Cálculo de nova versão: Utiliza o branching model trunk-based para determinar a próxima versão.
+    - Criação de tag Git: Cria e associa a nova tag ao commit atual.
+
+2. Build e Push da Imagem Docker
+
+Este job constrói a imagem Docker da aplicação e publica no Amazon ECR.
+
+    Etapas:
+    - Checkout do repositório.
+    - Configuração de credenciais AWS: Configura acesso seguro para interagir com o ECR.
+    - Login no registro ECR: Autentica no ECR privado.
+    - Build e push da imagem Docker:
+        Utiliza a nova versão semântica como tag da imagem.
+        Faz o push da imagem para o ECR.
+
+3.  Deploy no Kubernetes
+
+Este job realiza o deploy da aplicação no ambiente de produção, utilizando o namespace production.
+
+    Etapas:
+
+    - Checkout do repositório.
+    - Configuração de credenciais AWS.
+    - Setup do Kubeconfig: Configura o acesso ao cluster EKS.
+    - Deploy com kustomize:
+        Verifica se o namespace production existe, criando-o caso necessário.
+        Ajusta a versão da imagem no diretório infra/kubernetes/production.
+        Aplica os manifests no cluster Kubernetes.
+        Em caso de erro, exibe detalhes dos pods para facilitar a depuração.
+
+Observações
+
+    Controle de versão: Utiliza o SemVer para versionamento consistente.
+    Personalização Kubernetes: O deploy utiliza o kustomize para gerenciar configurações específicas do ambiente.
+    Tratamento de erros: Logs detalhados são exibidos em caso de falha no deploy, facilitando a análise.
