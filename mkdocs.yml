@@ -104,6 +104,8 @@ nav:
       - Kubernetes: "fase_2/kubernetes.md"
       - Novas Rotas: "fase_2/novas_rotas.md"
       - Passo a Passo: "fase_2/steps.md"
+    - Fase 3:
+      - CI/CD App: "fase_3/cicd_code_app.md"
 
   - Guia:
     - Ambiente: "environment.md"
