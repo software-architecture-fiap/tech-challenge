@@ -89,54 +89,54 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }} .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
 
-      - name: update CHANGELOG.md
+      # - name: update CHANGELOG.md
+      #   env:
+      #     NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
+      #   run: |
+      #     if ! grep -q "\[${{ env.NEW_VERSION }}\]" CHANGELOG.md; then
+      #       sed -i "1i ## [${{ env.NEW_VERSION }}] - $(date +'%d-%m-%Y')\n\n### Added\n" CHANGELOG.md
+      #       echo $NEW_VERSION > VERSION
+      #       echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+      #     else
+      #       echo "Version $NEW_VERSION already exists in CHANGELOG.md. Skipping update."
+      #     fi
+
+      # - name: Commit and push updated version in CHANGELOG.md
+      #   env:
+      #     NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
+      #   run: |
+      #     git config user.name "github-actions[bot]"
+      #     git config user.email "github-actions[bot]@users.noreply.github.com"
+      #     git add CHANGELOG.md VERSION
+      #     git commit -m "ci: bump version to ${{ env.NEW_VERSION }}"
+      #     git push origin ${{ github.ref }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build, version]
+    name: Deploy to Kubernetes
+
+    steps:
+      - name: Setup Kubeconfig
+        run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+
+      - name: Deploy app in Kubernetes cluster
         env:
           NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
         run: |
-          if ! grep -q "\[${{ env.NEW_VERSION }}\]" CHANGELOG.md; then
-            sed -i "1i ## [${{ env.NEW_VERSION }}] - $(date +'%d-%m-%Y')\n\n### Added\n" CHANGELOG.md
-            echo $NEW_VERSION > VERSION
-            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-          else
-            echo "Version $NEW_VERSION already exists in CHANGELOG.md. Skipping update."
-          fi
+          source $GITHUB_ENV
 
-      - name: Commit and push updated version in CHANGELOG.md
-        env:
-          NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md VERSION
-          git commit -m "ci: bump version to ${{ env.NEW_VERSION }}"
-          git push origin ${{ github.ref }}
+          ENVIRONMENT=production
+          KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/production
+          cd $KUSTOMIZE_DIR
 
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: [build, version]
-  #   name: Deploy to Kubernetes
+          # Check if namespace exists, if not create it
+          kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
 
-  #   steps:
-  #     - name: Setup Kubeconfig
-  #       run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+          IMAGE_TAG=${{ env.NEW_VERSION }}
+          kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
 
-  #     - name: Deploy app in Kubernetes cluster
-  #       env:
-  #         NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
-  #       run: |
-  #         source $GITHUB_ENV
+          echo "Deploying resources in $ENVIRONMENT environment"
 
-  #         ENVIRONMENT=production
-  #         KUSTOMIZE_DIR=$(pwd)/infra/kubernetes/production
-  #         cd $KUSTOMIZE_DIR
-
-  #         # Check if namespace exists, if not create it
-  #         kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
-
-  #         IMAGE_TAG=${{ env.NEW_VERSION }}
-  #         kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
-
-  #         echo "Deploying resources in $ENVIRONMENT environment"
-
-  #         echo "Using image version: ${{ env.NEW_VERSION }}"
-  #         kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || {echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }
+          echo "Using image version: ${{ env.NEW_VERSION }}"
+          kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || {echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1; }
