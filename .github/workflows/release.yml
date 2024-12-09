@@ -117,6 +117,9 @@ jobs:
     name: Deploy to Kubernetes
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Setup Kubeconfig
         run: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
