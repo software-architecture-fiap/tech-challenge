@@ -1,8 +1,8 @@
-name: test-create-pr
+name: Create PR to update CHANGELOG.md
 on:
   push:
-    branches:
-      - "*"
+    tags:
+      - '*'
 
 jobs:
   pr-create:
@@ -13,10 +13,15 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
 
+      - name: Get the latest tag
+        id: get_tag
+        run: echo "::set-output name=tag::$(git describe --tags `git rev-list --tags --max-count=1`)"
+
       - name: Update changelog
         run: |
-          echo "## [${{ github.sha }}] - $(date +'%d-%m-%Y')" >> CHANGELOG.md
-          sed -i "1i ## [${{ github.sha }}] - $(date +'%d-%m-%Y')\n\n### Added\n" CHANGELOG.md
+          LATEST_TAG=${{ steps.get_tag.outputs.tag }}
+          echo "## [${LATEST_TAG}] - $(date +'%d-%m-%Y')" >> CHANGELOG.md
+          sed -i "1i ## [${LATEST_TAG}] - $(date +'%d-%m-%Y')\n\n### Added\n" CHANGELOG.md
 
       - name: Generate PR to commit changes using github-actions-bot
         uses: peter-evans/create-pull-request@v3
