@@ -3,7 +3,9 @@ on:
   push:
     branches:
       - "*"
-
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   pr-create:
     runs-on: ubuntu-latest
