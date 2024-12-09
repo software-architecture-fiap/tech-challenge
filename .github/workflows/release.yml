@@ -134,6 +134,7 @@ jobs:
       - name: Deploy app in Kubernetes cluster
         env:
           NEW_VERSION: ${{ needs.version.outputs.semver_tag }}
+          ECR_REGISTRY: ${{ needs.build.outputs.ECR_REGISTRY }}
         run: |
           source $GITHUB_ENV
 
@@ -150,4 +151,5 @@ jobs:
           echo "Deploying resources in $ENVIRONMENT environment"
 
           echo "Using image version: ${{ env.NEW_VERSION }}"
+          echo "Full image name: $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}"
           kubectl apply -k $KUSTOMIZE_DIR -n $ENVIRONMENT && echo "Resources deployed successfully!" || (echo "Failed to deploy resources! Check the logs"; kubectl describe pods -n $ENVIRONMENT; exit 1)
