@@ -6,6 +6,7 @@ from app.main import app
 
 client = TestClient(app)
 
+
 def test_auth_success(mocker):
     mock_user = SimpleNamespace(id=1, email='user@example.com', hashed_password='$2b$12$125as3fd45gdas5')
 
@@ -20,6 +21,7 @@ def test_auth_success(mocker):
     assert response.status_code == status.HTTP_200_OK
     print('Response JSON:', response.json())
     assert response.json() == {'access_token': 'bearer mock_access_token', 'customer_id': mock_user.id}
+
 
 def test_auth_invalid_credentials(mocker):
     mock_user = None

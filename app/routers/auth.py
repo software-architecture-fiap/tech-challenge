@@ -10,6 +10,7 @@ from ..tools.logging import logger
 
 router = APIRouter()
 
+
 @router.post('/token', response_model=schemas.Token)
 def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
     """

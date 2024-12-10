@@ -10,6 +10,9 @@ from ..tools.logging import logger
 
 router = APIRouter()
 
+CATEGORY_NOT_FOUND = 'Categoria não encontrada'
+
+
 @router.get('/', response_model=Dict[str, List[schemas.Category]])
 def list_categories(
     skip: int = 0,
@@ -31,6 +34,7 @@ def list_categories(
     """
     categories = repository.get_categories(db, skip=skip, limit=limit)
     return {'categories': categories}
+
 
 @router.get('/{category_id}', response_model=schemas.Category)
 def get_category(
@@ -58,7 +62,7 @@ def get_category(
 
     if not db_category:
         logger.error(f'Categoria não encontrada para ID: {category_id}')
-        raise HTTPException(status_code=404, detail='Categoria não encontrada')
+        raise HTTPException(status_code=404, detail=CATEGORY_NOT_FOUND)
 
     category_response = schemas.Category(
         id=str(db_category.id),
@@ -77,6 +81,7 @@ def get_category(
 
     logger.info(f'Retorno da categoria: {category_response}')
     return category_response
+
 
 @router.post('/', response_model=schemas.Category)
 def create_category(
@@ -118,6 +123,7 @@ def create_category(
         logger.error(f'Erro ao criar categoria: {e}')
         raise HTTPException(status_code=500, detail='Erro interno do servidor')
 
+
 @router.put('/{category_id}', response_model=schemas.Category)
 def update_category(
     category_id: int,
@@ -142,7 +148,7 @@ def update_category(
     """
     db_category = repository.get_category(db, category_id=category_id)
     if db_category is None:
-        raise HTTPException(status_code=404, detail='Categoria não encontrada')
+        raise HTTPException(status_code=404, detail=CATEGORY_NOT_FOUND)
 
     db_category.name = category.name
     db.commit()
@@ -164,6 +170,7 @@ def update_category(
     )
 
     return category_response
+
 
 @router.delete('/{category_id}', response_model=schemas.Category)
 def delete_category(
@@ -192,7 +199,7 @@ def delete_category(
 
     db_category = repository.get_category(db, category_id=category_id_int)
     if db_category is None:
-        raise HTTPException(status_code=404, detail='Categoria não encontrada')
+        raise HTTPException(status_code=404, detail=CATEGORY_NOT_FOUND)
 
     repository.delete_category(db, db_category=db_category)
     return db_category
