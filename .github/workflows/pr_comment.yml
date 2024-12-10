@@ -18,7 +18,7 @@ jobs:
             Regras para deploy e convenção de nomenclatura da branch.
 
             **Deploy para o ambiente de desenvolvimento:**
-            - Para realizar o deploy no ambiente de desenvolvimento, comente: `/deploy-dev`
+            - Para realizar o deploy no ambiente de desenvolvimento, comente: `/deploy`
 
             **Deploy para o ambiente produtivo:**
             Este projeto utiliza o SemVer (Versionamento Semântico) para controlar as versões de imagens e tags do repositório. 
