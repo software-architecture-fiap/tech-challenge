@@ -1,8 +1,9 @@
 # Infra-Kitchen
 
+
 Nesta etapa apresentamos os processos e práticas adotados para o gerenciamento da infraestrutura utilizada no Tech Challenge 3. 
 Contendo os detalhes para configurar, provisionar e gerenciar o Kubernetes no EKS, bem como as boas práticas para garantir um processo seguro e eficiente. 
-Este guia é estruturado para atender aos critérios de avaliação acadêmica, priorizando clareza e detalhamento técnico.
+O repositório que contém os manifestor do Terraform o [infra-kitchen](https://github.com/software-architecture-fiap/infra-kitchen).
 
 ---
 
