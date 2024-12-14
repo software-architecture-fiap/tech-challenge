@@ -105,6 +105,7 @@ nav:
       - Novas Rotas: "fase_2/novas_rotas.md"
       - Passo a Passo: "fase_2/steps.md"
     - Fase 3:
+      - EKS infra: "fase_3/eks_infra_cicd.md"
       - CI/CD App: "fase_3/cicd_code_app.md"
 
   - Guia:
