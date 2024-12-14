@@ -27,7 +27,7 @@ Este workflow do GitHub Actions automatiza o processo de deploy para o ambiente 
 
 ```mermaid
 
-flowchart LR
+flowchart TD
   A[[Issue Comment Triggered]]
     style A fill:#f9f,stroke:#333,stroke-width:2
   B[[Start Job: build-deploy-dev]]
@@ -78,7 +78,7 @@ Este workflow automatiza o processo de versionamento, build, publicação de ima
 # :material-foot-print: Fluxograma do Workflow de Produção
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Push na branch main] -->|Trigger| B[Job: Version]
     B -->|Calcula nova versão semântica| C[Cria tag Git]
     C --> D[Job: Build]
