@@ -146,7 +146,7 @@ jobs:
           kubectl get namespace $ENVIRONMENT || kubectl create namespace $ENVIRONMENT
 
           IMAGE_TAG=${{ env.NEW_VERSION }}
-          kustomize edit set image web=$ECR_REGISTRY/$ECR_REPOSITORY:${{ env.NEW_VERSION }}
+          kustomize edit set image web=${{ needs.build.outputs.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.NEW_VERSION }}
 
           echo "Deploying resources in $ENVIRONMENT environment"
 
