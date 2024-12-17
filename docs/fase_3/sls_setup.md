@@ -23,6 +23,7 @@ Antes de começar, você precisa ter os seguintes pré-requisitos configurados:
 
 #### **Passos para Subir a Aplicação com Serverless**
 
+
 1. **Acessando o diretório da aplicação**
 
    Entre no diretório onde a aplicação já foi criada com o Serverless Framework.
@@ -30,6 +31,7 @@ Antes de começar, você precisa ter os seguintes pré-requisitos configurados:
    ```bash
    cd /.../auth-coffee
    ```
+
 
 2. **Configurando o arquivo `serverless.yml`**
 
@@ -64,12 +66,14 @@ Antes de começar, você precisa ter os seguintes pré-requisitos configurados:
    - serverless-dotenv-plugin
    ```
 
+
    **Explicação:**
    - **service:** Nome do serviço ou aplicação.
    - **provider:** Definições do provedor de nuvem (AWS, no caso).
    - **functions:** Define as funções Lambda que serão implementadas.
    - **events:** O evento que aciona a função Lambda, no caso, uma requisição HTTP do API Gateway.
    - **plugins:** Caso você tenha dependências específicas, como em projetos Python.
+
 
 3. **Verificando o `handler`**
 
@@ -83,6 +87,7 @@ Antes de começar, você precisa ter os seguintes pré-requisitos configurados:
      )
    ```
 
+
 4. **Instalar dependências (se houver)**
 
    Caso você tenha dependências para o seu projeto (ex.: com `pip` no Python ou `npm` no Node.js), instale-as:
@@ -91,6 +96,7 @@ Antes de começar, você precisa ter os seguintes pré-requisitos configurados:
      ```bash
      pip install -r requirements.txt
      ```
+
 
 5. **Deploy da aplicação**
 
