@@ -18,10 +18,10 @@ jobs:
         with:
           python-version: 3.12
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           pip install poetry
-          poetry install
+          poetry install --no-root
 
       - name: Run tests with coverage
         run: poetry run pytest --cov=src --cov-report=xml --cov-fail-under=80
