@@ -21,12 +21,22 @@ jobs:
       - name: Install Poetry
         run: curl -sSL https://install.python-poetry.org | python3 -
 
+      - name: Add Poetry to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install system dependencies (e.g., distutils)
+        run: sudo apt-get update && sudo apt-get install -y python3-distutils
+
       - name: Install Dependencies
         run: |
-          poetry install
+          poetry install --no-interaction --no-root
+
+      - name: Check Poetry environment
+        run: poetry show --tree
 
       - name: Run tests with coverage
-        run: poetry run pytest --cov=src --cov-report=xml --cov-fail-under=80
+        run: |
+          poetry run pytest --cov=src --cov-report=xml --cov-fail-under=80
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
