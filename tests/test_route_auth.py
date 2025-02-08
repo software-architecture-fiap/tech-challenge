@@ -6,7 +6,6 @@ from app.main import app
 
 client = TestClient(app)
 
-
 def test_auth_success(mocker):
     mock_user = SimpleNamespace(id=1, email='user@example.com', hashed_password='$2b$12$125as3fd45gdas5')
 
@@ -32,4 +31,4 @@ def test_auth_invalid_credentials(mocker):
     response = client.post('/token', data=form_data)
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.json() == {'detail': 'Nome de usuário ou senha incorretos'}
+    assert response.json() == {'msg': 'Nome de usuário ou senha incorretos', 'status code': 400}
