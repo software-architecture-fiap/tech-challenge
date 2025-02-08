@@ -18,10 +18,12 @@ jobs:
         with:
           python-version: 3.12
 
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python3 -
+
       - name: Install Dependencies
         run: |
-          pip install poetry
-          poetry install --no-root
+          poetry install
 
       - name: Run tests with coverage
         run: poetry run pytest --cov=src --cov-report=xml --cov-fail-under=80
