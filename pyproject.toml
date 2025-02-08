@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Projeto Backend da Turma de Pós Graduação em Software Architecture da FIAP em 2024."
 authors = ["rikemorais <rikeaju@hotmail.com>"]
 readme = "README.md"
+packages = [{ include = "app" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -125,3 +126,16 @@ select = ['I', 'F', 'E', 'W', 'PL', 'PT']
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+branch = true
+omit = [
+    "**/__init__.py",
+    "tests/*",
+    "app/middleware/*",
+    "app/model/*",
+    "app/routers/*",
+    "app/services/*",
+    "app/tools/*",
+    "infra/*"
+]
