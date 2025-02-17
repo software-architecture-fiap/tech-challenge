@@ -43,6 +43,6 @@ jobs:
           sonar-scanner \
             -Dsonar.organization=software-architecture-fiap\
             -Dsonar.projectKey=tech-challenge \
-            -Dsonar.sources=src \
+            -Dsonar.sources=app \
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN
