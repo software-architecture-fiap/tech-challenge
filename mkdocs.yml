@@ -108,6 +108,7 @@ nav:
       - EKS infra: "fase_3/eks_infra_cicd.md"
       - CI/CD App: "fase_3/cicd_code_app.md"
       - Serverless: "fase_3/sls_setup.md"
-
+    - Fase 4:
+        - Vídeos: "fase_4/movies.md"
   - Guia:
     - Ambiente: "environment.md"
