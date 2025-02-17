@@ -41,8 +41,8 @@ jobs:
           unzip sonarscanner.zip
           export PATH=$PWD/sonar-scanner-5.0.1.3006-linux/bin:$PATH
           sonar-scanner \
-            -Dsonar.organization=nome-da-organizacao \
-            -Dsonar.projectKey=nome-do-projeto \
+            -Dsonar.organization=software-architecture-fiap\
+            -Dsonar.projectKey=tech-challenge \
             -Dsonar.sources=src \
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN
