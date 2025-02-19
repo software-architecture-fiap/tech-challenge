@@ -9,9 +9,12 @@ Nesta documentação, detalharemos três microsserviços principais da nossa pla
 Cada serviço é desenvolvido utilizando tecnologias específicas e possui funcionalidades e endpoints próprios, garantindo uma arquitetura modular e escalável.
 
 ### Desenho da arquitetura atualizada com os microsserviços
+
 ---
+
 ![image](../assets/arquitetura.png)
 
+---
 
 ## :material-wrench-outline: Auth service
 
@@ -40,7 +43,7 @@ Esse microsserviço é parte essencial da plataforma de vendas da lanchonete, ge
 
 ### :material-dots-circle: Detalhes do funcionamento
 
- Utilizamos o FastAPI como framework para desenvolvimento de APIs. O MongoDB é o banco de dados NoSQL utilizado para armazenar dados de transações, e a interação com o MongoDB é feita através do driver pymongo. Para a integração com o sistema de pagamentos MercadoPago, utilizamos o MercadoPago SDK. Além disso, o Poetry é utilizado como gerenciador de dependências e ambiente virtual.
+Utilizamos o FastAPI como framework para desenvolvimento de APIs. O MongoDB é o banco de dados NoSQL utilizado para armazenar dados de transações, e a interação com o MongoDB é feita através do driver pymongo. Para a integração com o sistema de pagamentos MercadoPago, utilizamos o MercadoPago SDK. Além disso, o Poetry é utilizado como gerenciador de dependências e ambiente virtual.
 
 ## :material-wrench-outline: Order service
 
@@ -49,7 +52,7 @@ O Order service gerencia os pedidos da lanchonete, atualizando os status dos ped
 ### :material-dots-circle: Funcionalidades
 
 - **Criação de pedidos:** Permite a criação de novos pedidos a partir de um cliente autenticado.
-- **Atualização de status:**  Permite que o status do pedido seja atualizado, como paid, preparing, delivered, etc.
-- **Integração com serviço de pagamento:**  Comunica-se com um serviço de pagamento para gerar links de pagamento ou QR codes.
+- **Atualização de status:** Permite que o status do pedido seja atualizado, como paid, preparing, delivered, etc.
+- **Integração com serviço de pagamento:** Comunica-se com um serviço de pagamento para gerar links de pagamento ou QR codes.
 - **Gerenciamento de produtos e categorias:** Ações CRUD (Create, Read, Update, Delete) para produtos e categorias.
 - **Rastreamento de pedidos:** Permite o rastreamento do status de cada pedido.
