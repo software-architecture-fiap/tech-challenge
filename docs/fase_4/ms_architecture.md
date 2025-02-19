@@ -10,11 +10,7 @@ Cada serviço é desenvolvido utilizando tecnologias específicas e possui funci
 
 ### Desenho da arquitetura atualizada com os microsserviços
 
----
-
 ![image](../assets/arquitetura.png)
-
----
 
 ## :material-wrench-outline: Auth service
 
