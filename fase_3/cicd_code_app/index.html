@@ -1,0 +1,1274 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Projeto desenvolvido para as entregas da Pós-Tech da FIAP para Software Architecture.">
+      
+      
+      
+      
+        <link rel="prev" href="../eks_infra_cicd/">
+      
+      
+        <link rel="next" href="../sls_setup/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+    
+    
+      
+        <title>CI/CD App - Tech Challenge</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+   <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../../assets/javascripts/glightbox.min.js"></script></head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="black">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cicd-using-github-actions-workflow-to-deploy-code-in-eks-cluster" class="md-skip">
+          Pular para conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href="../.." title="Tech Challenge" class="md-header__button md-logo" aria-label="Tech Challenge" data-md-component="logo">
+      
+  <img src="../../assets/favicon.ico" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Tech Challenge
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              CI/CD App
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="black"  aria-label="Modo Noturno"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo Noturno" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="white"  aria-label="Modo Claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo Claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Selecione o idioma">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/home/" hreflang="pt-BR" class="md-select__link">
+              Portugês
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Buscar" placeholder="Buscar" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Pesquisar">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Compartilhar" aria-label="Compartilhar" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpar" aria-label="Limpar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando busca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/software-architecture-fiap/tech-challenge" title="Ir para repositório" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    tech-challenge
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../fase_1/ddd/" class="md-tabs__link">
+          
+  
+  Docs
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../environment/" class="md-tabs__link">
+          
+  
+  Guia
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Tech Challenge" class="md-nav__button md-logo" aria-label="Tech Challenge" data-md-component="logo">
+      
+  <img src="../../assets/favicon.ico" alt="logo">
+
+    </a>
+    Tech Challenge
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/software-architecture-fiap/tech-challenge" title="Ir para repositório" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    tech-challenge
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Fase 1
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Fase 1
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_1/ddd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DDD
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_1/event_storming/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Event Storming
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_1/entrega/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Entrega
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_1/steps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Passo a Passo
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Fase 2
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Fase 2
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_2/clean_code/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Clean Code
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_2/kubernetes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_2/novas_rotas/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Novas Rotas
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_2/steps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Passo a Passo
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Fase 3
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Fase 3
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eks_infra_cicd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EKS infra
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    CI/CD App
+    
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sls_setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Serverless
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Fase 4
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            Fase 4
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_4/ms_architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Arquitetura de microsserviços
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_4/continuous_integration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Integração contínua
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fase_4/movies/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vídeos
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Guia
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Guia
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../environment/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ambiente
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="cicd-using-github-actions-workflow-to-deploy-code-in-eks-cluster">CICD using GitHub Actions Workflow to deploy code in EKS cluster</h1>
+<p>Este projeto utiliza o GitHub Actions para automatizar as etapas de versionamento, build e publicação de imagens de contêiner no Amazon ECR, além do deploy em um cluster EKS. O fluxo foi projetado para garantir simplicidade e continuidade nos processos, com gatilhos configurados para pipelines específicos de acordo com o ambiente.
+Deploy em Ambiente Não-Produtivo</p>
+<p>No ambiente não-produtivo, o versionamento das imagens segue o padrão do commit SHA do GitHub, acompanhado do sufixo -dev. Esse pipeline é ativado por meio de um comentário /deploy em um Pull Request. O deploy é realizado no cluster EKS no namespace development.
+Deploy em Ambiente Produtivo</p>
+<p>Para o ambiente de produção, adota-se o versionamento semântico para as imagens, com um controle rigoroso da nomenclatura de branches, conforme descrito abaixo:</p>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span class="linenos" data-linenos="1 "></span>Patch Version (Correção de bugs): Prefixo `bugfix/`.
+<span class="linenos" data-linenos="2 "></span>Minor Version (Novas funcionalidades sem mudanças incompatíveis): Prefixo feature/.
+<span class="linenos" data-linenos="3 "></span>Major Version (Mudanças incompatíveis ou significativas): Prefixo release/.
+<span class="linenos" data-linenos="4 "></span>Documentação ou Ajustes Diversos: Prefixos doc/ ou misc/ — usados apenas para incrementar a versão de build (ex.: v0.0.0+1).
+</code></pre></div>
+<p>Benefícios do Workflow</p>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span class="linenos" data-linenos="1 "></span>Automação completa: Reduz a intervenção manual e agiliza os processos de build e deploy.
+<span class="linenos" data-linenos="2 "></span>Controle de qualidade: Facilita a separação clara entre ambientes de desenvolvimento e produção.
+<span class="linenos" data-linenos="3 "></span>Rastreabilidade: Garante que cada versão seja facilmente identificável por meio de padrões definidos de nomenclatura e versionamento.
+</code></pre></div>
+<h1 id="workflow-de-deploy-para-o-ambiente-de-desenvolvimento"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 2a2 2 0 1 1-2 2 2 2 0 0 1 2-2m-3.96 1a1.5 1.5 0 1 1-1.5 1.5 1.5 1.5 0 0 1 1.5-1.5M9.09 4.5a1 1 0 1 1-1 1 1 1 0 0 1 1-1M7.04 6a1 1 0 1 1-1 1 1 1 0 0 1 1-1m7.49 6A2.5 2.5 0 0 0 17 9.24 2.6 2.6 0 0 0 14.39 7h-2.48a6 6 0 0 0-5.79 4.4 2 2 0 0 0 .11 1.4 6.8 6.8 0 0 1 .68 2.96 6.9 6.9 0 0 1-.69 2.79 1.92 1.92 0 0 0 .08 1.76 3.62 3.62 0 0 0 3.89 1.6 3.5 3.5 0 0 0 2.17-5.28 2.8 2.8 0 0 1-.45-1.63s-.23-3 2.62-3"/></svg></span> Workflow de Deploy para o Ambiente de Desenvolvimento</h1>
+<p>Este workflow do GitHub Actions automatiza o processo de deploy para o ambiente de desenvolvimento ao detectar um comentário específico (/deploy) em uma issue. Essa funcionalidade atende aos requisitos de integração e entrega de código no workload, promovendo a adoção de práticas de integração e deploy contínuos.</p>
+<h1 id="fluxograma-do-workflow-nao-produtivo"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 2a2 2 0 1 1-2 2 2 2 0 0 1 2-2m-3.96 1a1.5 1.5 0 1 1-1.5 1.5 1.5 1.5 0 0 1 1.5-1.5M9.09 4.5a1 1 0 1 1-1 1 1 1 0 0 1 1-1M7.04 6a1 1 0 1 1-1 1 1 1 0 0 1 1-1m7.49 6A2.5 2.5 0 0 0 17 9.24 2.6 2.6 0 0 0 14.39 7h-2.48a6 6 0 0 0-5.79 4.4 2 2 0 0 0 .11 1.4 6.8 6.8 0 0 1 .68 2.96 6.9 6.9 0 0 1-.69 2.79 1.92 1.92 0 0 0 .08 1.76 3.62 3.62 0 0 0 3.89 1.6 3.5 3.5 0 0 0 2.17-5.28 2.8 2.8 0 0 1-.45-1.63s-.23-3 2.62-3"/></svg></span> Fluxograma do Workflow Não-Produtivo</h1>
+<pre class="mermaid"><code>
+flowchart TD
+  A[[Issue Comment Triggered]]
+    style A fill:#f9f,stroke:#333,stroke-width:2
+  B[[Start Job: build-deploy-dev]]
+    style B fill:#ff9,stroke:#333,stroke-width:2
+  C[[Checkout Code]]
+  D[[Configure AWS Credentials]]
+  E[[Login to Amazon ECR]]
+  F[[Build Container Image]]
+  G[[Setup Kubeconfig for EKS]]
+  H[[Deploy EKS: Development]]
+
+  A --&gt;|Trigger: /deploy| B
+  B --&gt; C
+  C --&gt; D
+  D --&gt; E
+  E --&gt; F
+  F --&gt; G
+  G --&gt; H
+</code></pre>
+<h3 id="detalhes">Detalhes</h3>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span class="linenos" data-linenos=" 1 "></span>Etapas:
+<span class="linenos" data-linenos=" 2 "></span>- Condição: Executa apenas se o corpo do comentário contiver /deploy.
+<span class="linenos" data-linenos=" 3 "></span>- Checkout do código: Faz o checkout do repositório usando actions/checkout@v2.
+<span class="linenos" data-linenos=" 4 "></span>- Configuração das credenciais AWS: Configura as credenciais da AWS utilizando aws-actions/configure-aws-credentials@v1.
+<span class="linenos" data-linenos=" 5 "></span>- Login no registro ECR: Realiza o login no ECR usando aws-actions/amazon-ecr-login@v1.
+<span class="linenos" data-linenos=" 6 "></span>- Build e push da imagem de contêiner:
+<span class="linenos" data-linenos=" 7 "></span>    Constrói a imagem Docker e a envia para o repositório ECR.
+<span class="linenos" data-linenos=" 8 "></span>    Utiliza o SHA do commit com o sufixo -dev como versão da imagem.
+<span class="linenos" data-linenos=" 9 "></span>    Define a versão da imagem no ambiente do GitHub.
+<span class="linenos" data-linenos="10 "></span>- Configuração do Kubeconfig: Configura o kubectl para usar o cluster EKS especificado.
+<span class="linenos" data-linenos="11 "></span>- Deploy no namespace development do cluster EKS:
+<span class="linenos" data-linenos="12 "></span>    Utiliza o kustomize para ajustar a versão da imagem.
+<span class="linenos" data-linenos="13 "></span>    Verifica se o namespace development existe, criando-o se necessário.
+<span class="linenos" data-linenos="14 "></span>    Aplica os manifests Kubernetes com kubectl apply -k.
+</code></pre></div>
+<p>Observações:</p>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span class="linenos" data-linenos="1 "></span>O workflow utiliza o kustomize para personalização dos recursos Kubernetes.
+<span class="linenos" data-linenos="2 "></span>O processo de deploy inclui tratamento de erros para relatar detalhes dos pods em caso de falha.
+</code></pre></div>
+<h1 id="workflow-de-deploy-para-o-ambiente-de-producao"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 2a2 2 0 1 1-2 2 2 2 0 0 1 2-2m-3.96 1a1.5 1.5 0 1 1-1.5 1.5 1.5 1.5 0 0 1 1.5-1.5M9.09 4.5a1 1 0 1 1-1 1 1 1 0 0 1 1-1M7.04 6a1 1 0 1 1-1 1 1 1 0 0 1 1-1m7.49 6A2.5 2.5 0 0 0 17 9.24 2.6 2.6 0 0 0 14.39 7h-2.48a6 6 0 0 0-5.79 4.4 2 2 0 0 0 .11 1.4 6.8 6.8 0 0 1 .68 2.96 6.9 6.9 0 0 1-.69 2.79 1.92 1.92 0 0 0 .08 1.76 3.62 3.62 0 0 0 3.89 1.6 3.5 3.5 0 0 0 2.17-5.28 2.8 2.8 0 0 1-.45-1.63s-.23-3 2.62-3"/></svg></span> Workflow de Deploy para o Ambiente de Produção</h1>
+<p>Este workflow automatiza o processo de versionamento, build, publicação de imagem Docker no Amazon ECR e deploy no ambiente de produção no cluster Kubernetes gerenciado pelo EKS. Ele é acionado automaticamente ao realizar um push na branch main.</p>
+<h1 id="fluxograma-do-workflow-de-producao"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 2a2 2 0 1 1-2 2 2 2 0 0 1 2-2m-3.96 1a1.5 1.5 0 1 1-1.5 1.5 1.5 1.5 0 0 1 1.5-1.5M9.09 4.5a1 1 0 1 1-1 1 1 1 0 0 1 1-1M7.04 6a1 1 0 1 1-1 1 1 1 0 0 1 1-1m7.49 6A2.5 2.5 0 0 0 17 9.24 2.6 2.6 0 0 0 14.39 7h-2.48a6 6 0 0 0-5.79 4.4 2 2 0 0 0 .11 1.4 6.8 6.8 0 0 1 .68 2.96 6.9 6.9 0 0 1-.69 2.79 1.92 1.92 0 0 0 .08 1.76 3.62 3.62 0 0 0 3.89 1.6 3.5 3.5 0 0 0 2.17-5.28 2.8 2.8 0 0 1-.45-1.63s-.23-3 2.62-3"/></svg></span> Fluxograma do Workflow de Produção</h1>
+<pre class="mermaid"><code>flowchart TD
+    A[Push na branch main] --&gt;|Trigger| B[Job: Version]
+    B --&gt;|Calcula nova versão semântica| C[Cria tag Git]
+    C --&gt; D[Job: Build]
+    D --&gt;|Faz login no ECR e publica imagem| E[Publica imagem com nova versão]
+    E --&gt; F[Job: Deploy]
+    F --&gt;|Configura o Kubeconfig| G[Verifica namespace e ajusta manifests]
+    G --&gt;|Aplica recursos no Kubernetes| H[Deploy concluído]
+    H --&gt;|Erro?| I{Erro no Deploy?}
+    I --&gt;|Sim| J[Exibe logs de pods e detalhes]
+    I --&gt;|Não| K[Deploy bem-sucedido]</code></pre>
+<h3 id="detalhes_1">Detalhes</h3>
+<ol>
+<li>Gerenciamento de Versão</li>
+</ol>
+<p>Este job calcula e cria uma nova versão semântica baseada no histórico de commits.
+Este job é executado apenas quando há um push para a branch main e não é acionado pelo bot do GitHub Actions. A saída deste job é uma nova versão semântica, armazenada na variável <code>semver_tag</code>.</p>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span class="linenos" data-linenos="1 "></span>Etapas:
+<span class="linenos" data-linenos="2 "></span>- Checkout do repositório: Garante acesso ao histórico completo dos commits.
+<span class="linenos" data-linenos="3 "></span>- Listagem de tags Git: Identifica a versão mais recente.
+<span class="linenos" data-linenos="4 "></span>- Cálculo de nova versão: Utiliza o branching model trunk-based para determinar a próxima versão.
+<span class="linenos" data-linenos="5 "></span>- Criação de tag Git: Cria e associa a nova tag ao commit atual.
+</code></pre></div>
+<ol>
+<li>Build e Push da Imagem Docker</li>
+</ol>
+<p>Este job constrói a imagem Docker da aplicação e publica no Amazon ECR.</p>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span class="linenos" data-linenos="1 "></span>Etapas:
+<span class="linenos" data-linenos="2 "></span>- Checkout do repositório.
+<span class="linenos" data-linenos="3 "></span>- Configuração de credenciais AWS: Configura acesso seguro para interagir com o ECR.
+<span class="linenos" data-linenos="4 "></span>- Login no registro ECR: Autentica no ECR privado.
+<span class="linenos" data-linenos="5 "></span>- Build e push da imagem Docker:
+<span class="linenos" data-linenos="6 "></span>    Utiliza a nova versão semântica como tag da imagem.
+<span class="linenos" data-linenos="7 "></span>    Faz o push da imagem para o ECR.
+</code></pre></div>
+<ol>
+<li>Deploy no Kubernetes</li>
+</ol>
+<p>Este job realiza o deploy da aplicação no ambiente de produção, utilizando o namespace production.</p>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span class="linenos" data-linenos=" 1 "></span>Etapas:
+<span class="linenos" data-linenos=" 2 "></span>
+<span class="linenos" data-linenos=" 3 "></span>- Checkout do repositório.
+<span class="linenos" data-linenos=" 4 "></span>- Configuração de credenciais AWS.
+<span class="linenos" data-linenos=" 5 "></span>- Setup do Kubeconfig: Configura o acesso ao cluster EKS.
+<span class="linenos" data-linenos=" 6 "></span>- Deploy com kustomize:
+<span class="linenos" data-linenos=" 7 "></span>    Verifica se o namespace production existe, criando-o caso necessário.
+<span class="linenos" data-linenos=" 8 "></span>    Ajusta a versão da imagem no diretório infra/kubernetes/production.
+<span class="linenos" data-linenos=" 9 "></span>    Aplica os manifests no cluster Kubernetes.
+<span class="linenos" data-linenos="10 "></span>    Em caso de erro, exibe detalhes dos pods para facilitar a depuração.
+</code></pre></div>
+<p>Observações</p>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span class="linenos" data-linenos="1 "></span>Controle de versão: Utiliza o SemVer para versionamento consistente.
+<span class="linenos" data-linenos="2 "></span>Personalização Kubernetes: O deploy utiliza o kustomize para gerenciar configurações específicas do ambiente.
+<span class="linenos" data-linenos="3 "></span>Tratamento de erros: Logs detalhados são exibidos em caso de falha no deploy, facilitando a análise.
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Voltar para o topo
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Rodapé" >
+        
+          
+          <a href="../eks_infra_cicd/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: EKS infra">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                EKS infra
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../sls_setup/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Serverless">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Próximo
+              </span>
+              <div class="md-ellipsis">
+                Serverless
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; Software Architecture Team 2024
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.top", "navigation.footer", "content.code.annotate", "content.code.copy", "content.code.select", "search.highlight", "search.share", "search.suggest"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f1b6f286.min.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  <script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(() => { lightbox.reload() });
+</script></body>
+</html>
