@@ -109,7 +109,7 @@ nav:
       - CI/CD App: "fase_3/cicd_code_app.md"
       - Serverless: "fase_3/sls_setup.md"
     - Fase 4:
-      - Arquitetura: "fase_4/architecture.md"
+      - Arquitetura de microsserviços: "fase_4/ms_architecture.md"
       - Integração contínua: "fase_4/continuous_integration.md"
       - Vídeos: "fase_4/movies.md"
   - Guia:

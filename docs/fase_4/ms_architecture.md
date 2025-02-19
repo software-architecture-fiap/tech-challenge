@@ -2,9 +2,9 @@
 
 Nesta documentação, detalharemos três microsserviços principais da nossa plataforma:
 
-1. **Auth Service**: Responsável pela autenticação de usuários e geração de tokens JWT.
-2. **Payment Service**: Gerencia a integração de pagamentos através do MercadoPago.
-3. **Order Service**: Cuida do gerenciamento de pedidos e sua interação com o Payment Service.
+1. [**Auth Service**](https://github.com/software-architecture-fiap/tc-auth-service): Responsável pela autenticação de usuários e geração de tokens JWT.
+2. [**Order Service**](https://github.com/software-architecture-fiap/tc-order-service): Cuida do gerenciamento de pedidos e sua interação com o Payment Service.
+3. [**Payment Service**](https://github.com/software-architecture-fiap/tc-payment-service): Gerencia a integração de pagamentos através do MercadoPago.
 
 Cada serviço é desenvolvido utilizando tecnologias específicas e possui funcionalidades e endpoints próprios, garantindo uma arquitetura modular e escalável.
 
